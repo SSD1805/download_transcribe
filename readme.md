@@ -64,14 +64,91 @@ This project automates the process of:
    ```bash
    pip install -r requirements.txt
    ```
+   
+## Requirements
 
-3. **Install `ffmpeg`**:
-   - **Windows**: [Download and install `ffmpeg`](https://ffmpeg.org/download.html). Add it to your system's `PATH`.
-   - **Linux/macOS**: Install via package manager:
-     ```bash
-     sudo apt install ffmpeg  # For Linux
-     brew install ffmpeg      # For macOS
-     ```
+- **Python**: Ensure you have Python 3.x installed.
+- **yt-dlp**: A powerful tool to download videos and audio from YouTube.
+- **Whisper AI**: An automatic speech recognition (ASR) system for transcription.
+- **ffmpeg**: A command-line tool used by `yt-dlp` to extract and convert audio formats.
+
+## Installation
+
+### 1. Clone the Repository
+Download or clone this repository to your local machine.
+
+### 2. Install Python Packages
+
+Run the following command to install the required Python packages:
+
+```bash
+pip install yt-dlp whisper
+```
+
+### 3. Install `ffmpeg`
+
+`ffmpeg` is required for `yt-dlp` to extract and convert audio files. Follow the instructions below based on your operating system.
+
+#### **Windows**:
+
+1. Download `ffmpeg` from the official site: [https://ffmpeg.org/download.html](https://ffmpeg.org/download.html).
+   - Download the **Windows build**.
+   
+2. Extract the downloaded `.zip` file and move the extracted folder (e.g., `ffmpeg-<version>-full_build`) to a desired location (e.g., `C:\ffmpeg`).
+
+3. Add `ffmpeg` to your system's `PATH`:
+   - Open **Control Panel** → **System and Security** → **System** → **Advanced system settings**.
+   - Click on **Environment Variables**.
+   - In the **System variables** section, find the `Path` variable and click **Edit**.
+   - Click **New** and add the path to the `bin` directory of `ffmpeg` (e.g., `C:\ffmpeg\bin`).
+   - Click **OK** to close all windows.
+
+4. Verify the installation by opening the command prompt and typing:
+
+```bash
+ffmpeg -version
+```
+
+You should see the version information for `ffmpeg`.
+
+#### **Linux (Ubuntu/Debian)**:
+
+Run the following commands to install `ffmpeg`:
+
+```bash
+sudo apt update
+sudo apt install ffmpeg
+```
+
+Verify the installation by running:
+
+```bash
+ffmpeg -version
+```
+
+#### **macOS**:
+
+If you have **Homebrew** installed, you can use it to install `ffmpeg`:
+
+```bash
+brew install ffmpeg
+```
+
+Verify the installation by running:
+
+```bash
+ffmpeg -version
+```
+
+### 4. Install Additional Dependencies for Whisper
+
+You may also need to install additional dependencies for Whisper, such as `torch`:
+
+```bash
+pip install torch
+```
+
+
 
 4. **Set Up Environment Variables** (Optional):
    These can improve functionality if set up.
