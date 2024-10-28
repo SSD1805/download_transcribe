@@ -7,4 +7,4 @@ ffmpeg-python  # Python bindings for ffmpeg
 # NLP libraries for text processing and formatting
 gensim==4.1.2
 flair==0.9
-transformers==4.12.5
+transformers==4.38.0
