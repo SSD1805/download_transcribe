@@ -3,7 +3,10 @@
 
 # YouTube Audio Downloader and Transcriber with Whisper AI
 
-This project downloads audio from YouTube videos and transcribes them using Whisper AI. Designed for ease of use, it is accessible to non-technical users and beginner coders.
+This project downloads audio from YouTube videos and transcribes them using Whisper AI. 
+
+I tried to design this repo with ease of use in mind. I'm hoping it's accessible to non-technical users exploring how to code as well as beginner coders.
+
 
 ## Table of Contents
 
