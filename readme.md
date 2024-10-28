@@ -153,7 +153,7 @@ pip install torch
 
 
 
-4. **Set Up Environment Variables** (Optional):
+1. **Set Up Environment Variables** (Optional):
    These can improve functionality if set up.
    - **Linux/macOS**:
      ```bash
@@ -168,7 +168,7 @@ pip install torch
      set TRANSCRIPTION_FORMAT=txt
      ```
 
-5. **Run in Docker (Optional)**:
+2. **Run in Docker (Optional)**:
    To run the project in a containerized environment:
    ```bash
    docker build -t your_image_name .
