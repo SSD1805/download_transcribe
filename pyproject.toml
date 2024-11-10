@@ -1,0 +1,54 @@
+[tool.poetry]
+name = "requirements"
+version = "0.1.0"
+description = "Core dependencies for transcription and audio processing"
+authors = ["SSD"]
+license = "MIT"
+readme = "README.md"
+packages = [
+    { include = "app" },
+    { include = "src" }
+]
+
+[tool.poetry.dependencies]
+# Python compatibility range
+python = ">=3.10,<3.13"
+
+# Core dependencies for transcription and audio processing
+openai-whisper = { git = "https://github.com/openai/whisper.git" }  # Whisper AI for automatic transcription
+speechbrain = "^0.5.13"  # Advanced speech processing and speaker identification
+torch = "^2.0.1"  # Deep learning library used by Whisper and SpeechBrain
+
+# Scientific libraries for data processing
+numpy = "^1.23"  # Numerical operations and array manipulation
+pandas = "^1.5"  # Data manipulation and analysis in tabular format
+scipy = "^1.10"  # Scientific computing tools and algorithms
+
+# NLP tools for text processing
+nltk = "^3.8"  # Natural Language Toolkit for tokenization and sentence segmentation
+spacy = "^3.5"  # NLP library for tasks like named entity recognition
+spacy-transformers = "^1.2"  # Transformer integration within spaCy for advanced NLP capabilities
+
+# Audio utilities for handling and processing audio files
+pydub = "^0.25"  # Audio processing library (e.g., cutting, joining, and format conversion)
+soundfile = "^0.12"  # For reading and writing audio files in various formats
+
+# Utilities for convenience and task automation
+requests = "^2.31"  # Library for making HTTP requests (e.g., web scraping, APIs)
+tqdm = "^4.65"  # Library for displaying progress bars for long-running tasks
+tenacity = "^8.2"  # Retry logic to handle potential transient errors in tasks
+python-dotenv = "^1.0"  # Loads environment variables from a .env file into the Python environment
+pyyaml = "^6.0"  # YAML parser for reading and writing configuration files
+click = "^8.1.3"  # Command-line interface creation library
+
+[tool.poetry.dev-dependencies]
+# Libraries for development, testing, and quality assurance
+pytest = "^7.0"  # Testing framework for Python
+pytest-cov = "^4.0"  # Coverage plugin for pytest to check code coverage
+black = "^23.0"  # Code formatter to ensure consistent code style
+flake8 = "^6.0"  # Linting tool for checking code quality and potential errors
+mypy = "^1.0"  # Static type checker for Python
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,10 +1,24 @@
 download:
   delay: 10  # delay in seconds between downloads
-  cookiefile_path: "/path/to/your/youtube_cookies.txt"
+  cookiefile_path: "/path/to/your/youtube_cookies.txt"  # Optional cookie file for YouTube downloads
 
 whisper:
-  model: "base"  # model size options: base, small, medium, large
+  model: "base"  # Whisper model size: base, small, medium, large
+  timestamps: true  # Enable timestamps in Whisper transcription
+  segmentation: true  # Segment transcriptions into readable chunks
+  noise_suppression: true  # Apply noise suppression if supported
+
+processing:
+  sentence_segmentation: true  # Segment transcription into sentences
+  ner: true  # Perform named entity recognition
+  save_format: "csv"  # Output format for processed files: options are 'csv' or 'json'
+  output_dir: "/app/processed_transcriptions"  # Directory for storing processed transcriptions
 
 directories:
-  podcast_audio_dir: "./app/podcast_audio"
-  transcriptions_dir: "./app/transcriptions"
+  audio_files_dir: "/app/audio_files"  # Updated directory for audio files
+  transcriptions_dir: "/app/transcriptions"  # Directory for raw transcriptions
+  scripts_dir: "/src/scripts"  # Directory for script files
+
+logging:
+  level: "INFO"  # Logging level, options: DEBUG, INFO, WARNING, ERROR
+  output_file: "/app/logs/app.log"  # Optional log file path

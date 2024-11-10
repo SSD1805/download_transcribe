@@ -1,314 +1,209 @@
+# YouTube Audio Downloader and Transcriber
 
----
+This project provides a comprehensive tool to download audio from YouTube videos or channels using `yt-dlp`, transcribe the audio using Whisper AI, and process the transcriptions for further analysis. It incorporates robust error handling, modular structure, and clear configuration options to enhance functionality and maintainability.
 
-# YouTube Audio Downloader and Transcriber with Whisper AI
+## Features
+### Audio and Transcription
+- **Audio Download**: Utilizes `yt-dlp` to download audio from YouTube in `.mp3` format, supporting both individual videos and entire channels.
+- **Transcription**: Automatically transcribes audio files using Whisper AI and saves the transcriptions as `.txt` files.
+- **Skip Existing Files**: Checks if both the audio file and its transcription already exist, skipping redundant processes.
 
-This project downloads audio from YouTube videos and transcribes them using Whisper AI. 
+### Modular Structure and Processing
+- **Modular Codebase**: Separate modules for audio processing, file management, transcription, configuration management, and text processing.
+- **Processing Transcriptions**: Segments transcriptions into sentences, applies NER using spaCy, and tokenizes sentences with NLTK.
+- **Folder Management**: Organizes audio files in `/app/audio_files` and transcriptions in `/app/transcriptions`.
+- **File Management**: Manages file paths, sanitizes file names, tracks progress, and logs metadata to CSV.
 
-I tried to design this repo with ease of use in mind. I'm hoping it's accessible to non-technical users exploring how to code as well as beginner coders.
+### Configuration and Logging
+- **Configuration**: Customizable settings in `config.yaml` for download delay, Whisper model size, directories, etc.
+- **Logging**: Configurable logging through `logger.py`, supporting both console and file logging based on `.env` settings.
+- **Environment Variable Support**: Uses `python-dotenv` to load environment variables from a `.env` file.
 
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [How to Run](#how-to-run)
-- [Module Breakdown](#module-breakdown)
-- [Common Issues](#common-issues)
-- [Next Steps and Customization](#next-steps-and-customization)
-
-## Overview
-
-This project automates the process of:
-1. **Downloading audio from YouTube** using `yt-dlp`.
-2. **Transcribing audio files** into text using Whisper AI.
-3. **Organizing files** using a dedicated file management module.
+### Deployment and Containerization
+- **Docker Support**: Contains a `Dockerfile` for building a consistent deployment image.
+- **Environment Variables**: Easily configured through a `.env` file.
 
 ## Project Structure
-
 ```
-.
-├── main.py              # Central script to run the project
-├── audio_downloader.py  # Downloads audio from YouTube
-├── transcriber.py       # Transcribes audio files
-├── file_manager.py      # Manages files and directories
-├── podcast_audio        # Stores downloaded audio files
-├── transcriptions       # Stores transcriptions
-└── README.md            # Documentation
+/app
+|-- audio_files
+|-- logs
+|-- podcast_audio
+|-- transcriptions
+|-- src
+    |-- modules
+        |-- audio_processing.py
+        |-- config_manager.py
+        |-- file_manager.py
+        |-- logger.py
+        |-- text_processor.py
+        |-- transcriber.py
+        |-- transcription_manager.py
+        |-- youtube_downloader.py
+    |-- scripts
+    |-- utils
+        |-- helper_functions.py
+|-- tests
+.env
+app.py
+config.yaml
+Dockerfile
+pyproject.toml
+README.md
 ```
 
-- **`main.py`**: Orchestrates downloading and transcribing.
-- **`audio_downloader.py`**: Handles audio downloads.
-- **`transcriber.py`**: Transcribes audio using Whisper AI.
-- **`file_manager.py`**: Ensures proper file organization.
-
-## Installation
-
-### Prerequisites
-
-- **Python 3.9+**
-- **`ffmpeg`**: Required for `yt-dlp` to handle audio extraction.
-- **Environment Variables** (Optional):
-  - `FFMPEG_PATH`: Path to `ffmpeg` executable.
-  - `WHISPER_MODEL_SIZE`: Specify the Whisper model size (`"base"`, `"small"`, etc.).
-  - `TRANSCRIPTION_FORMAT`: Format for transcriptions (`"txt"` or `"json"`).
-
-### Step-by-Step Setup
-
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/yourproject.git
-   cd yourproject
-   ```
-
-2. **Install Required Packages**:
-   Run this command to install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-   
 ## Requirements
-
-- **Python**: Ensure you have Python 3.x installed.
-- **yt-dlp**: A powerful tool to download videos and audio from YouTube.
-- **Whisper AI**: An automatic speech recognition (ASR) system for transcription.
-- **ffmpeg**: A command-line tool used by `yt-dlp` to extract and convert audio formats.
+- **Python**: Ensure Python 3.12 or higher is installed.
+- **yt-dlp**: Tool for downloading YouTube audio.
+- **Whisper AI**: Automatic speech recognition for transcriptions.
+- **ffmpeg**: Essential for audio extraction and conversion.
+- **Additional Libraries**:
+  - `torch`: Core dependency for machine learning tasks.
+  - `speechbrain`: For advanced audio processing.
+  - `numpy`, `pandas`, `scipy`: For data manipulation and scientific computing.
+  - `nltk`, `spacy`, `spacy-transformers`: For NLP tasks.
+  - `pydub`, `soundfile`: Audio manipulation and file handling.
+  - `requests`, `tqdm`, `tenacity`, `python-dotenv`, `pyyaml`: Various utility functions and environment handling.
 
 ## Installation
 
 ### 1. Clone the Repository
-Download or clone this repository to your local machine.
+Clone this repository to your local machine.
 
-### 2. Install Python Packages
-
-Run the following command to install the required Python packages:
-
-```bash
-pip install yt-dlp whisper
-```
-
-### 3. Install `ffmpeg`
-
-`ffmpeg` is required for `yt-dlp` to extract and convert audio files. Follow the instructions below based on your operating system.
-
-#### **Windows**:
-
-1. Download `ffmpeg` from the official site: [https://ffmpeg.org/download.html](https://ffmpeg.org/download.html).
-   - Download the **Windows build**.
-   
-2. Extract the downloaded `.zip` file and move the extracted folder (e.g., `ffmpeg-<version>-full_build`) to a desired location (e.g., `C:\ffmpeg`).
-
-3. Add `ffmpeg` to your system's `PATH`:
-   - Open **Control Panel** → **System and Security** → **System** → **Advanced system settings**.
-   - Click on **Environment Variables**.
-   - In the **System variables** section, find the `Path` variable and click **Edit**.
-   - Click **New** and add the path to the `bin` directory of `ffmpeg` (e.g., `C:\ffmpeg\bin`).
-   - Click **OK** to close all windows.
-
-4. Verify the installation by opening the command prompt and typing:
+### 2. Install Dependencies Using Poetry
+Ensure `Poetry` is installed. Run the following command:
 
 ```bash
-ffmpeg -version
+poetry install
 ```
 
-You should see the version information for `ffmpeg`.
+This command reads `pyproject.toml` and `poetry.lock` to set up the environment with all necessary dependencies.
 
-#### **Linux (Ubuntu/Debian)**:
+### 3. Install ffmpeg
+Install `ffmpeg` by following the instructions based on your operating system. This step is essential for `yt-dlp` to extract and convert audio files.
 
-Run the following commands to install `ffmpeg`:
+## Usage
+
+### Run the Application
 
 ```bash
-sudo apt update
-sudo apt install ffmpeg
+poetry run python app.py
 ```
 
-Verify the installation by running:
+### Command-line Arguments
+The `app.py` file supports various command-line arguments for running different modules:
 
 ```bash
-ffmpeg -version
+poetry run python app.py download --url "https://youtube.com/your-video"
+poetry run python app.py transcribe audio.mp3 --title "Your Title"
+poetry run python app.py process --directory "/app/transcriptions"
+poetry run python app.py setup --config-path "config.yaml"
+poetry run python app.py manage_files --directory "/app/audio_files"
 ```
 
-#### **macOS**:
+### Using Click
+The application uses the `click` library to create a command-line interface (CLI). Here are the available commands:
 
-If you have **Homebrew** installed, you can use it to install `ffmpeg`:
+- **download**: Downloads audio from a YouTube URL.
+  ```bash
+  poetry run python app.py download --url "https://youtube.com/your-video"
+  ```
 
-```bash
-brew install ffmpeg
-```
+- **transcribe**: Transcribes the provided audio file.
+  ```bash
+  poetry run python app.py transcribe audio.mp3 --title "Your Title"
+  ```
 
-Verify the installation by running:
+- **process**: Processes transcriptions for NER and sentence segmentation.
+  ```bash
+  poetry run python app.py process --directory "/app/transcriptions"
+  ```
 
-```bash
-ffmpeg -version
-```
+- **setup**: Sets up configuration for the application.
+  ```bash
+  poetry run python app.py setup --config-path "config.yaml"
+  ```
 
-### 4. Install Additional Dependencies for Whisper
+- **manage_files**: Manages files in the specified directory.
+  ```bash
+  poetry run python app.py manage_files --directory "/app/audio_files"
+  ```
 
-You may also need to install additional dependencies for Whisper, such as `torch`:
+### Example Workflows
 
-```bash
-pip install torch
-```
+#### Scenario 1: Processing Pre-existing Audio Files
+If you already have audio files and want to transcribe and process them, you can use the `transcribe` and `process` commands.
 
-
-
-1. **Set Up Environment Variables** (Optional):
-   These can improve functionality if set up.
-   - **Linux/macOS**:
-     ```bash
-     export FFMPEG_PATH="/path/to/ffmpeg"
-     export WHISPER_MODEL_SIZE="base"
-     export TRANSCRIPTION_FORMAT="txt"
-     ```
-   - **Windows**:
-     ```cmd
-     set FFMPEG_PATH=C:\path\to\ffmpeg
-     set WHISPER_MODEL_SIZE=base
-     set TRANSCRIPTION_FORMAT=txt
-     ```
-
-2. **Run in Docker (Optional)**:
-   To run the project in a containerized environment:
+1. **Transcribe an Audio File**:
    ```bash
-   docker build -t your_image_name .
-   docker run -v $(pwd)/podcast_audio:/app/podcast_audio -v $(pwd)/transcriptions:/app/transcriptions your_image_name
+   poetry run python app.py transcribe /path/to/audio.mp3 --title "Existing Audio"
    ```
 
-## How to Run
-
-1. **Set the YouTube Channel URL in `main.py`**:
-   Update the `channel_url` variable in `main.py` with the YouTube channel or playlist URL.
-
-2. **Run the Main Script**:
+2. **Process Transcriptions**:
    ```bash
-   python main.py
+   poetry run python app.py process --directory "/app/transcriptions"
    ```
 
-   The script will automatically download and transcribe videos from the specified YouTube channel.
+#### Scenario 2: Downloading and Processing Audio Files
+If you want to download audio files from YouTube and then process them through the rest of the modules, you can chain the commands.
 
-## Module Breakdown
+1. **Download Audio from YouTube**:
+   ```bash
+   poetry run python app.py download --url "https://youtube.com/your-video"
+   ```
 
-### 1. `audio_downloader.py`
+2. **Transcribe the Downloaded Audio**:
+   ```bash
+   poetry run python app.py transcribe /app/audio_files/downloaded_audio.mp3 --title "Downloaded Audio"
+   ```
 
-Handles downloading audio from YouTube.
+3. **Process Transcriptions**:
+   ```bash
+   poetry run python app.py process --directory "/app/transcriptions"
+   ```
 
-- **Features**:
-  - **Progress Logging**: Provides download progress updates.
-  - **Retry Mechanism**: Retries downloads on network failure.
-  - **Dynamic `ffmpeg` Path**: Reads the `ffmpeg` location from `FFMPEG_PATH`.
+#### Scenario 3: Full Workflow Automation
+To automate the entire workflow from downloading to processing, you can create a script that runs all the commands sequentially.
 
-- **Code Sample**:
-  ```python
-  import yt_dlp
+```bash
+#!/bin/bash
 
-  ydl_opts = {
-      'format': 'bestaudio/best',
-      'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '192'}],
-      'outtmpl': './podcast_audio/%(title)s.%(ext)s',
-      'ignoreerrors': True,
-  }
+# Download audio from YouTube
+poetry run python app.py download --url "https://youtube.com/your-video"
 
-  def download_audio(video_url):
-      with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-          ydl.download([video_url])
-  ```
+# Transcribe the downloaded audio
+poetry run python app.py transcribe /app/audio_files/downloaded_audio.mp3 --title "Downloaded Audio"
 
-### 2. `transcriber.py`
+# Process the transcriptions
+poetry run python app.py process --directory "/app/transcriptions"
+```
 
-Uses Whisper AI to transcribe audio files to text.
+Save this script as `run_workflow.sh` and execute it:
+```bash
+bash run_workflow.sh
+```
 
-- **Configurable Model**: Select Whisper model size with `WHISPER_MODEL_SIZE`.
-- **Flexible Output Formats**: Transcriptions can be saved as `.txt` or `.json`.
+## Configuration
+Configure the `config.yaml` file for customizable settings like download delay, directories, Whisper model size, and more.
 
-- **Code Sample**:
-  ```python
-  import whisper
+## Logging
+The project uses `logger.py` to handle logging, configured via environment variables set in the `.env` file:
 
-  whisper_model = whisper.load_model("base")
+```
+LOG_FILE_PATH=/app/logs/app.log
+LOG_LEVEL=10
+LOG_MAX_BYTES=10485760
+LOG_BACKUP_COUNT=5
+ENABLE_CONSOLE_LOGGING=true
+ENABLE_FILE_LOGGING=true
+```
 
-  def transcribe_audio(audio_file, title, transcriptions_dir):
-      result = whisper_model.transcribe(audio_file)
-      with open(f"{transcriptions_dir}/{title}.txt", 'w') as f:
-          f.write(result['text'])
-  ```
+## Testing
+The `tests` folder contains unit tests for individual modules to ensure that components like `audio_processing`, `file_manager`, and `transcriber` work as expected. Use the following command to run tests:
 
-### 3. `file_manager.py`
-
-Utility functions to manage files and directories.
-
-- **Ensures Directories Exist**: Verifies required folders are created.
-- **File Existence Check**: Skips existing files to avoid reprocessing.
-
-- **Code Sample**:
-  ```python
-  import os
-
-  def ensure_directories_exist(*directories):
-      for directory in directories:
-          if not os.path.exists(directory):
-              os.makedirs(directory)
-
-  def sanitize_filename(title):
-      return ''.join(c if c.isalnum() or c in (' ', '.', '_') else '_' for c in title)
-  ```
-
-### 4. `main.py`
-
-Orchestrates the downloading and transcribing.
-
-- **Parallel Processing**: Allows concurrent downloads and transcriptions using `ThreadPoolExecutor`.
-- **Usage of `max_workers`**:
-  - **Why**: Parallel processing speeds up large playlists.
-  - **Adjustable**: `max_workers` can be increased or decreased based on system capacity.
-
-- **Code Sample**:
-  ```python
-  from audio_downloader import download_audio_from_channel
-  from transcriber import transcribe_audio
-  from file_manager import ensure_directories_exist, files_exist
-
-  def download_and_transcribe(channel_url):
-      video_entries = download_audio_from_channel(channel_url)
-      for video_info in video_entries:
-          if not files_exist(video_info['title']):
-              download_audio(video_info['url'])
-              transcribe_audio(video_info['title'])
-  ```
-
-## Common Issues
-
-1. **`ffmpeg` Not Found**:
-   - Ensure `ffmpeg` is installed and added to the system `PATH`.
-
-2. **Unavailable Videos**:
-   - Some videos might be private or restricted. The script skips such videos and logs the error.
-
-3. **Slow Transcription**:
-   - Whisper AI can be slow for long files. To speed up, try smaller models by adjusting `WHISPER_MODEL_SIZE`.
-
-4. **Large File Sizes**:
-   - Ensure enough storage for downloaded audio files, especially for long playlists.
-
-## Next Steps and Customization
-
-### Ideas for Expansion
-
-1. **Advanced Whisper Models**:
-   - Experiment with larger Whisper models for improved transcription accuracy.
-
-2. **Batch Processing**:
-   - Automate the script to run at scheduled intervals.
-
-3. **Support for Multiple Platforms**:
-   - Extend the `audio_downloader` module to download from other platforms like Vimeo.
-
-4. **Enhanced File Management**:
-   - Use a database to manage and track processed files, particularly useful for large datasets.
+```bash
+pytest tests/
+```
 
 ## License
-
 This project is licensed under the MIT License.
-
---- 
-
