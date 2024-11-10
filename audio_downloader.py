@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # Environment and Path Configurations
 FFMPEG_PATH = os.getenv("FFMPEG_PATH", "ffmpeg")
 PODCAST_AUDIO_DIR = os.path.abspath('./podcast_audio')
-COOKIE_PATH = r'C:\Users\share\Downloads\youtube.com_cookies.txt'
+COOKIE_PATH = r'C:\Users\user\Downloads\youtube.com_cookies.txt'
 
 # Ensure the podcast_audio directory exists
 if not os.path.exists(PODCAST_AUDIO_DIR):
