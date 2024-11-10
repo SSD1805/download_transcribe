@@ -27,10 +27,6 @@ RUN pip install --upgrade pip && \
 RUN poetry config virtualenvs.create false && \
     poetry install --no-dev --no-interaction --no-ansi
 
-# Clone Whisper AI repository and install its dependencies
-RUN git clone https://github.com/openai/whisper.git /app/whisper && \
-    poetry run pip install --no-cache-dir -r /app/whisper/requirements.txt --no-build-isolation
-
 # Install spaCy and its model
 RUN poetry run pip install spacy && \
     poetry run python -m spacy download en_core_web_sm

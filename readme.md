@@ -5,7 +5,7 @@ This project provides a comprehensive tool to download audio from YouTube videos
 ## Features
 ### Audio and Transcription
 - **Audio Download**: Utilizes `yt-dlp` to download audio from YouTube in `.mp3` format, supporting both individual videos and entire channels.
-- **Transcription**: Automatically transcribes audio files using Whisper AI and saves the transcriptions as `.txt` files.
+- **Transcription**: Automatically transcribes audio files using WhisperX and saves the transcriptions as `.txt` files.
 - **Skip Existing Files**: Checks if both the audio file and its transcription already exist, skipping redundant processes.
 
 ### Modular Structure and Processing
@@ -55,7 +55,7 @@ README.md
 ## Requirements
 - **Python**: Ensure Python 3.12 or higher is installed.
 - **yt-dlp**: Tool for downloading YouTube audio.
-- **Whisper AI**: Automatic speech recognition for transcriptions.
+- **WhisperX**: Advanced ASR tool with word-level timestamps and alignment.
 - **ffmpeg**: Essential for audio extraction and conversion.
 - **Additional Libraries**:
   - `torch`: Core dependency for machine learning tasks.

@@ -16,6 +16,7 @@ python = ">=3.10,<3.13"
 
 # Core dependencies for transcription and audio processing
 openai-whisper = { git = "https://github.com/openai/whisper.git" }  # Whisper AI for automatic transcription
+whisperx = "^0.x" # WhisperX - Advanced ASR (Automatic Speech Recognition) tool with word-level timestamps and alignment
 speechbrain = "^0.5.13"  # Advanced speech processing and speaker identification
 torch = "^2.0.1"  # Deep learning library used by Whisper and SpeechBrain
 
