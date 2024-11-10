@@ -1,9 +1,8 @@
 import os
 import time
-import pandas as pd
 import nltk
 from tqdm import tqdm
-from audio_downloader import download_audio_from_channel, download_audio
+from src.scripts.audio_downloader import download_audio_from_channel, download_audio
 from transcriber import transcribe_audio
 from app.file_manager import ensure_directories_exist, files_exist, sanitize_filename
 
