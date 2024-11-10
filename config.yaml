@@ -1,6 +1,9 @@
 download:
-  delay: 10  # delay in seconds between downloads
+  delay: 10  # Delay in seconds between downloads
+  retries: 3  # Number of retry attempts for failed downloads
+  timeout: 30  # Timeout in seconds for each download attempt
   cookiefile_path: "/path/to/your/youtube_cookies.txt"  # Optional cookie file for YouTube downloads
+  user_agent: "Mozilla/5.0"  # Custom user agent string
 
 whisper:
   model: "base"  # Whisper model size: base, small, medium, large
@@ -8,17 +11,40 @@ whisper:
   segmentation: true  # Segment transcriptions into readable chunks
   noise_suppression: true  # Apply noise suppression if supported
 
+whisperx:
+  alignment: true  # Enable phoneme or word-level alignment
+  diarization: true  # Enable speaker diarization
+
 processing:
   sentence_segmentation: true  # Segment transcription into sentences
   ner: true  # Perform named entity recognition
   save_format: "csv"  # Output format for processed files: options are 'csv' or 'json'
   output_dir: "/app/processed_transcriptions"  # Directory for storing processed transcriptions
 
+transcription_post_processing:
+  remove_noise: true  # Clean up background noise in the transcription
+  spell_check: true  # Apply spell checking to final output
+
 directories:
-  audio_files_dir: "/app/audio_files"  # Updated directory for audio files
+  audio_files_dir: "/app/audio_files"  # Directory for audio files
   transcriptions_dir: "/app/transcriptions"  # Directory for raw transcriptions
   scripts_dir: "/src/scripts"  # Directory for script files
+  archive_dir: "/app/archived_transcriptions"  # Directory for archiving processed files
 
 logging:
   level: "INFO"  # Logging level, options: DEBUG, INFO, WARNING, ERROR
-  output_file: "/app/logs/app.log"  # Optional log file path
+  output_file: "/app/logs/app.log"  # Log file path
+  console_logging: true  # Enable console logging
+  file_logging: true  # Enable file-based logging
+  max_bytes: 10485760  # Log rotation file size limit (10 MB)
+  backup_count: 5  # Number of log backups to keep
+
+environment: "development"  # Environment mode (e.g., development, production)
+
+error_handling:
+  retry_on_failure: true  # Retry tasks on failure
+  max_retries: 5  # Max number of retries
+  retry_delay: 5  # Delay between retries (in seconds)
+
+file_management:
+  auto_cleanup: true  # Automatically clean up processed files

@@ -31,6 +31,9 @@ RUN poetry config virtualenvs.create false && \
 RUN poetry run pip install spacy && \
     poetry run python -m spacy download en_core_web_sm
 
+# Install WhisperX
+RUN poetry run pip install whisperx
+
 # Install development dependencies
 RUN poetry install --with dev
 
