@@ -1,96 +1,114 @@
 import os
-import logging
-from transcriber import Transcriber
-from logger import LoggerManager
+import warnings
+import soundfile as sf
+from tqdm import tqdm
+import whisperx
+import whisper
+import torch
+from pydub import AudioSegment
+from src.core.logger_manager import LoggerManager
+from src.core.performance_tracker import PerformanceManager
 
+# Initialize the centralized logger and performance manager
 log_manager = LoggerManager()
 logger = log_manager.get_logger()
 
-class TranscriptionManager:
-    def __init__(self, audio_directory, transcriptions_directory, log_path='transcription.log', format='txt'):
-        """
-        Initialize the TranscriptionManager with specified directories and settings.
+perf_manager = PerformanceManager()
 
-        Args:
-            audio_directory (str): Path to the directory containing audio files.
-            transcriptions_directory (str): Path to the directory for saving transcriptions.
-            log_path (str): Path to the log file for recording transcription activity.
-            format (str): Default format for transcription output (e.g., 'txt' or 'csv').
-        """
-        self.audio_directory = audio_directory
-        self.transcriptions_directory = transcriptions_directory
-        self.transcriber = Transcriber(model_size='base')
-        self.format = format
+# Suppress specific warnings
+warnings.filterwarnings("ignore", message="FP16 is not supported on CPU")
 
-        # Configure logging
-        self.log_path = log_path
-        logging.basicConfig(filename=self.log_path, level=logging.INFO, format='%(asctime)s - %(message)s')
-        print("TranscriptionManager initialized.")
+# Paths for input modules files and output transcriptions
+AUDIO_FILES_DIR = '/app/audio_files'
+TRANSCRIPTIONS_DIR = '/app/transcriptions'
 
-    def list_audio_files(self):
-        """
-        List all audio files in the audio directory.
+# Load WhisperX as the primary model and Whisper as the fallback
+device = "cuda" if torch.cuda.is_available() else "cpu"
+try:
+    whisperx_model = whisperx.load_model("base", device)
+    logger.info(f"WhisperX model loaded successfully on {device}.")
+except Exception as e:
+    logger.error(f"Failed to load WhisperX model: {e}")
+    logger.info("Attempting to load standard Whisper as fallback.")
+    try:
+        whisper_model = whisper.load_model("base")
+        logger.info("Standard Whisper model loaded successfully.")
+    except Exception as fallback_e:
+        logger.error(f"Failed to load Whisper model: {fallback_e}")
+        exit(1)
 
-        Returns:
-            list: List of audio file paths.
-        """
-        if not os.path.exists(self.audio_directory):
-            raise FileNotFoundError(f"Audio directory not found: {self.audio_directory}")
+# Function to sanitize file names
+def sanitize_filename(title):
+    return ''.join(c if c.isalnum() or c in (' ', '.', '_') else '_' for c in title)
 
-        audio_files = [os.path.join(self.audio_directory, f) for f in os.listdir(self.audio_directory)
-                       if f.lower().endswith(('.mp3', '.wav', '.flac'))]
+# Function to convert modules files to WAV format
+def convert_to_wav(audio_file):
+    try:
+        audio = AudioSegment.from_file(audio_file)
+        wav_file = audio_file.rsplit('.', 1)[0] + '.wav'
+        audio.export(wav_file, format='wav')
+        logger.info(f"Converted '{audio_file}' to WAV format.")
+        return wav_file
+    except Exception as e:
+        logger.error(f"Error converting '{audio_file}' to WAV: {e}")
+        return None
 
-        if not audio_files:
-            print("No audio files found in the directory.")
-        else:
-            print(f"Found {len(audio_files)} audio files.")
+# Function to transcribe using WhisperX or Whisper as a fallback
+def transcribe_audio(audio_file, use_whisperx=True):
+    if use_whisperx:
+        try:
+            result = whisperx_model.transcribe(audio_file)
+            logger.info(f"Transcription (WhisperX) completed for '{audio_file}'.")
+            return result['segments']
+        except Exception as e:
+            logger.error(f"Error transcribing with WhisperX for '{audio_file}': {e}")
+            logger.info("Falling back to standard Whisper.")
+            use_whisperx = False
 
-        return audio_files
+    # Fallback to standard Whisper
+    if not use_whisperx:
+        try:
+            result = whisper_model.transcribe(audio_file)
+            logger.info(f"Transcription (Whisper) completed for '{audio_file}'.")
+            return [{'text': result['text']}]
+        except Exception as e:
+            logger.error(f"Error transcribing with Whisper for '{audio_file}': {e}")
+            return []
 
-    def transcribe_all(self):
-        """
-        Transcribe all audio files in the directory and save the results.
-        """
-        audio_files = self.list_audio_files()
+# Main function to process and transcribe modules files
+@perf_manager.track_performance
+def transcribe_audio_files():
+    os.makedirs(TRANSCRIPTIONS_DIR, exist_ok=True)
+    audio_files = [f for f in os.listdir(AUDIO_FILES_DIR) if f.endswith(('.mp3', '.wav', '.m4a', '.flac'))]
 
-        for audio_file in audio_files:
-            try:
-                print(f"Transcribing file: {audio_file}")
-                self.transcriber.load_audio(audio_file)
-                transcription = self.transcriber.transcribe_audio()
+    for file_name in tqdm(audio_files, desc="Transcribing modules files"):
+        audio_file = os.path.join(AUDIO_FILES_DIR, file_name)
+        sanitized_title = sanitize_filename(file_name.rsplit('.', 1)[0])
+        transcription_file = os.path.join(TRANSCRIPTIONS_DIR, f'{sanitized_title}.txt')
 
-                # Generate output path and save transcription
-                output_path = self.get_transcription_output_path(audio_file)
-                self.transcriber.save_transcription(transcription, output_path, format=self.format)
-                self.log_transcription_activity(audio_file, "Success")
+        if os.path.exists(transcription_file):
+            logger.info(f"Skipping '{file_name}' (already transcribed).")
+            continue
 
-            except Exception as e:
-                print(f"Error transcribing {audio_file}: {e}")
-                self.log_transcription_activity(audio_file, f"Failed: {e}")
+        logger.info(f"Starting transcription for '{file_name}'...")
 
-    def get_transcription_output_path(self, audio_file):
-        """
-        Generate the output path for saving the transcription.
+        # Convert to WAV if necessary
+        if not file_name.endswith('.wav'):
+            audio_file = convert_to_wav(audio_file)
+            if not audio_file:
+                logger.warning(f"Skipping '{file_name}' due to conversion error.")
+                continue
 
-        Args:
-            audio_file (str): Path to the input audio file.
+        # Transcribe the modules and save the results
+        segments = transcribe_audio(audio_file)
+        try:
+            with open(transcription_file, 'w') as f:
+                for segment in segments:
+                    f.write(f"{segment['text']}\n")
+            logger.info(f"Transcription saved as '{transcription_file}'.")
+        except Exception as e:
+            logger.error(f"Error saving transcription for '{file_name}': {e}")
 
-        Returns:
-            str: Path to the output transcription file.
-        """
-        base_name = os.path.splitext(os.path.basename(audio_file))[0]
-        output_file = f"{base_name}_transcription.{self.format}"
-        output_path = os.path.join(self.transcriptions_directory, output_file)
-        print(f"Generated output path: {output_path}")
-        return output_path
-
-    def log_transcription_activity(self, audio_file, status):
-        """
-        Log the transcription activity to a log file.
-
-        Args:
-            audio_file (str): Name of the audio file being transcribed.
-            status (str): The status of the transcription (e.g., 'Success', 'Failed').
-        """
-        logging.info(f"{audio_file} - {status}")
-        print(f"Logged activity for {audio_file}: {status}")
+if __name__ == "__main__":
+    perf_manager.monitor_memory_usage()  # Start monitoring memory usage
+    transcribe_audio_files()

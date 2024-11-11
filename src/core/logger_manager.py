@@ -49,7 +49,7 @@ def critical_function_with_retry():
     try:
         # Simulate a critical operation that might fail
         logger.info("Attempting a critical operation.")
-        # Replace with actual logic (e.g., network call, file processing)
+        # Replace with actual logic (e.g., network call, file modules)
         raise ValueError("Simulated failure for retry.")
     except Exception as e:
         logger.error(f"An error occurred: {e}")

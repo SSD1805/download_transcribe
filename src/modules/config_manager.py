@@ -1,6 +1,6 @@
 import yaml
 import os
-from logger import LoggerManager
+from logger_manager import LoggerManager
 
 log_manager = LoggerManager()
 logger = log_manager.get_logger()

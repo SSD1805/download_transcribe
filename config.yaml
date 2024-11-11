@@ -1,3 +1,4 @@
+# Configuration for downloading settings
 download:
   delay: 10  # Delay in seconds between downloads
   retries: 3  # Number of retry attempts for failed downloads
@@ -5,46 +6,76 @@ download:
   cookiefile_path: "/path/to/your/youtube_cookies.txt"  # Optional cookie file for YouTube downloads
   user_agent: "Mozilla/5.0"  # Custom user agent string
 
+# Whisper AI configuration
 whisper:
   model: "base"  # Whisper model size: base, small, medium, large
-  timestamps: true  # Enable timestamps in Whisper transcription
+  timestamps: true  # Enable timestamps in Whisper transcription_pipeline
   segmentation: true  # Segment transcriptions into readable chunks
   noise_suppression: true  # Apply noise suppression if supported
+  fallback_to_whisper_ai: true  # Use Whisper AI as fallback if WhisperX fails
 
+# WhisperX configuration for enhanced ASR features
 whisperx:
-  alignment: true  # Enable phoneme or word-level alignment
+  model: "base"  # WhisperX model to use (base, small, etc.)
+  alignment: true  # Enable word-level or phoneme alignment
   diarization: true  # Enable speaker diarization
+  device: "cuda"  # Device for running models, options: 'cuda' or 'cpu'
 
-processing:
-  sentence_segmentation: true  # Segment transcription into sentences
-  ner: true  # Perform named entity recognition
-  save_format: "csv"  # Output format for processed files: options are 'csv' or 'json'
-  output_dir: "/app/processed_transcriptions"  # Directory for storing processed transcriptions
-
+# Post-modules settings for transcriptions
 transcription_post_processing:
-  remove_noise: true  # Clean up background noise in the transcription
-  spell_check: true  # Apply spell checking to final output
+  remove_noise: true  # Apply noise removal to the final transcription_pipeline output
+  spell_check: true  # Enable spell checking for the final output
+  grammar_check: false  # Optional grammar check for final outputs
 
+# Processing options
+processing:
+  sentence_segmentation: true  # Enable sentence segmentation
+  ner: true  # Perform named entity recognition
+  save_format: "csv"  # Output format for processed files (options: 'csv' or 'json')
+  output_dir: "/app/processed_transcriptions"  # Directory for saving processed transcriptions
+
+# Directories for file storage
 directories:
-  audio_files_dir: "/app/audio_files"  # Directory for audio files
-  transcriptions_dir: "/app/transcriptions"  # Directory for raw transcriptions
-  scripts_dir: "/src/scripts"  # Directory for script files
+  audio_files_dir: "/app/audio_files"  # Directory for storing modules files
+  transcriptions_dir: "/app/transcriptions"  # Directory for storing raw transcriptions
+  processed_dir: "/app/processed_transcriptions"  # Directory for processed transcriptions
   archive_dir: "/app/archived_transcriptions"  # Directory for archiving processed files
+  logs_dir: "/app/logs"  # Directory for storing log files
 
+# Logging configuration
 logging:
-  level: "INFO"  # Logging level, options: DEBUG, INFO, WARNING, ERROR
-  output_file: "/app/logs/app.log"  # Log file path
-  console_logging: true  # Enable console logging
+  level: "INFO"  # Logging level (options: DEBUG, INFO, WARNING, ERROR)
+  output_file: "/app/logs/app.log"  # Path for the log file
+  console_logging: true  # Enable logging to the console
   file_logging: true  # Enable file-based logging
-  max_bytes: 10485760  # Log rotation file size limit (10 MB)
-  backup_count: 5  # Number of log backups to keep
+  max_bytes: 10485760  # Log file size limit for rotation (10 MB)
+  backup_count: 5  # Number of backup log files to keep
 
-environment: "development"  # Environment mode (e.g., development, production)
+# Environment-specific settings
+environment: "development"  # Specify the environment (options: 'development', 'production')
 
+# Error handling settings
 error_handling:
   retry_on_failure: true  # Retry tasks on failure
-  max_retries: 5  # Max number of retries
-  retry_delay: 5  # Delay between retries (in seconds)
+  max_retries: 5  # Maximum number of retries
+  retry_delay: 5  # Delay in seconds between retries
 
+# File management settings
 file_management:
-  auto_cleanup: true  # Automatically clean up processed files
+  auto_cleanup: true  # Automatically clean up processed files after a set period
+  cleanup_threshold: 7  # Number of days after which files will be auto-cleaned (set to 0 to disable)
+
+# Advanced configuration for batch and parallel modules
+batch_processing:
+  enabled: true  # Enable batch modules for modules files
+  batch_size: 5  # Number of files to process in one batch
+
+parallel_processing:
+  enabled: true  # Enable parallel modules for handling multiple files
+  num_workers: 4  # Number of parallel workers for modules
+
+# Resource management settings
+resource_management:
+  max_memory_usage: "2GB"  # Maximum memory usage limit
+  enable_memory_profiling: true  # Enable profiling to monitor memory usage
+  cpu_limit: 2  # Limit the number of CPU cores to use (set to 0 for no limit)
