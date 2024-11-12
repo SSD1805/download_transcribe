@@ -1,9 +1,9 @@
 # Configuration for downloading settings
 download:
-  delay: 10  # Delay in seconds between downloads
-  retries: 3  # Number of retry attempts for failed downloads
+  delay: 10  # Delay in seconds between download_pipeline
+  retries: 3  # Number of retry attempts for failed download_pipeline
   timeout: 30  # Timeout in seconds for each download attempt
-  cookiefile_path: "/path/to/your/youtube_cookies.txt"  # Optional cookie file for YouTube downloads
+  cookiefile_path: "/path/to/your/youtube_cookies.txt"  # Optional cookie file for YouTube download_pipeline
   user_agent: "Mozilla/5.0"  # Custom user agent string
 
 # Whisper AI configuration

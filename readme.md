@@ -87,18 +87,18 @@ Install `ffmpeg` by following the instructions based on your operating system. T
 ### Run the Application
 
 ```bash
-poetry run python app.py
+poetry run python app_test.py
 ```
 
 ### Command-line Arguments
 The `app.py` file supports various command-line arguments for running different modules:
 
 ```bash
-poetry run python app.py download --url "https://youtube.com/your-video"
-poetry run python app.py transcribe modules.mp3 --title "Your Title"
-poetry run python app.py process --directory "/app/transcriptions"
-poetry run python app.py setup --config-path "config.yaml"
-poetry run python app.py manage_files --directory "/app/audio_files"
+poetry run python app_test.py download --url "https://youtube.com/your-video"
+poetry run python app_test.py transcribe modules.mp3 --title "Your Title"
+poetry run python app_test.py process --directory "/app/transcriptions"
+poetry run python app_test.py setup --config-path "config.yaml"
+poetry run python app_test.py manage_files --directory "/app/audio_files"
 ```
 
 ### Using Click
@@ -106,27 +106,27 @@ The application uses the `click` library to create a command-line interface (CLI
 
 - **download**: Downloads audio from a YouTube URL.
   ```bash
-  poetry run python app.py download --url "https://youtube.com/your-video"
+  poetry run python app_test.py download --url "https://youtube.com/your-video"
   ```
 
 - **transcribe**: Transcribes the provided audio file.
   ```bash
-  poetry run python app.py transcribe modules.mp3 --title "Your Title"
+  poetry run python app_test.py transcribe modules.mp3 --title "Your Title"
   ```
 
 - **process**: Processes transcriptions for NER and sentence segmentation.
   ```bash
-  poetry run python app.py process --directory "/app/transcriptions"
+  poetry run python app_test.py process --directory "/app/transcriptions"
   ```
 
 - **setup**: Sets up configuration for the application.
   ```bash
-  poetry run python app.py setup --config-path "config.yaml"
+  poetry run python app_test.py setup --config-path "config.yaml"
   ```
 
 - **manage_files**: Manages files in the specified directory.
   ```bash
-  poetry run python app.py manage_files --directory "/app/audio_files"
+  poetry run python app_test.py manage_files --directory "/app/audio_files"
   ```
 
 ### Example Workflows
@@ -136,12 +136,12 @@ If you already have audio files and want to transcribe and process them, you can
 
 1. **Transcribe an Audio File**:
    ```bash
-   poetry run python app.py transcribe /path/to/modules.mp3 --title "Existing Audio"
+   poetry run python app_test.py transcribe /path/to/modules.mp3 --title "Existing Audio"
    ```
 
 2. **Process Transcriptions**:
    ```bash
-   poetry run python app.py process --directory "/app/transcriptions"
+   poetry run python app_test.py process --directory "/app/transcriptions"
    ```
 
 #### Scenario 2: Downloading and Processing Audio Files
@@ -149,17 +149,17 @@ If you want to download audio files from YouTube and then process them through t
 
 1. **Download Audio from YouTube**:
    ```bash
-   poetry run python app.py download --url "https://youtube.com/your-video"
+   poetry run python app_test.py download --url "https://youtube.com/your-video"
    ```
 
 2. **Transcribe the Downloaded Audio**:
    ```bash
-   poetry run python app.py transcribe /app/audio_files/downloaded_audio.mp3 --title "Downloaded Audio"
+   poetry run python app_test.py transcribe /app/audio_files/downloaded_audio.mp3 --title "Downloaded Audio"
    ```
 
 3. **Process Transcriptions**:
    ```bash
-   poetry run python app.py process --directory "/app/transcriptions"
+   poetry run python app_test.py process --directory "/app/transcriptions"
    ```
 
 #### Scenario 3: Full Workflow Automation
@@ -169,13 +169,13 @@ To automate the entire workflow from downloading to processing, you can create a
 #!/bin/bash
 
 # Download modules from YouTube
-poetry run python app.py download --url "https://youtube.com/your-video"
+poetry run python app_test.py download --url "https://youtube.com/your-video"
 
 # Transcribe the downloaded modules
-poetry run python app.py transcribe /app/audio_files/downloaded_audio.mp3 --title "Downloaded Audio"
+poetry run python app_test.py transcribe /app/audio_files/downloaded_audio.mp3 --title "Downloaded Audio"
 
 # Process the transcriptions
-poetry run python app.py process --directory "/app/transcriptions"
+poetry run python app_test.py process --directory "/app/transcriptions"
 ```
 
 Save this script as `run_workflow.sh` and execute it:

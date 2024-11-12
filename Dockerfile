@@ -29,4 +29,13 @@ RUN poetry config virtualenvs.create false && \
 
 # Install spaCy and its model
 RUN poetry run pip install spacy && \
+    poetry run python -m spacy download en_core_web_sm
 
+# Copy the rest of the application code
+COPY . /app
+
+# Expose the port your application runs on
+EXPOSE 8000
+
+# Run the application
+CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]

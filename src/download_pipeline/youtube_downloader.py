@@ -1,17 +1,17 @@
-from src.downloads.download_manager import DownloadManager
-from src.core.performance_tracker import PerformanceManager
+from src.download_pipeline.download_manager import DownloadManager
+from src.core.performance_tracker import PerformanceTracker
 from src.core.logger_manager import LoggerManager
 
 log_manager = LoggerManager()
 logger = log_manager.get_logger()
 
 class YouTubeDownloader:
-    def __init__(self, download_manager, performance_manager=None):
+    def __init__(self, download_manager, performance_tracker=None):
         """
-        Initialize YouTubeDownloader with a DownloadManager and optionally a PerformanceManager.
+        Initialize YouTubeDownloader with a DownloadManager and optionally a PerformanceTracker.
         """
         self.download_manager = download_manager
-        self.performance_manager = performance_manager or PerformanceManager()
+        self.performance_manager = performance_tracker or PerformanceTracker()
 
     def download_video(self, url):
         """
@@ -50,7 +50,7 @@ class YouTubeDownloader:
 
     def download_batch(self, urls, batch_size=3):
         """
-        Download videos in batches using PerformanceManager.
+        Download videos in batches using PerformanceTracker.
         """
         def download_single_url(url):
             self.download_video(url)

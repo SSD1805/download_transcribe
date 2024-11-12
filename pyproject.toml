@@ -13,10 +13,11 @@ packages = [
 [tool.poetry.dependencies]
 # Python compatibility range
 python = ">=3.10,<3.13"
+django = "^4.0"  # Web framework for building the application
 
 # Core dependencies for transcription_pipeline and modules modules
 openai-whisper = { git = "https://github.com/openai/whisper.git" }
-whisperx = "^0.x"  # Advanced ASR with word-level timestamps and speaker diarization
+whisperx = "^0.1"  # Advanced ASR with word-level timestamps and speaker diarization
 speechbrain = "^0.5.13"  # Advanced speech modules
 torch = "^2.0.1"  # Required for deep learning models
 
@@ -46,6 +47,7 @@ click = "^8.1.3"  # Command-line interface creation
 # Development, testing, and quality assurance tools
 pytest = "^7.0"  # Testing framework
 pytest-cov = "^4.0"  # Code coverage plugin for pytest
+unittest = "^1.0"  # Testing framework
 black = "^23.0"  # Code formatter for consistent style
 flake8 = "^6.0"  # Linter for code quality checks
 mypy = "^1.0"  # Static type checker for Python
