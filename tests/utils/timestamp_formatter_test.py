@@ -1,9 +1,16 @@
-# timestamp_formatter_test.py
-class TimestampFormatter:
-    @staticmethod
-    def format_timestamp(seconds):
-        hours = int(seconds // 3600)
-        minutes = int((seconds % 3600) // 60)
-        sec = int(seconds % 60)
-        formatted_time = f"{hours:02}:{minutes:02}:{sec:02}"
-        return formatted_time
+import unittest
+from src.utils.timestamp_formatter import TimestampFormatter
+
+class TestTimestampFormatter(unittest.TestCase):
+    def test_format_timestamp(self):
+        self.assertEqual(TimestampFormatter.format_timestamp(3661), "01:01:01")
+        self.assertEqual(TimestampFormatter.format_timestamp(0), "00:00:00")
+        self.assertEqual(TimestampFormatter.format_timestamp(59), "00:00:59")
+        self.assertEqual(TimestampFormatter.format_timestamp(3600), "01:00:00")
+        self.assertEqual(TimestampFormatter.format_timestamp(86399), "23:59:59")
+
+if __name__ == '__main__':
+    unittest.main()
+
+
+#this test passed successfully
