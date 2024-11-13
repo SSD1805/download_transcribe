@@ -22,11 +22,11 @@ class AudioConverter:
     @perf_manager.track_performance
     def convert_audio_format(self, input_file, output_format=None):
         """
-        Converts an audio_pipeline file to the specified format.
+        Converts an downloaders file to the specified format.
 
         Args:
-            input_file (str): Path to the input audio_pipeline file.
-            output_format (str, optional): Format to convert the audio_pipeline file to. Defaults to class attribute 'format'.
+            input_file (str): Path to the input downloaders file.
+            output_format (str, optional): Format to convert the downloaders file to. Defaults to class attribute 'format'.
         """
         output_format = output_format or self.format
         try:
@@ -41,14 +41,14 @@ class AudioConverter:
 
     def batch_convert_audio_files(self):
         """
-        Batch processes all audio_pipeline files in the input directory and converts them to the specified format.
+        Batch processes all downloaders files in the input directory and converts them to the specified format.
         """
         audio_files = [f for f in os.listdir(self.input_directory) if f.lower().endswith(('.mp3', '.wav', '.m4a', '.flac'))]
         if not audio_files:
-            logger.info("No audio_pipeline files found for conversion.")
+            logger.info("No downloaders files found for conversion.")
             return
 
-        logger.info(f"Starting batch conversion of {len(audio_files)} audio_pipeline files.")
+        logger.info(f"Starting batch conversion of {len(audio_files)} downloaders files.")
         for audio_file in audio_files:
             input_path = os.path.join(self.input_directory, audio_file)
             self.convert_audio_format(input_path)

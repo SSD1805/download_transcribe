@@ -1,29 +1,44 @@
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from src.core.logger_manager import LoggerManager
+import unittest
+from unittest.mock import patch, MagicMock
+from src.audio_transcriber import AudioTranscriber
 
-logger_manager = LoggerManager()
-logger = logger_manager.get_logger(__name__)
+class TestAudioTranscriber(unittest.TestCase):
+    def setUp(self):
+        self.transcriber = AudioTranscriber()
 
-class BatchProcessor:
-    def __init__(self, batch_size=5):
-        self.batch_size = batch_size
+    @patch('src.audio_transcriber.whisperx.load_model')
+    @patch('src.audio_transcriber.whisper.load_model')
+    def test_load_models(self, mock_whisper_load_model, mock_whisperx_load_model):
+        mock_whisperx_load_model.return_value = MagicMock()
+        mock_whisper_load_model.return_value = MagicMock()
 
-    def process(self, func, items):
-        """
-        Process items in batches to improve performance.
+        transcriber = AudioTranscriber()
+        self.assertIsNotNone(transcriber.whisperx_model)
+        self.assertIsNotNone(transcriber.whisper_model)
 
-        Args:
-            func (callable): The function to process each item.
-            items (list): The list of items to process.
-        """
-        logger.info(f"Starting batch modules with batch size: {self.batch_size}")
-        with ThreadPoolExecutor(max_workers=self.batch_size) as executor:
-            futures = {executor.submit(func, item): item for item in items}
-            for future in as_completed(futures):
-                item = futures[future]
-                try:
-                    result = future.result()
-                    logger.info(f"Processing complete for: {item}")
-                except Exception as e:
-                    logger.error(f"Error modules {item}: {e}")
-        logger.info("Batch modules completed.")
+    @patch('src.audio_transcriber.whisperx.load_model')
+    @patch('src.audio_transcriber.whisper.load_model')
+    def test_transcribe_with_whisperx(self, mock_whisper_load_model, mock_whisperx_load_model):
+        mock_whisperx_model = MagicMock()
+        mock_whisperx_model.transcribe.return_value = {'segments': [{'text': 'test transcription'}]}
+        mock_whisperx_load_model.return_value = mock_whisperx_model
+        mock_whisper_load_model.return_value = MagicMock()
+
+        transcriber = AudioTranscriber()
+        result = transcriber.transcribe('test_audio.mp3', use_whisperx=True)
+        self.assertEqual(result, [{'text': 'test transcription'}])
+
+    @patch('src.audio_transcriber.whisperx.load_model')
+    @patch('src.audio_transcriber.whisper.load_model')
+    def test_transcribe_with_whisper(self, mock_whisper_load_model, mock_whisperx_load_model):
+        mock_whisper_model = MagicMock()
+        mock_whisper_model.transcribe.return_value = {'text': 'test transcription'}
+        mock_whisper_load_model.return_value = mock_whisper_model
+        mock_whisperx_load_model.return_value = None
+
+        transcriber = AudioTranscriber()
+        result = transcriber.transcribe('test_audio.mp3', use_whisperx=False)
+        self.assertEqual(result, [{'text': 'test transcription'}])
+
+if __name__ == '__main__':
+    unittest.main()

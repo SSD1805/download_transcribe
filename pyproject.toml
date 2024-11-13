@@ -11,49 +11,54 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-# Python compatibility range
-python = ">=3.10,<3.13"
-django = "^4.0"  # Web framework for building the application
+python = ">=3.10,<3.13"  # Python version
+django = "^4.0"  # Core Django framework
 
-# Core dependencies for transcription_pipeline and modules modules
-openai-whisper = { git = "https://github.com/openai/whisper.git" }
-whisperx = "^0.1"  # Advanced ASR with word-level timestamps and speaker diarization
-speechbrain = "^0.5.13"  # Advanced speech modules
-torch = "^2.0.1"  # Required for deep learning models
+# API and Real-time
+djangorestframework = "^3.13"  # Django REST Framework
+channels = "^3.0"  # Django Channels for WebSockets
 
-# Scientific libraries for data modules
-numpy = "^1.23"  # For numerical operations
-pandas = "^1.5"  # For data manipulation
-scipy = "^1.10"  # For scientific computing
+# Task Queue and Distributed Processing
+celery = "^5.2"  # Celery for async task management
+dask = "^2022.5.0"  # Dask for distributed processing
 
-# NLP tools for text modules
-nltk = "^3.8"  # For text tokenization and modules
-spacy = "^3.5"  # NLP library for named entity recognition
-spacy-transformers = "^1.2"  # Transformer integration for advanced NLP
+# Transcription and NLP Libraries
+openai-whisper = { git = "https://github.com/openai/whisper.git" } # OpenAI Whisper for transcription
+whisperx = { git = "https://github.com/m-bain/whisperx.git" }  # WhisperX for transcription with speaker diarization and timestamps
+speechbrain = "^0.5.13"  # Speech processing libraryspeechbrain = "^0.5.13"  # Speech processing library
+torch = "^2.0.1"  # Deep learning support for NLP
 
-# Audio utilities for handling modules files
-pydub = "^0.25"  # For modules modules (format conversion, etc.)
-soundfile = "^0.12"  # For reading/writing modules files
+# Data Processing and Scientific Libraries
+numpy = "^1.23"
+pandas = "^1.5"
+scipy = "^1.10"
 
-# Utilities for task automation and environment management
-requests = "^2.31"  # HTTP library for API requests
-tqdm = "^4.65"  # Progress bars for long-running tasks
-tenacity = "^8.2"  # Retry logic for handling transient errors
-python-dotenv = "^1.0"  # Loads environment variables from a .env file
-pyyaml = "^6.0"  # For YAML configuration file handling
-click = "^8.1.3"  # Command-line interface creation
+# NLP Tools
+nltk = "^3.8"
+spacy = "^3.5"
+spacy-transformers = "^1.2"  # Transformer integration for NLP
+
+# Audio Processing Utilities
+pydub = "^0.25"  # Audio handling
+soundfile = "^0.12"  # Read/write audio files
+
+# HTTP and CLI Utilities
+requests = "^2.31"  # HTTP client
+tqdm = "^4.65"  # Progress bars
+tenacity = "^8.2"  # Retry logic
+python-dotenv = "^1.0"  # Load .env files
+pyyaml = "^6.0"  # YAML configuration
+click = "^8.1.3"  # CLI creation
 
 [tool.poetry.dev-dependencies]
-# Development, testing, and quality assurance tools
 pytest = "^7.0"  # Testing framework
-pytest-cov = "^4.0"  # Code coverage plugin for pytest
-unittest = "^1.0"  # Testing framework
-black = "^23.0"  # Code formatter for consistent style
-flake8 = "^6.0"  # Linter for code quality checks
-mypy = "^1.0"  # Static type checker for Python
+pytest-cov = "^4.0"  # Code coverage
+black = "^23.0"  # Code formatter
+flake8 = "^6.0"  # Linter
+mypy = "^1.0"  # Type checker
 
 [tool.poetry.scripts]
-app = "app:cli"  # Main entry point for click commands
+app = "app:cli"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

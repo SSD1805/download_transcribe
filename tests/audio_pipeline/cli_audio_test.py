@@ -8,15 +8,15 @@ def cli():
 
 @cli.command()
 @click.argument('input_file')
-@click.option('--output-format', default='wav', help='Format to convert the audio_pipeline file to.')
+@click.option('--output-format', default='wav', help='Format to convert the downloaders file to.')
 def convert(input_file, output_format):
-    """Convert an audio_pipeline file to a different format."""
+    """Convert an downloaders file to a different format."""
     converter = AudioConverter()
     converter.convert_audio_format(input_file, output_format)
 
 @cli.command()
 def batch_convert():
-    """Batch convert all audio_pipeline files in the input directory."""
+    """Batch convert all downloaders files in the input directory."""
     converter = AudioConverter()
     converter.batch_convert_audio_files()
 

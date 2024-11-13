@@ -28,7 +28,7 @@ def download(url):
 @cli.command()
 @click.argument('audio_file')
 @click.option('--title', prompt='Enter video title', help='Title for the modules file.')
-@click.option('--use-whisperx', is_flag=True, default=False, help='Use WhisperX for transcription_pipeline.')
+@click.option('--use-whisperx', is_flag=True, default=False, help='Use WhisperX for transcription_service.')
 @click.option('--fallback-to-whisper', is_flag=True, default=False, help='Use Whisper AI as a fallback if WhisperX fails.')
 def transcribe(audio_file, title, use_whisperx, fallback_to_whisper):
     """Transcribe the provided modules file"""

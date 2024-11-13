@@ -1,195 +1,211 @@
+
 # YouTube Audio Downloader and Transcriber
 
-This project provides a comprehensive tool to download audio from YouTube videos or channels using `yt-dlp`, transcribe the audio using Whisper AI, and process the transcriptions for further analysis. It incorporates robust error handling, modular structure, and clear configuration options to enhance functionality and maintainability.
+This project is a microservices-based application designed to download audio from YouTube videos, transcribe it using Whisper AI, and process the transcriptions for further analysis. It is modular, scalable, and fully containerized for easy deployment.
 
 ## Features
-### Audio and Transcription
-- **Audio Download**: Utilizes `yt-dlp` to download audio from YouTube in `.mp3` format, supporting both individual videos and entire channels.
-- **Transcription**: Automatically transcribes audio files using WhisperX and saves the transcriptions as `.txt` files.
-- **Skip Existing Files**: Checks if both the audio file and its transcription already exist, skipping redundant processes.
 
-### Modular Structure and Processing
-- **Modular Codebase**: Separate modules for audio processing, file management, transcription, configuration management, and text processing.
-- **Processing Transcriptions**: Segments transcriptions into sentences, applies NER using spaCy, and tokenizes sentences with NLTK.
-- **Folder Management**: Organizes audio files in `/app/audio_files` and transcriptions in `/app/transcriptions`.
-- **File Management**: Manages file paths, sanitizes file names, tracks progress, and logs metadata to CSV.
-
-### Configuration and Logging
-- **Configuration**: Customizable settings in `config.yaml` for download delay, Whisper model size, directories, etc.
-- **Logging**: Configurable logging through `logger.py`, supporting both console and file logging based on `.env` settings.
-- **Environment Variable Support**: Uses `python-dotenv` to load environment variables from a `.env` file.
-
-### Deployment and Containerization
-- **Docker Support**: Contains a `Dockerfile` for building a consistent deployment image.
-- **Environment Variables**: Easily configured through a `.env` file.
+| Feature                     | Description                                                                                                                                   |
+|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| **Audio Download**          | Uses `yt-dlp` to download audio in `.mp3` format from videos or channels.                                                                    |
+| **Transcription**           | Transcribes audio with WhisperX, supporting speaker tagging and timestamps, saved as `.txt` files.                                          |
+| **Skip Existing Files**     | Prevents redundant downloads or processing by checking for existing audio and transcription files.                                           |
+| **Modular Structure**       | Organized into modules for audio processing, transcription, configuration, and text processing, ensuring a scalable codebase.                |
+| **Text Processing**         | Includes Named Entity Recognition (NER) with spaCy and sentence segmentation with NLTK.                                                     |
+| **Folder Management**       | Manages files in structured directories (`/app/audio_files`, `/app/transcriptions`).                                                        |
+| **Configurable**            | Central configuration with `config.yaml` for customizable settings (e.g., download delay, model size).                                      |
+| **Logging**                 | Configurable logging based on `.env`, supporting both console and file logging.                                                             |
+| **Environment Variables**   | Sensitive data is stored in environment variables loaded from `.env`.                                                                       |
+| **Containerized**           | Docker-based architecture allows each component to run in separate containers for modularity and fault isolation.                          |
 
 ## Project Structure
-```
-/app
-|-- audio_files
-|-- logs
-|-- podcast_audio
-|-- transcriptions
-|-- src
-    |-- modules
-        |-- audio_processing.py
-        |-- config_manager.py
-        |-- file_manager.py
-        |-- logger.py
-        |-- text_processor.py
-        |-- transcriber.py
-        |-- transcription_manager.py
-        |-- youtube_downloader.py
-    |-- scripts
-    |-- utils
-        |-- helper_functions.py
-|-- tests
-.env
-app.py
-config.yaml
-Dockerfile
-pyproject.toml
-README.md
+
+```plaintext
+download_transcribe/
+├── .venv/                       # Python virtual environment
+├── app/
+│   ├── audio_files/             # Downloaded audio files
+│   └── transcriptions/          # Generated transcriptions
+├── db/                          # Database-related files
+├── docker/
+│   ├── audio_processing/
+│   │   ├── Dockerfile_audio_converter
+│   │   ├── Dockerfile_audio_normalizer
+│   │   ├── Dockerfile_audio_splitter
+│   │   └── Dockerfile_audio_trimmer
+│   ├── celery_worker/
+│   │   └── Dockerfile_celery
+│   ├── dask_worker/
+│   │   └── Dockerfile_dask
+│   ├── django_app/
+│   │   └── Dockerfile_django
+│   ├── downloaders/
+│   │   ├── Dockerfile_download_manager
+│   │   └── Dockerfile_youtube_downloader
+│   ├── reverse_proxy/
+│   │   └── Dockerfile_nginx
+│   ├── text_processing/
+│   │   ├── Dockerfile_ner_processor
+│   │   ├── Dockerfile_text_loader
+│   │   ├── Dockerfile_text_saver
+│   │   ├── Dockerfile_text_segmenter
+│   │   └── Dockerfile_text_tokenizer
+│   └── transcription_service/
+│       ├── Dockerfile_audio_transcriber
+│       ├── Dockerfile_main_transcriber
+│       └── Dockerfile_transcription_saver
+├── src/
+│   ├── audio_pipeline/
+│   │   ├── audio_converter.py
+│   │   ├── audio_normalizer.py
+│   │   ├── audio_splitter.py
+│   │   ├── audio_trimmer.py
+│   │   └── cli_audio.py
+│   ├── cli/
+│   │   └── app.py
+│   ├── core/
+│   │   ├── batch_processor.py
+│   │   ├── file_manager.py
+│   │   ├── file_uploader.py
+│   │   ├── logger_manager.py
+│   │   ├── memory_monitor.py
+│   │   └── performance_tracker.py
+│   ├── download_pipeline/
+│   │   ├── download_manager.py
+│   │   └── youtube_downloader.py
+│   ├── modules/
+│   │   ├── audio_handler.py
+│   │   ├── config_manager.py
+│   │   ├── download_coordinator.py
+│   │   ├── helper_functions.py
+│   │   ├── pipeline_manager.py
+│   │   ├── text_processor.py
+│   │   └── transcription_manager.py
+│   ├── text_pipeline/
+│   │   ├── ner_processor.py
+│   │   ├── text_loader.py
+│   │   ├── text_saver.py
+│   │   ├── text_segmenter.py
+│   │   └── text_tokenizer.py
+│   ├── transcription_pipeline/
+│   │   ├── audio_transcriber.py
+│   │   ├── main_transcriber.py
+│   │   └── transcription_saver.py
+│   └── utils/
+│       ├── filename_sanitizer.py
+│       ├── message_logger.py
+│       ├── progress_bar.py
+│       └── timestamp_formatter.py
+├── tests/                       # Test cases
+├── .env                         # Environment variables
+├── config.yaml                  # Application configuration
+├── docker-compose.yml           # Docker Compose for services
+├── Dockerfile                   # Base Dockerfile
+├── pyproject.toml               # Poetry dependency file
+└── README.md                    # Documentation
 ```
 
-## Requirements
-- **Python**: Ensure Python 3.12 or higher is installed.
-- **yt-dlp**: Tool for downloading YouTube audio.
-- **WhisperX**: Advanced ASR tool with word-level timestamps and alignment.
-- **ffmpeg**: Essential for audio extraction and conversion.
-- **Additional Libraries**:
-  - `torch`: Core dependency for machine learning tasks.
-  - `speechbrain`: For advanced audio processing.
-  - `numpy`, `pandas`, `scipy`: For data manipulation and scientific computing.
-  - `nltk`, `spacy`, `spacy-transformers`: For NLP tasks.
-  - `pydub`, `soundfile`: Audio manipulation and file handling.
-  - `requests`, `tqdm`, `tenacity`, `python-dotenv`, `pyyaml`: Various utility functions and environment handling.
+## Docker Containers
+
+| Container                   | Purpose                                              | Benefits                                                                                        |
+|-----------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+| **YouTube Downloader**      | Downloads YouTube audio using `yt-dlp`.              | Handles video/audio download requests independently.                                            |
+| **Audio Converter**         | Converts downloaded audio to the required format.    | Isolated audio conversion, enabling scalable audio tasks.                                       |
+| **Audio Normalizer**        | Normalizes audio levels.                             | Ensures consistent audio quality across files.                                                  |
+| **Audio Splitter**          | Splits audio into smaller segments if necessary.     | Enables modular processing of audio.                                                            |
+| **Audio Trimmer**           | Trims silence or unwanted sections in audio.         | Ensures cleaner and more concise audio files.                                                   |
+| **Transcription Service**   | Transcribes audio with WhisperX.                     | GPU-enabled for efficient transcription tasks.                                                  |
+| **Text Processing Modules** | NLP tasks (NER, segmentation).                       | Independent scaling and updates for NLP processes.                                              |
+| **Django App**              | Main web application and API backend.                | Centralized interface for UI, authentication, and API handling.                                 |
+| **Celery Worker**           | Asynchronous task processing.                        | Offloads background tasks from Django app to keep it responsive.                                |
+| **Dask Worker**             | Distributed processing of data tasks.                | Parallel processing for computationally heavy tasks.                                            |
+| **Reverse Proxy (Nginx)**   | Manages SSL and request routing.                     | Provides load balancing and security.                                                           |
+| **Database (PostgreSQL)**   | Stores metadata and transcript data.                 | Reliable storage for metadata and transcription files.                                          |
+
+## Technologies and Dependencies
+
+| Component                  | Technology               | Purpose                                       | Docker Container     |
+|----------------------------|--------------------------|-----------------------------------------------|-----------------------|
+| **Framework**              | Django                   | Backend structure and logic                  | Django App           |
+| **Frontend**               | React or Vue             | Interactive user interface                    | Django App           |
+| **API Layer**              | Django REST Framework    | REST API for frontend/backend communication   | Django App           |
+| **Real-Time Updates**      | Django Channels          | WebSocket for real-time updates               | Django App           |
+| **Task Queue**             | Celery                   | Background task management                    | Celery Worker        |
+| **Distributed Processing** | Dask                     | Parallel processing of heavy tasks            | Dask Worker          |
+| **GPU Processing**         | Paperspace/AWS GPU       | Runs WhisperX model on GPU                    | Transcription Service |
+| **Transcription/NLP**      | WhisperX                 | ASR tool for audio transcription              | Transcription Service |
+| **Data Storage**           | PostgreSQL               | Stores metadata and transcription data        | Database             |
+| **Static/Media Storage**   | Linode/AWS S3            | Stores audio and transcript files             | External             |
+| **NLP Libraries**          | spaCy, NLTK              | Text processing tools                         | Text Processing      |
+| **Reverse Proxy**          | Nginx                    | Routes requests and handles SSL               | Reverse Proxy        |
+| **Logging**                | Django Logging           | Logs events and errors                        | Django App           |
+| **Monitoring**             | Grafana, Prometheus      | Application performance monitoring            | Optional             |
 
 ## Installation
 
 ### 1. Clone the Repository
-Clone this repository to your local machine.
+
+```bash
+git clone <repository-url>
+cd <repository-folder>
+```
 
 ### 2. Install Dependencies Using Poetry
-Ensure `Poetry` is installed. Run the following command:
 
 ```bash
 poetry install
 ```
 
-This command reads `pyproject.toml` and `poetry.lock` to set up the environment with all necessary dependencies.
+### 3. Install `ffmpeg`
 
-### 3. Install ffmpeg
-Install `ffmpeg` by following the instructions based on your operating system. This step is essential for `yt-dlp` to extract and convert audio files.
+Follow the instructions for your OS to install `ffmpeg`.
 
 ## Usage
 
-### Run the Application
+### Run with Docker Compose
+
+To build and start all services:
 
 ```bash
-poetry run python app_test.py
+docker-compose up --build
 ```
 
-### Command-line Arguments
-The `app.py` file supports various command-line arguments for running different modules:
+To stop the services:
 
 ```bash
-poetry run python app_test.py download --url "https://youtube.com/your-video"
-poetry run python app_test.py transcribe modules.mp3 --title "Your Title"
-poetry run python app_test.py process --directory "/app/transcriptions"
-poetry run python app_test.py setup --config-path "config.yaml"
-poetry run python app_test.py manage_files --directory "/app/audio_files"
+docker-compose down
 ```
 
-### Using Click
-The application uses the `click` library to create a command-line interface (CLI). Here are the available commands:
+### CLI Commands
 
-- **download**: Downloads audio from a YouTube URL.
-  ```bash
-  poetry run python app_test.py download --url "https://youtube.com/your-video"
-  ```
+| Command         | Description                           |
 
-- **transcribe**: Transcribes the provided audio file.
-  ```bash
-  poetry run python app_test.py transcribe modules.mp3 --title "Your Title"
-  ```
+ Example Usage                                      |
+|-----------------|---------------------------------------|----------------------------------------------------|
+| **download**    | Downloads YouTube audio.             | `poetry run python app.py download --url <URL>`    |
+| **transcribe**  | Transcribes an audio file.           | `poetry run python app.py transcribe <file>`       |
+| **process**     | NLP processing on transcriptions.    | `poetry run python app.py process --directory <dir>`|
+| **setup**       | Configures the application.          | `poetry run python app.py setup`                   |
+| **manage_files**| Manages files in a directory.        | `poetry run python app.py manage_files <directory>`|
 
-- **process**: Processes transcriptions for NER and sentence segmentation.
-  ```bash
-  poetry run python app_test.py process --directory "/app/transcriptions"
-  ```
-
-- **setup**: Sets up configuration for the application.
-  ```bash
-  poetry run python app_test.py setup --config-path "config.yaml"
-  ```
-
-- **manage_files**: Manages files in the specified directory.
-  ```bash
-  poetry run python app_test.py manage_files --directory "/app/audio_files"
-  ```
-
-### Example Workflows
-
-#### Scenario 1: Processing Pre-existing Audio Files
-If you already have audio files and want to transcribe and process them, you can use the `transcribe` and `process` commands.
-
-1. **Transcribe an Audio File**:
-   ```bash
-   poetry run python app_test.py transcribe /path/to/modules.mp3 --title "Existing Audio"
-   ```
-
-2. **Process Transcriptions**:
-   ```bash
-   poetry run python app_test.py process --directory "/app/transcriptions"
-   ```
-
-#### Scenario 2: Downloading and Processing Audio Files
-If you want to download audio files from YouTube and then process them through the rest of the modules, you can chain the commands.
-
-1. **Download Audio from YouTube**:
-   ```bash
-   poetry run python app_test.py download --url "https://youtube.com/your-video"
-   ```
-
-2. **Transcribe the Downloaded Audio**:
-   ```bash
-   poetry run python app_test.py transcribe /app/audio_files/downloaded_audio.mp3 --title "Downloaded Audio"
-   ```
-
-3. **Process Transcriptions**:
-   ```bash
-   poetry run python app_test.py process --directory "/app/transcriptions"
-   ```
-
-#### Scenario 3: Full Workflow Automation
-To automate the entire workflow from downloading to processing, you can create a script that runs all the commands sequentially.
+### Sample Workflow
 
 ```bash
-#!/bin/bash
-
-# Download modules from YouTube
-poetry run python app_test.py download --url "https://youtube.com/your-video"
-
-# Transcribe the downloaded modules
-poetry run python app_test.py transcribe /app/audio_files/downloaded_audio.mp3 --title "Downloaded Audio"
-
-# Process the transcriptions
-poetry run python app_test.py process --directory "/app/transcriptions"
-```
-
-Save this script as `run_workflow.sh` and execute it:
-```bash
-bash run_workflow.sh
+# Full Workflow
+poetry run python app.py download --url "https://youtube.com/your-video"
+poetry run python app.py transcribe /app/audio_files/downloaded_audio.mp3
+poetry run python app.py process --directory "/app/transcriptions"
 ```
 
 ## Configuration
-Configure the `config.yaml` file for customizable settings like download delay, directories, Whisper model size, and more.
 
-## Logging
-The project uses `logger.py` to handle logging, configured via environment variables set in the `.env` file:
+Modify `config.yaml` to set preferences like download delay, directories, and Whisper model size.
 
-```
+## Logging Configuration
+
+Define logging settings in `.env`:
+
+```plaintext
 LOG_FILE_PATH=/app/logs/app.log
 LOG_LEVEL=10
 LOG_MAX_BYTES=10485760
@@ -199,11 +215,38 @@ ENABLE_FILE_LOGGING=true
 ```
 
 ## Testing
-The `tests` folder contains unit tests for individual modules to ensure that components like `audio_processing`, `file_manager`, and `transcriber` work as expected. Use the following command to run tests:
+
+Run tests with:
 
 ```bash
 pytest tests/
 ```
 
-## License
-This project is licensed under the MIT License.
+---
+
+## Docker Compose Setup
+
+### Environment Variables
+
+Create an `.env` file to specify sensitive data:
+
+```bash
+PAPERSERVE_API_KEY=your_paperserve_api_key
+DJANGO_SECRET_KEY=your_django_secret_key
+POSTGRES_USER=your_user
+POSTGRES_PASSWORD=your_password
+POSTGRES_DB=your_db
+```
+
+### Starting Services
+
+To build and launch the application:
+
+```bash
+docker-compose up --build
+```
+
+Access the app at `http://localhost:8000`.
+
+
+

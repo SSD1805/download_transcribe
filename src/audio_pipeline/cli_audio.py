@@ -1,28 +1,46 @@
+# cli_audio.py
+
 import click
-from src.audio_pipeline.audio_converter import AudioConverter
+from audio_handler import AudioHandler
 
 @click.group()
 def cli():
-    """Audio Processing CLI"""
+    """Command-line interface for audio processing tasks."""
     pass
 
 @cli.command()
 @click.argument('input_file')
-@click.option('--output-format', default='wav', help='Format to convert the audio_pipeline file to.')
+@click.option('--output-format', default='wav', help='Format to convert the audio file to.')
 def convert(input_file, output_format):
-    """Convert an audio_pipeline file to a different format."""
-    converter = AudioConverter()
-    converter.convert_audio_format(input_file, output_format)
+    """Convert an audio file to a different format."""
+    handler = AudioHandler()
+    result = handler.convert(input_file, output_format)
+    click.echo(f"Converted file saved to: {result}")
 
 @cli.command()
-def batch_convert():
-    """Batch convert all audio_pipeline files in the input directory."""
-    converter = AudioConverter()
-    converter.batch_convert_audio_files()
+@click.argument('input_file')
+@click.option('--segment-duration', default=30000, help='Duration of each audio segment in milliseconds.')
+def split(input_file, segment_duration):
+    """Split an audio file into segments."""
+    handler = AudioHandler()
+    segments = handler.split(input_file, segment_duration)
+    click.echo(f"Audio file split into {len(segments)} segments.")
 
-if __name__ == "__main__":
+@cli.command()
+@click.argument('input_file')
+def normalize(input_file):
+    """Normalize an audio file."""
+    handler = AudioHandler()
+    result = handler.normalize(input_file)
+    click.echo(f"Normalized file saved to: {result}")
+
+@cli.command()
+@click.argument('input_file')
+def trim(input_file):
+    """Trim silence from an audio file."""
+    handler = AudioHandler()
+    result = handler.trim(input_file)
+    click.echo(f"Trimmed file saved to: {result}")
+
+if __name__ == '__main__':
     cli()
-
-
-class AudioCLI:
-    pass

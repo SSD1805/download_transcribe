@@ -1,24 +1,41 @@
-import spacy
-from src.core.performance_tracker import PerformanceManager
+import sys
+import os
+import pytest
+from unittest.mock import MagicMock
 
-class NERProcessor:
-    def __init__(self, logger, perf_manager, spacy_model='en_core_web_sm'):
-        self.logger = logger
-        self.perf_manager = perf_manager
-        try:
-            self.spacy_model = spacy.load(spacy_model)
-            self.logger.info(f"spaCy model '{spacy_model}' loaded successfully.")
-        except Exception as e:
-            self.logger.error(f"Error loading spaCy model '{spacy_model}': {e}")
-            raise
+# Add the src directory to the Python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
 
-    def perform_ner(self, text):
-        if not text:
-            self.logger.warning("No input text for NER. Please load text before processing.")
-            return []
+from text_pipeline.ner_processor import NERProcessor
 
-        self.perf_manager.monitor_memory_usage()
-        doc = self.spacy_model(text)
-        entities = [{'text': ent.text, 'label': ent.label_, 'start': ent.start_char, 'end': ent.end_char} for ent in doc.ents]
-        self.logger.info(f"Found {len(entities)} named entities.")
-        return entities
+@pytest.fixture
+def ner_processor():
+    logger = MagicMock()
+    perf_manager = MagicMock()
+    return NERProcessor(logger, perf_manager), logger
+
+def test_perform_ner_with_text(ner_processor):
+    ner_processor, logger = ner_processor
+    text = "Apple is looking at buying U.K. startup for $1 billion"
+    expected_entities = [
+        {'text': 'Apple', 'label': 'ORG', 'start': 0, 'end': 5},
+        {'text': 'U.K.', 'label': 'GPE', 'start': 27, 'end': 31},
+        {'text': '$1 billion', 'label': 'MONEY', 'start': 44, 'end': 54}
+    ]
+    ner_processor.spacy_model = MagicMock()
+    ner_processor.spacy_model.return_value.ents = [
+        MagicMock(text='Apple', label_='ORG', start_char=0, end_char=5),
+        MagicMock(text='U.K.', label_='GPE', start_char=27, end_char=31),
+        MagicMock(text='$1 billion', label_='MONEY', start_char=44, end_char=54)
+    ]
+
+    entities = ner_processor.perform_ner(text)
+    assert entities == expected_entities
+    logger.info.assert_called_with("Found 3 named entities.")
+
+def test_perform_ner_with_empty_text(ner_processor):
+    ner_processor, logger = ner_processor
+    text = ""
+    entities = ner_processor.perform_ner(text)
+    assert entities == []
+    logger.warning.assert_called_with("No input text for NER. Please load text before processing.")

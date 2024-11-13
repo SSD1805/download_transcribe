@@ -16,7 +16,7 @@ def process_audio_files(input_directory='/app/audio_files'):
 
     audio_files = [f for f in os.listdir(input_directory) if f.endswith(('.mp3', '.wav', '.m4a', '.flac'))]
 
-    for file_name in tqdm(audio_files, desc="Processing audio_pipeline files"):
+    for file_name in tqdm(audio_files, desc="Processing downloaders files"):
         input_path = os.path.join(input_directory, file_name)
         wav_file = converter.convert_to_wav(input_path) if not file_name.endswith('.wav') else input_path
 

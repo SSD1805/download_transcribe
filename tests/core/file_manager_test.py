@@ -18,7 +18,7 @@ def ensure_directories_exist(*directories):
             os.makedirs(directory)
             logger.info(f"Created directory: {directory}")
 
-# Function to check if both the modules and transcription_pipeline files already exist
+# Function to check if both the modules and transcription_service files already exist
 def files_exist(title, podcast_audio_dir, transcriptions_dir):
     sanitized_title = sanitize_filename(title)
     audio_file = os.path.join(podcast_audio_dir, f'{sanitized_title}.mp3')

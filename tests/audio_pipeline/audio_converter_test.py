@@ -1,36 +1,36 @@
 import unittest
 import os
-from src.audio_pipeline.audio_converter import AudioConverter
+from unittest.mock import patch, MagicMock
+from pydub import AudioSegment
+from src.audio_pipeline.audio_normalizer import AudioNormalizer
 
-class TestAudioConverter(unittest.TestCase):
+class TestAudioNormalizer(unittest.TestCase):
     def setUp(self):
-        self.input_directory = '/app/audio_files'
         self.output_directory = '/app/processed_audio'
         self.format = 'wav'
-        self.converter = AudioConverter(self.input_directory, self.output_directory, self.format)
-        os.makedirs(self.input_directory, exist_ok=True)
+        self.normalizer = AudioNormalizer(self.output_directory, self.format)
         os.makedirs(self.output_directory, exist_ok=True)
 
     def tearDown(self):
-        for f in os.listdir(self.input_directory):
-            os.remove(os.path.join(self.input_directory, f))
         for f in os.listdir(self.output_directory):
             os.remove(os.path.join(self.output_directory, f))
 
-    def test_convert_audio_format(self):
-        input_file = os.path.join(self.input_directory, 'example.mp3')
-        with open(input_file, 'wb') as f:
-            f.write(b'\x00\x00\x00\x00')  # Dummy file content
-        output_file = self.converter.convert_audio_format(input_file)
-        self.assertTrue(os.path.exists(output_file))
+    @patch('src.downloaders.audio_normalizer.AudioSegment')
+    @patch('src.downloaders.audio_normalizer.logger')
+    def test_normalize(self, mock_logger, mock_audio_segment):
+        input_file = 'test.mp3'
+        mock_audio = MagicMock(spec=AudioSegment)
+        mock_audio_segment.from_file.return_value = mock_audio
+        mock_audio.export.return_value = None
 
-    def test_batch_convert_audio_files(self):
-        input_file = os.path.join(self.input_directory, 'example.mp3')
-        with open(input_file, 'wb') as f:
-            f.write(b'\x00\x00\x00\x00')  # Dummy file content
-        self.converter.batch_convert_audio_files()
-        output_file = os.path.join(self.output_directory, 'example.wav')
-        self.assertTrue(os.path.exists(output_file))
+        output_file = self.normalizer.normalize(input_file)
+
+        mock_audio_segment.from_file.assert_called_once_with(input_file)
+        mock_audio.export.assert_called_once_with(os.path.join(self.output_directory, 'test_normalized.wav'), format=self.format)
+        mock_logger.info.assert_any_call(f"Normalized audio saved as {os.path.join(self.output_directory, 'test_normalized.wav')}")
+        self.assertEqual(output_file, os.path.join(self.output_directory, 'test_normalized.wav'))
 
 if __name__ == '__main__':
     unittest.main()
+
+# this test needs to be completed

@@ -1,28 +1,36 @@
+import unittest
 import os
-from pydub import AudioSegment, effects
-from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceManager
+from unittest.mock import patch, MagicMock
+from pydub import AudioSegment
+from src.audio_pipeline.audio_normalizer import AudioNormalizer
 
-log_manager = LoggerManager()
-logger = log_manager.get_logger()
-perf_manager = PerformanceManager()
-
-class AudioNormalizer:
-    def __init__(self, output_directory='/app/processed_audio', format='wav'):
-        self.output_directory = output_directory
-        self.format = format
+class TestAudioNormalizer(unittest.TestCase):
+    def setUp(self):
+        self.output_directory = '/app/processed_audio'
+        self.format = 'wav'
+        self.normalizer = AudioNormalizer(self.output_directory, self.format)
         os.makedirs(self.output_directory, exist_ok=True)
-        logger.info(f"AudioNormalizer initialized with output directory: {self.output_directory}")
 
-    @perf_manager.track_performance
-    def normalize(self, input_file):
-        try:
-            audio = AudioSegment.from_file(input_file)
-            normalized_audio = effects.normalize(audio)
-            output_file = os.path.join(self.output_directory, f"{os.path.splitext(os.path.basename(input_file))[0]}_normalized.{self.format}")
-            normalized_audio.export(output_file, format=self.format)
-            logger.info(f"Normalized audio saved as {output_file}")
-            return output_file
-        except Exception as e:
-            logger.error(f"Error normalizing {input_file}: {e}")
-            return None
+    def tearDown(self):
+        for f in os.listdir(self.output_directory):
+            os.remove(os.path.join(self.output_directory, f))
+
+    @patch('src.downloaders.audio_normalizer.AudioSegment')
+    @patch('src.downloaders.audio_normalizer.logger')
+    def test_normalize(self, mock_logger, mock_audio_segment):
+        input_file = 'test.mp3'
+        mock_audio = MagicMock(spec=AudioSegment)
+        mock_audio_segment.from_file.return_value = mock_audio
+        mock_audio.export.return_value = None
+
+        output_file = self.normalizer.normalize(input_file)
+
+        mock_audio_segment.from_file.assert_called_once_with(input_file)
+        mock_audio.export.assert_called_once_with(os.path.join(self.output_directory, 'test_normalized.wav'), format=self.format)
+        mock_logger.info.assert_any_call(f"Normalized audio saved as {os.path.join(self.output_directory, 'test_normalized.wav')}")
+        self.assertEqual(output_file, os.path.join(self.output_directory, 'test_normalized.wav'))
+
+if __name__ == '__main__':
+    unittest.main()
+
+# this test needs to be completed

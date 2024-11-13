@@ -9,7 +9,7 @@ download:
 # Whisper AI configuration
 whisper:
   model: "base"  # Whisper model size: base, small, medium, large
-  timestamps: true  # Enable timestamps in Whisper transcription_pipeline
+  timestamps: true  # Enable timestamps in Whisper transcription_service
   segmentation: true  # Segment transcriptions into readable chunks
   noise_suppression: true  # Apply noise suppression if supported
   fallback_to_whisper_ai: true  # Use Whisper AI as fallback if WhisperX fails
@@ -23,7 +23,7 @@ whisperx:
 
 # Post-modules settings for transcriptions
 transcription_post_processing:
-  remove_noise: true  # Apply noise removal to the final transcription_pipeline output
+  remove_noise: true  # Apply noise removal to the final transcription_service output
   spell_check: true  # Enable spell checking for the final output
   grammar_check: false  # Optional grammar check for final outputs
 
