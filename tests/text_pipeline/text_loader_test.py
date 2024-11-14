@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 from src.core.logger_manager import LoggerManager
-from src.text_pipeline.text_loader import TextLoader
+from src.nlp_pipeline.text_loader import TextLoader
 
 @pytest.fixture
 def text_loader():

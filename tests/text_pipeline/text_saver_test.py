@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 import pandas as pd
-from src.text_pipeline.text_saver import TextSaver
+from src.nlp_pipeline.text_saver import TextSaver
 
 class TestTextSaver(unittest.TestCase):
     def setUp(self):
