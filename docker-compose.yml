@@ -51,20 +51,19 @@ services:
       - app_network
     restart: always
 
-transcription_service:
-  build:
-    context: ./docker/transcription_service
-    dockerfile: Dockerfile_main_transcriber
-  volumes:
-    - ./data:/app/data
-  environment:
-    LAMBDA_IP: "your.lambda.instance.ip"
-    LAMBDA_USER: "your_username"
-    LAMBDA_PATH: "/path/on/lambda/instance"
-  networks:
-    - app_network
-  restart: always
-
+  transcription_service:
+    build:
+      context: ./docker/transcription_service
+      dockerfile: Dockerfile_main_transcriber
+    volumes:
+      - ./data:/app/data
+    environment:
+      LAMBDA_IP: "your.lambda.instance.ip"
+      LAMBDA_USER: "your_username"
+      LAMBDA_PATH: "/path/on/lambda/instance"
+    networks:
+      - app_network
+    restart: always
 
   text_loader:
     build:
@@ -150,12 +149,100 @@ transcription_service:
       - app_network
     restart: always
 
-  dask_worker:
+  dask_scheduler:
+    build:
+      context: ./docker/dask_worker
+      dockerfile: Dockerfile_dask_scheduler
+    volumes:
+      - ./data:/app/data
+    networks:
+      - app_network
+    restart: always
+
+  dask_audio_conversion_worker:
     build:
       context: ./docker/dask_worker
       dockerfile: Dockerfile_audio_conversion_worker
-    depends_on:
-      - django_app
+    volumes:
+      - ./data:/app/data
+    networks:
+      - app_network
+    restart: always
+
+  dask_ner_worker:
+    build:
+      context: ./docker/dask_worker
+      dockerfile: Dockerfile_ner_worker
+    volumes:
+      - ./data:/app/data
+    networks:
+      - app_network
+    restart: always
+
+  dask_performance_monitor_worker:
+    build:
+      context: ./docker/dask_worker
+      dockerfile: Dockerfile_performance_monitor_worker
+    volumes:
+      - ./data:/app/data
+    networks:
+      - app_network
+    restart: always
+
+  dask_pipeline_manager:
+    build:
+      context: ./docker/dask_worker
+      dockerfile: Dockerfile_pipeline_manager
+    volumes:
+      - ./data:/app/data
+    networks:
+      - app_network
+    restart: always
+
+  dask_text_loading_worker:
+    build:
+      context: ./docker/dask_worker
+      dockerfile: Dockerfile_text_loading_worker
+    volumes:
+      - ./data:/app/data
+    networks:
+      - app_network
+    restart: always
+
+  dask_text_saving_worker:
+    build:
+      context: ./docker/dask_worker
+      dockerfile: Dockerfile_text_saving_worker
+    volumes:
+      - ./data:/app/data
+    networks:
+      - app_network
+    restart: always
+
+  dask_text_segmentation_worker:
+    build:
+      context: ./docker/dask_worker
+      dockerfile: Dockerfile_text_segmentation_worker
+    volumes:
+      - ./data:/app/data
+    networks:
+      - app_network
+    restart: always
+
+  dask_text_tokenization_worker:
+    build:
+      context: ./docker/dask_worker
+      dockerfile: Dockerfile_text_tokenization_worker
+    volumes:
+      - ./data:/app/data
+    networks:
+      - app_network
+    restart: always
+
+  dask_transcription_worker:
+    build:
+      context: ./docker/dask_worker
+      dockerfile: Dockerfile_transcription_worker
     volumes:
       - ./data:/app/data
     networks:
