@@ -13,7 +13,7 @@ from src.nlp_pipeline.text_saver import TextSaver
 class PipelineManager:
     def __init__(self, config_manager):
         self.config_manager = config_manager
-        self.logger = LoggerManager().get_logger(__name__)
+        self.logger = LoggerManager().get_logger()
         self.memory_monitor = MemoryMonitor(interval=config_manager.get('memory_interval', 5))
         self.performance_tracker = PerformanceTracker()
         self.client = Client("tcp://dask_scheduler:8786")  # Connect to Dask scheduler
@@ -30,24 +30,26 @@ class PipelineManager:
             try:
                 with self.performance_tracker.track_execution("Pipeline Task"):
                     # Schedule tasks for each text item in the batch
-                    loader = TextLoader(self.logger)
+                    loader = TextLoader()
                     future_load = self.client.submit(loader.load_text, text)
                     loaded_text = future_load.result()
 
-                    segmenter = TextSegmenter(self.logger, self.performance_tracker)
+                    segmenter = TextSegmenter()
                     future_segment = self.client.submit(segmenter.segment_sentences, loaded_text)
                     sentences = future_segment.result()
 
-                    tokenizer = TextTokenizer(self.logger, self.performance_tracker)
+                    tokenizer = TextTokenizer()
                     future_tokenize = self.client.submit(tokenizer.tokenize_text, loaded_text)
-                    tokens = future_tokenize.result()  # Optionally remove if unused
+                    tokens = future_tokenize.result()
 
-                    ner_processor = NERProcessor(self.logger, self.performance_tracker)
-                    future_ner = self.client.submit(ner_processor.perform_ner, loaded_text)
+                    ner_processor = NERProcessor(self.logger)
+                    future_ner = self.client.submit(ner_processor.perform_ner, tokens)
                     entities = future_ner.result()
 
-                    saver = TextSaver(self.logger, self.performance_tracker)
-                    future_save = self.client.submit(saver.save_processed_text, sentences, entities, output_file)
+                    saver = TextSaver()
+                    future_save = self.client.submit(
+                        saver.save_processed_text, sentences, entities, tokens, output_file
+                    )
                     results.append(future_save.result())
 
                     self.logger.info(f"Processed text and saved to {output_file}")
@@ -56,6 +58,7 @@ class PipelineManager:
                 self.logger.error(f"Error processing text batch item: {e}")
 
         return results
+
 
     def run_pipeline(self, input_texts, save_filepath):
         """
@@ -66,7 +69,7 @@ class PipelineManager:
                 self.logger.info("Starting batch processing pipeline.")
 
                 # Use BatchProcessor to process texts in defined batch sizes
-                self.batch_processor.process(input_texts, self.process_batch, save_filepath)
+                self.batch_processor.process(input_texts, self.process_batch)
 
                 self.logger.info("Batch processing pipeline completed.")
         except Exception as e:

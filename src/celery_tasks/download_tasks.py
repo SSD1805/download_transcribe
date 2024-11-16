@@ -13,6 +13,7 @@ def download_video_task(self, url, config_manager):
     Celery task to download a video using DownloadManager.
 
     Args:
+        self:
         url (str): The video URL to download.
         config_manager (ConfigManager): Configuration manager for centralized settings.
 

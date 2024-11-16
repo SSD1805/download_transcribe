@@ -1,12 +1,12 @@
 import os
 from pydub import AudioSegment
 from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceManager
+from src.core.performance_tracker import PerformanceTracker
 
 # Initialize the logger and performance manager
 log_manager = LoggerManager()
 logger = log_manager.get_logger()
-perf_manager = PerformanceManager()
+perf_tracker = PerformanceTracker()
 
 class AudioConverter:
     def __init__(self, input_directory='/app/audio_files', output_directory='/app/processed_audio', format='wav'):
@@ -19,10 +19,10 @@ class AudioConverter:
         os.makedirs(self.output_directory, exist_ok=True)
         logger.info(f"AudioConverter initialized with input: {self.input_directory}, output: {self.output_directory}, format: {self.format}")
 
-    @perf_manager.track_performance
+    @perf_tracker.track_performance
     def convert_audio_format(self, input_file, output_format=None):
         """
-        Converts an downloaders file to the specified format.
+        Converts a downloaders file to the specified format.
 
         Args:
             input_file (str): Path to the input downloaders file.

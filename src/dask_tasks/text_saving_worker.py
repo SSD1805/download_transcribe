@@ -9,7 +9,7 @@ logger = LoggerManager().get_logger()
 perf_tracker = PerformanceTracker()
 
 
-def save_text_task(sentences, entities, filepath):
+def save_text_task(processed_sentences, identified_entities, output_filepath):
     """
     Save processed text and track performance.
     """
@@ -18,10 +18,10 @@ def save_text_task(sentences, entities, filepath):
     with perf_tracker.track_execution("Text Saving"):
         logger.info("Starting text saving task.")
         try:
-            saver.save_processed_text(sentences, entities, filepath)
-            logger.info(f"Text saved successfully to {filepath}.")
+            saver.save_processed_text(processed_sentences, identified_entities, output_filepath)
+            logger.info(f"Text saved successfully to {output_filepath}.")
         except Exception as e:
-            logger.error(f"Error saving text to {filepath}: {e}")
+            logger.error(f"Error saving text to {output_filepath}: {e}")
             raise
 
 

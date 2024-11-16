@@ -8,7 +8,7 @@ from src.modules.config_manager import ConfigManager
 def main():
     # Initialize configuration and performance tracker
     config_manager = ConfigManager(config_path='config.yaml')
-    performance_manager = PerformanceTracker()
+    perf_tracker = PerformanceTracker()
 
     # For asynchronous task
     download_video_task.delay("https://youtube.com/watch?v=example_video_id", config_manager)

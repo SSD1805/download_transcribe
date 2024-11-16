@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.core.logger_manager import LoggerManager
 
 logger_manager = LoggerManager()
-logger = logger_manager.get_logger(__name__)
+logger = logger_manager.get_logger()
 
 class BatchProcessor:
     def __init__(self, batch_size=5):

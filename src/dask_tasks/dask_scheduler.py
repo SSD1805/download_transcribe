@@ -1,38 +1,53 @@
 from dask.distributed import Client
 from src.core.logger_manager import LoggerManager
 from src.core.performance_tracker import PerformanceTracker
-from src.audio_pipeline.audio_converter import convert_audio
-from src.transcription_pipeline.audio_transcriber import transcribe_audio
+from src.audio_pipeline.audio_converter import AudioConverter
+from src.transcription_pipeline.audio_transcriber import AudioTranscriber
 
 # Initialize Dask client, logger, and performance tracker
 client = Client("tcp://dask_scheduler:8786")
-logger = LoggerManager().get_logger(__name__)
+logger = LoggerManager().get_logger()
 perf_tracker = PerformanceTracker()
 
 
-def execute_pipeline():
+def execute_pipeline(input_file, output_file):
     """
     Executes the audio processing pipeline, including audio conversion and transcription tasks.
+
+    Args:
+        input_file (str): Path to the input audio file (e.g., MP3).
+        output_file (str): Path to save the transcription output (e.g., TXT).
     """
     # Track the overall pipeline execution time
     with perf_tracker.track_execution("Audio Processing Pipeline"):
         try:
-            # Schedule audio conversion task
-            logger.info("Scheduling audio conversion task.")
-            future_conversion = client.submit(convert_audio, "/app/audio_files/file.mp3")
+            # Instantiate pipeline components
+            audio_converter = AudioConverter()
+            audio_transcriber = AudioTranscriber()
 
-            # Schedule transcription task
-            logger.info("Scheduling transcription task.")
-            future_transcription = client.submit(transcribe_audio, "/app/audio_files/file.wav")
+            # Schedule audio conversion task
+            logger.info(f"Scheduling audio conversion for file: {input_file}")
+            future_conversion = client.submit(audio_converter.convert_audio, input_file)
+
+            # Schedule transcription task (depends on audio conversion result)
+            logger.info("Scheduling transcription task after audio conversion.")
+            future_transcription = client.submit(
+                audio_transcriber.transcribe, future_conversion.result()
+            )
 
             # Retrieve and log results with performance tracking for each task
             with perf_tracker.track_execution("Audio Conversion Task"):
-                result_conversion = future_conversion.result()
-                logger.info(f"Audio conversion completed successfully: {result_conversion}")
+                converted_file = future_conversion.result()
+                logger.info(f"Audio conversion completed successfully: {converted_file}")
 
             with perf_tracker.track_execution("Audio Transcription Task"):
-                result_transcription = future_transcription.result()
-                logger.info(f"Audio transcription completed successfully: {result_transcription}")
+                transcription_result = future_transcription.result()
+                logger.info(f"Audio transcription completed successfully: {transcription_result}")
+
+            # Save transcription output
+            with open(output_file, "w", encoding="utf-8") as f:
+                f.write(transcription_result)
+            logger.info(f"Transcription saved to {output_file}.")
 
         except Exception as e:
             logger.error(f"Error in processing pipeline: {e}")
@@ -40,4 +55,8 @@ def execute_pipeline():
 
 
 if __name__ == "__main__":
-    execute_pipeline()
+    # Example input/output files
+    input_audio_file = "/app/audio_files/file.mp3"
+    transcription_output_file = "/app/audio_files/transcription.txt"
+
+    execute_pipeline(input_audio_file, transcription_output_file)

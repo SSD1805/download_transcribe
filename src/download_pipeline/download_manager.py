@@ -1,25 +1,24 @@
 import os
 import yt_dlp
 from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceManager
-from src.custom_exceptions import DownloadError, ConfigurationError, FileError
-
+from src.core.performance_tracker import PerformanceTracker
+from src.download_pipeline.custom_exceptions import DownloadError, ConfigurationError, FileError
 
 class DownloadManager:
-    def __init__(self, config_manager, logger=None, performance_manager=None):
+    def __init__(self, config_manager, logger=None, tracker=None):
         """
         Initialize the DownloadManager with a specified configuration manager, logger,
-        and performance manager for flexible injection and centralized configuration.
+        and performance tracker for flexible injection and centralized configuration.
 
         Args:
             config_manager (ConfigManager): Instance of ConfigManager to manage configurations.
             logger (Logger, optional): Logger instance for logging messages. Defaults to None.
-            performance_manager (PerformanceManager, optional): Instance of PerformanceManager
+            tracker (PerformanceTracker, optional): Instance of PerformanceTracker
                 for performance tracking. Defaults to None.
         """
         self.config_manager = config_manager
         self.logger = logger or LoggerManager().get_logger()
-        self.performance_manager = performance_manager or PerformanceManager()
+        self.tracker = tracker or PerformanceTracker()
 
         # Attempt to load configuration values
         try:
@@ -59,7 +58,6 @@ class DownloadManager:
         self.logger.info(f"Sanitized filename: {sanitized_name}")
         return sanitized_name
 
-    @PerformanceManager.track
     def download(self, url):
         """
         Download a single video from a URL with performance tracking.
@@ -70,17 +68,18 @@ class DownloadManager:
         Raises:
             DownloadError: If the download fails, an exception is raised with an error message.
         """
-        try:
-            with yt_dlp.YoutubeDL(self.yt_dlp_options) as ydl:
-                self.logger.info(f"Starting download from URL: {url}")
-                ydl.download([url])
-                self.logger.info(f"Download completed for URL: {url}")
-        except yt_dlp.DownloadError as e:
-            message = f"Error during download from {url}: {e}"
-            self.logger.error(message)
-            raise DownloadError(message) from e
-        except Exception as e:
-            # Capture any other unexpected errors
-            message = f"Unexpected error while downloading from {url}: {e}"
-            self.logger.error(message)
-            raise DownloadError(message) from e
+        with self.tracker.track_execution("Video Download"):
+            try:
+                with yt_dlp.YoutubeDL(self.yt_dlp_options) as ydl:
+                    self.logger.info(f"Starting download from URL: {url}")
+                    ydl.download([url])
+                    self.logger.info(f"Download completed for URL: {url}")
+            except yt_dlp.DownloadError as e:
+                message = f"Error during download from {url}: {e}"
+                self.logger.error(message)
+                raise DownloadError(message) from e
+            except Exception as e:
+                # Capture any other unexpected errors
+                message = f"Unexpected error while downloading from {url}: {e}"
+                self.logger.error(message)
+                raise DownloadError(message) from e

@@ -4,7 +4,7 @@ from src.core.logger_manager import LoggerManager
 
 # Initialize Dask client and logger
 client = Client()
-logger = LoggerManager().get_logger(__name__)
+logger = LoggerManager().get_logger()
 
 class PerformanceMonitoringPlugin(WorkerPlugin):
     def __init__(self, interval=5):

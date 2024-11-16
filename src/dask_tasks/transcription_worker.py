@@ -5,7 +5,7 @@ from src.core.performance_tracker import PerformanceTracker
 
 # Initialize Dask client, logger, and performance tracker
 client = Client()
-logger = LoggerManager().get_logger(__name__)
+logger = LoggerManager().get_logger()
 perf_tracker = PerformanceTracker()
 
 def transcribe_audio(file_path):

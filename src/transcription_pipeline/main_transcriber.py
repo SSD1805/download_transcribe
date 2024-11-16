@@ -7,12 +7,12 @@ from src.core.performance_tracker import PerformanceTracker
 from src.core.logger_manager import LoggerManager
 
 # Initialize performance manager and logger
-perf_manager = PerformanceTracker()
+perf_tracker = PerformanceTracker()
 log_manager = LoggerManager()
 logger = log_manager.get_logger()
 
 
-@perf_manager.track_performance
+@perf_tracker.track_performance
 def process_audio_files(input_directory='/app/audio_files'):
     """
     Process audio files in the specified directory, converting to WAV if necessary,
@@ -51,5 +51,5 @@ def process_audio_files(input_directory='/app/audio_files'):
 
 if __name__ == "__main__":
     # Start monitoring memory usage if needed
-    perf_manager.monitor_memory_usage()
+    perf_tracker.monitor_memory_usage()
     process_audio_files()

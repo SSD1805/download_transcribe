@@ -1,20 +1,26 @@
+# config_manager.py
 import yaml
 import os
 from src.core.logger_manager import LoggerManager
+from src.core.performance_tracker import PerformanceTracker
 
 
 class ConfigManager:
     def __init__(self, config_path='config.yaml', logger=None):
         """
-        Initialize the ConfigManager with a specified path to the configuration file.
+        Initialize the ConfigManager with configuration and performance tracking.
 
         Args:
             config_path (str): Path to the YAML configuration file.
-            logger (Logger, optional): Logger instance for logging messages. If not provided, a default will be created.
+            logger (Logger, optional): Logger instance for logging messages. Defaults to a logger created by LoggerManager.
         """
         self.config_path = config_path
         self.logger = logger or LoggerManager().get_logger()
         self.config_data = self._load_config()
+        self.performance_tracker = PerformanceTracker()  # Initialize performance tracking
+
+        # Optionally configure performance tracking settings from config
+        self._configure_performance_tracker()
 
     def _load_config(self):
         """
@@ -38,6 +44,24 @@ class ConfigManager:
         except yaml.YAMLError as e:
             self.logger.error(f"Error parsing YAML file {self.config_path}: {e}")
             raise
+
+    def _configure_performance_tracker(self):
+        """
+        Configure performance tracking based on settings in the config file.
+        """
+        performance_settings = self.config_data.get("performance", {})
+        monitor_interval = performance_settings.get("monitor_interval", 5)
+        self.performance_tracker.monitor_memory_usage(interval=monitor_interval)
+        self.logger.info(f"Performance tracker configured with interval: {monitor_interval} seconds")
+
+    def get_performance_tracker(self):
+        """
+        Returns the initialized PerformanceTracker instance.
+
+        Returns:
+            PerformanceTracker: Instance of PerformanceTracker.
+        """
+        return self.performance_tracker
 
     def get(self, key, default=None):
         """
@@ -83,7 +107,5 @@ class ConfigManager:
 # Example usage
 if __name__ == "__main__":
     config_manager = ConfigManager(config_path='config.yaml')
-    required_keys = ['download', 'whisper', 'directories']
-    config_manager.validate_keys(required_keys)
-    download_delay = config_manager.get('download', {}).get('delay', 10)
-    config_manager.logger.info(f"Download delay is set to: {download_delay} seconds")
+    performance_tracker = config_manager.get_performance_tracker()
+    # Now, you can use performance_tracker to track performance in other modules

@@ -1,35 +1,78 @@
 from src.core.logger_manager import LoggerManager
+from src.core.performance_tracker import PerformanceTracker
 from src.utils.filename_sanitizer import FilenameSanitizer
 from src.utils.timestamp_formatter import TimestampFormatter
 from src.utils.progress_bar import ProgressBar
 from src.utils.message_logger import MessageLogger
 
+# Initialize logger and performance tracker
+logger = LoggerManager().get_logger()
+perf_tracker = PerformanceTracker()
+
+
 class HelperFunctions:
     def __init__(self):
-        self.log_manager = LoggingManager()
-        self.logger = self.log_manager.get_logger()
+        self.logger = logger
 
-    def sanitize_filename(self, filename):
-        sanitized_name = FilenameSanitizer.sanitize_filename(filename)
+    @perf_tracker.track
+    def sanitize_filename(self, file_name):
+        """
+        Sanitizes the given filename and logs the result.
+
+        Args:
+            file_name (str): The filename to sanitize.
+
+        Returns:
+            str: The sanitized filename.
+        """
+        sanitized_name = FilenameSanitizer.sanitize_filename(file_name)
         self.logger.info(f"Sanitized filename: {sanitized_name}")
         return sanitized_name
 
-    def format_timestamp(self, seconds):
-        formatted_time = TimestampFormatter.format_timestamp(seconds)
+    @perf_tracker.track
+    def format_timestamp(self, total_seconds):
+        """
+        Formats the timestamp from seconds to a human-readable format.
+
+        Args:
+            total_seconds (int): The timestamp in seconds.
+
+        Returns:
+            str: The formatted timestamp.
+        """
+        formatted_time = TimestampFormatter.format_timestamp(total_seconds)
         self.logger.info(f"Formatted timestamp: {formatted_time}")
         return formatted_time
 
     def progress_bar(self, iterable, description="Processing"):
+        """
+        Displays a progress bar for the given iterable.
+
+        Args:
+            iterable (iterable): The iterable to wrap with a progress bar.
+            description (str): The description for the progress bar.
+
+        Returns:
+            iterable: The wrapped iterable with a progress bar.
+        """
         return ProgressBar.progress_bar(iterable, description)
 
-    def log_message(self, message, log_level='INFO'):
-        MessageLogger.log_message(message, log_level)
+    def log_message(self, log_message, log_level='INFO'):
+        """
+        Logs a message with the specified log level.
+
+        Args:
+            log_message (str): The message to log.
+            log_level (str): The log level (default is 'INFO').
+        """
+        MessageLogger.log_message(log_message, log_level)
+
 
 # Example usage
 if __name__ == "__main__":
     helper = HelperFunctions()
-    filename = helper.sanitize_filename("Example:File/Name.txt")
-    print(f"Sanitized filename: {filename}")
+    sanitized_filename = helper.sanitize_filename("Example:File/Name.txt")
+    print(f"Sanitized filename: {sanitized_filename}")
     formatted_time = helper.format_timestamp(4000)
     print(f"Formatted timestamp: {formatted_time}")
     for _ in helper.progress_bar(range(10), description="Processing"):

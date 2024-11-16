@@ -1,7 +1,7 @@
 # cli_audio.py
 
 import click
-from audio_handler import AudioHandler
+from src.modules.audio_handler import AudioHandler
 
 @click.group()
 def cli():
