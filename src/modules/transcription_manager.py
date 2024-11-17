@@ -1,7 +1,7 @@
 import whisperx
 import whisper
 import torch
-from src.pipelines.download.custom_exceptions import ConfigurationError
+from src.pipelines.registry.error_registry import ConfigurationError
 from src.core.services import CoreServices
 
 # Get logger and performance tracker from CoreServices

@@ -6,10 +6,10 @@ from src.modules.transcription_manager import TranscriptionManagerWhisperX
 from src.utils.file_utilities import FileManager
 from src.modules.text_processor import TextProcessor
 from src.modules.config_manager import ConfigManager
-from src.core.services import CoreServices
+from src.utils.logger_service import LoggerService
 
 # Get logger and performance tracker from CoreServices
-logger = CoreServices.get_logger()
+logger = LoggerService.get_instance()
 perf_tracker = CoreServices.get_performance_tracker()
 
 # Initialize the logger

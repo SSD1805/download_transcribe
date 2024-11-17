@@ -1,7 +1,7 @@
 # download_coordinator.py
 
 from src.celery_tasks.download_tasks import download_video_task
-from src.pipelines.download.download_manager import DownloadManager
+from src.pipelines.download.download_handler import DownloadManager
 from src.modules.config_manager import ConfigManager
 from src.core.services import CoreServices
 

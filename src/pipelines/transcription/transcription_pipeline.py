@@ -1,19 +1,17 @@
 # src/pipelines/transcription/transcription_pipeline.py
 import os
-from src.core.services import CoreServices
-from src.pipelines.audio.audio_converter import AudioConverter
-from src.pipelines.transcription.audio_transcriber import AudioTranscriber
-from src.pipelines.transcription.transcription_saver import TranscriptionSaver
+from src.pipelines.registry.handler_registry import HandlerRegistry
 
 class TranscriptionPipeline:
-    def __init__(self, input_directory, output_directory):
+    def __init__(self, input_directory, output_directory, registry=None):
         self.input_directory = input_directory
         self.output_directory = output_directory
-        self.logger = CoreServices.get_logger()
-        self.perf_tracker = CoreServices.get_performance_tracker()
-        self.converter = AudioConverter(output_directory=output_directory)
-        self.transcriber = AudioTranscriber()
-        self.saver = TranscriptionSaver(output_directory=output_directory)
+        self.registry = registry or HandlerRegistry
+        self.logger = self.registry.get("logger")
+        self.perf_tracker = self.registry.get("performance_tracker")
+        self.converter = self.registry.get("audio_converter")(output_directory=output_directory)
+        self.transcriber = self.registry.get("audio_transcriber")()
+        , performance_tracker=self.perf_tracker
 
     def process_files(self):
         """

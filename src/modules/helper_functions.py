@@ -1,7 +1,7 @@
 from src.utils.file_utilities import FilenameSanitizer
 from src.utils.timestamp_formatter import TimestampFormatter
 from src.utils.progress_bar import ProgressBar
-from src.utils.message_logger import MessageLogger
+from src.utils.logger_service import MessageLogger
 from src.core.services import CoreServices
 
 # Initialize logger and performance tracker
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 from src.utils.file_utilities import FilenameSanitizer
 from src.utils.timestamp_formatter import TimestampFormatter
 from src.utils.progress_bar import ProgressBar
-from src.utils.message_logger import MessageLogger
+from src.utils.logger_service import MessageLogger
 
 class HelperFunctions:
     @staticmethod

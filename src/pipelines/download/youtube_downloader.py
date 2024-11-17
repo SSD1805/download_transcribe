@@ -1,4 +1,4 @@
-from src.pipelines.download.download_manager import DownloadManager
+from src.pipelines.download.download_handler import DownloadManager
 from src.core.services import CoreServices
 
 logger = CoreServices.get_logger()

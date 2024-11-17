@@ -1,7 +1,7 @@
 from celery import shared_task
 from src.core.services import CoreServices
 from src.pipelines.transcription.audio_transcriber import AudioTranscriber
-from src.pipelines.download.custom_exceptions import ConfigurationError
+from src.pipelines.registry.error_registry import ConfigurationError
 from src.pipelines.transcription.transcription_saver import TranscriptionSaver
 
 # Get logger and performance tracker from CoreServices

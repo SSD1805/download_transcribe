@@ -5,7 +5,7 @@ from src.core.services import CoreServices
 
 # Initialize logger and performance tracker
 logger = CoreServices.get_logger()
-perf_tracker = CoreServices.get_performance_tracker()
+perf_tracker = LoggerService.get_instance()
 
 class ConfigManager:
     def __init__(self, config_path='config.yaml', logger=None):

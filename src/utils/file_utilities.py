@@ -1,16 +1,19 @@
 import os
 import shutil
 from src.core.services import CoreServices
+from typing import Optional
 
 # Get logger and performance tracker from CoreServices
 logger = CoreServices.get_logger()
 perf_tracker = CoreServices.get_performance_tracker()
 
-
 class FileManager:
     """
-    Handles file operations such as saving, loading, and deleting files.
+    Handles file operations such as saving, loading, copying, and deleting files.
     """
+    def __init__(self, logger=logger, tracker=perf_tracker):
+        self.logger = logger
+        self.tracker = tracker
 
     @perf_tracker.track
     def save_file(self, content: bytes, file_path: str):
@@ -24,9 +27,9 @@ class FileManager:
         try:
             with open(file_path, 'wb') as file:
                 file.write(content)
-            logger.info(f"File saved successfully: {file_path}")
+            self.logger.info(f"File saved successfully: {file_path}")
         except Exception as e:
-            logger.error(f"Failed to save file {file_path}: {e}")
+            self.logger.error(f"Failed to save file {file_path}: {e}")
             raise
 
     @perf_tracker.track
@@ -43,10 +46,10 @@ class FileManager:
         try:
             with open(file_path, 'rb') as file:
                 content = file.read()
-            logger.info(f"File loaded successfully: {file_path}")
+            self.logger.info(f"File loaded successfully: {file_path}")
             return content
         except Exception as e:
-            logger.error(f"Failed to load file {file_path}: {e}")
+            self.logger.error(f"Failed to load file {file_path}: {e}")
             raise
 
     @perf_tracker.track
@@ -59,9 +62,9 @@ class FileManager:
         """
         try:
             os.remove(file_path)
-            logger.info(f"File deleted successfully: {file_path}")
+            self.logger.info(f"File deleted successfully: {file_path}")
         except Exception as e:
-            logger.error(f"Failed to delete file {file_path}: {e}")
+            self.logger.error(f"Failed to delete file {file_path}: {e}")
             raise
 
     @perf_tracker.track
@@ -75,16 +78,17 @@ class FileManager:
         """
         try:
             shutil.copy2(source, destination)
-            logger.info(f"File copied from {source} to {destination}")
+            self.logger.info(f"File copied from {source} to {destination}")
         except Exception as e:
-            logger.error(f"Failed to copy file from {source} to {destination}: {e}")
+            self.logger.error(f"Failed to copy file from {source} to {destination}: {e}")
             raise
-
 
 class DirectoryManager:
     """
     Handles directory operations such as ensuring existence, listing files, and creating directories.
     """
+    def __init__(self, logger=logger):
+        self.logger = logger
 
     def ensure_directory_exists(self, directory_path: str):
         """
@@ -95,12 +99,12 @@ class DirectoryManager:
         """
         try:
             os.makedirs(directory_path, exist_ok=True)
-            logger.info(f"Directory ensured: {directory_path}")
+            self.logger.info(f"Directory ensured: {directory_path}")
         except Exception as e:
-            logger.error(f"Failed to ensure directory {directory_path}: {e}")
+            self.logger.error(f"Failed to ensure directory {directory_path}: {e}")
             raise
 
-    def list_files(self, directory_path: str, extensions: tuple = None) -> list:
+    def list_files(self, directory_path: str, extensions: Optional[tuple] = None) -> list:
         """
         List files in a directory with optional filtering by extensions.
 
@@ -118,20 +122,20 @@ class DirectoryManager:
                 if os.path.isfile(os.path.join(directory_path, f))
                 and (not extensions or f.endswith(extensions))
             ]
-            logger.info(f"Listed {len(files)} files in directory: {directory_path}")
+            self.logger.info(f"Listed {len(files)} files in directory: {directory_path}")
             return files
         except Exception as e:
-            logger.error(f"Failed to list files in directory {directory_path}: {e}")
+            self.logger.error(f"Failed to list files in directory {directory_path}: {e}")
             raise
 
-
 class FilenameSanitizer:
     """
     Provides utilities for sanitizing file names.
     """
+    def __init__(self, logger=logger):
+        self.logger = logger
 
-    @staticmethod
-    def sanitize_filename(filename: str) -> str:
+    def sanitize(self, filename: str) -> str:
         """
         Sanitize a filename to make it safe for file systems.
 
@@ -142,24 +146,5 @@ class FilenameSanitizer:
             str: Sanitized filename.
         """
         sanitized = "".join(c if c.isalnum() or c in " ._-()" else "_" for c in filename)
-        logger.info(f"Sanitized filename: {sanitized}")
-        return sanitized
-class FilenameSanitizer:
-    """
-    Provides utilities for sanitizing file names.
-    """
-
-    @staticmethod
-    def sanitize(filename: str) -> str:
-        """
-        Sanitize a filename to make it safe for file systems.
-
-        Args:
-            filename (str): Filename to sanitize.
-
-        Returns:
-            str: Sanitized filename.
-        """
-        sanitized = "".join(c if c.isalnum() or c in " ._-()" else "_" for c in filename)
-        logger.info(f"Sanitized filename: {sanitized}")
+        self.logger.info(f"Sanitized filename: {sanitized}")
         return sanitized
