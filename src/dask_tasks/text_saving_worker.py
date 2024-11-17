@@ -1,12 +1,14 @@
 from dask.distributed import Client
-from src.nlp_pipeline.text_saver import TextSaver
-from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceTracker
+from src.pipelines.text.text_saver import TextSaver
+from src.core.services import CoreServices
+
+# Initialize logger and performance tracker
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 # Initialize Dask client, logger, and performance tracker
 client = Client()
-logger = LoggerManager().get_logger()
-perf_tracker = PerformanceTracker()
+
 
 
 def save_text_task(processed_sentences, identified_entities, output_filepath):
@@ -30,6 +32,6 @@ client.register_worker_plugin(save_text_task)
 if __name__ == "__main__":
     sentences = ["This is a sentence.", "This is another sentence."]
     entities = [{"text": "Sample", "label": "NOUN"}]
-    filepath = "/app/data/processed_text.csv"
+    filepath = "/data/data/processed_text.csv"
     future = client.submit(save_text_task, sentences, entities, filepath)
     print("Save completed.")

@@ -6,47 +6,47 @@ services:
       context: ./docker/downloaders
       dockerfile: Dockerfile_youtube_downloader
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
 
   audio_converter:
     build:
-      context: ./docker/audio_processing
-      dockerfile: Dockerfile_audio_converter
+      context: docker/audio
+      dockerfile: docker/audio/Dockerfile_converter
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
 
   audio_normalizer:
     build:
-      context: ./docker/audio_processing
-      dockerfile: Dockerfile_audio_normalizer
+      context: docker/audio
+      dockerfile: docker/audio/Dockerfile_normalizer
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
 
   audio_splitter:
     build:
-      context: ./docker/audio_processing
-      dockerfile: Dockerfile_audio_splitter
+      context: docker/audio
+      dockerfile: docker/audio/Dockerfile_splitter
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
 
   audio_trimmer:
     build:
-      context: ./docker/audio_processing
-      dockerfile: Dockerfile_audio_trimmer
+      context: docker/audio
+      dockerfile: docker/audio/Dockerfile_trimmer
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
@@ -56,7 +56,7 @@ services:
       context: ./docker/transcription_service
       dockerfile: Dockerfile_main_transcriber
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     environment:
       LAMBDA_IP: "your.lambda.instance.ip"
       LAMBDA_USER: "your_username"
@@ -67,50 +67,50 @@ services:
 
   text_loader:
     build:
-      context: ./docker/nlp_pipeline
+      context: ./docker/text
       dockerfile: Dockerfile_text_loader
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
 
   text_segmenter:
     build:
-      context: ./docker/nlp_pipeline
+      context: ./docker/text
       dockerfile: Dockerfile_text_segmenter
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
 
   text_tokenizer:
     build:
-      context: ./docker/nlp_pipeline
+      context: ./docker/text
       dockerfile: Dockerfile_text_tokenizer
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
 
   ner_processor:
     build:
-      context: ./docker/nlp_pipeline
+      context: ./docker/text
       dockerfile: Dockerfile_ner_processor
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
 
   text_saver:
     build:
-      context: ./docker/nlp_pipeline
+      context: ./docker/text
       dockerfile: Dockerfile_text_saver
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
@@ -118,12 +118,12 @@ services:
   celery_worker:
     build:
       context: ./docker/celery
-      dockerfile: Dockerfile_celery_worker
+      dockerfile: docker/celery/Dockerfile_worker
     depends_on:
       - django_app
       - db
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     environment:
       DATABASE_URL: postgres://your_user:your_password@db:5432/your_db
       CELERY_BROKER_URL: ${DATABASE_URL}
@@ -135,12 +135,12 @@ services:
   celery_beat:
     build:
       context: ./docker/celery
-      dockerfile: Dockerfile_celery_beat
+      dockerfile: docker/celery/Dockerfile_beat
     depends_on:
       - django_app
       - db
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     environment:
       DATABASE_URL: postgres://your_user:your_password@db:5432/your_db
       CELERY_BROKER_URL: ${DATABASE_URL}
@@ -154,7 +154,7 @@ services:
       context: ./docker/dask_worker
       dockerfile: Dockerfile_dask_scheduler
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
@@ -164,7 +164,7 @@ services:
       context: ./docker/dask_worker
       dockerfile: Dockerfile_audio_conversion_worker
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
@@ -174,7 +174,7 @@ services:
       context: ./docker/dask_worker
       dockerfile: Dockerfile_ner_worker
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
@@ -184,7 +184,7 @@ services:
       context: ./docker/dask_worker
       dockerfile: Dockerfile_performance_monitor_worker
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
@@ -194,7 +194,7 @@ services:
       context: ./docker/dask_worker
       dockerfile: Dockerfile_pipeline_manager
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
@@ -204,7 +204,7 @@ services:
       context: ./docker/dask_worker
       dockerfile: Dockerfile_text_loading_worker
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
@@ -214,7 +214,7 @@ services:
       context: ./docker/dask_worker
       dockerfile: Dockerfile_text_saving_worker
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
@@ -224,7 +224,7 @@ services:
       context: ./docker/dask_worker
       dockerfile: Dockerfile_text_segmentation_worker
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
@@ -234,7 +234,7 @@ services:
       context: ./docker/dask_worker
       dockerfile: Dockerfile_text_tokenization_worker
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
@@ -244,7 +244,7 @@ services:
       context: ./docker/dask_worker
       dockerfile: Dockerfile_transcription_worker
     volumes:
-      - ./data:/app/data
+      - ./data:/data/data
     networks:
       - app_network
     restart: always
@@ -254,7 +254,7 @@ services:
       context: ./docker/django_app
       dockerfile: Dockerfile_django
     volumes:
-      - ./app:/app
+      - ./data:/data
     depends_on:
       - db
       - youtube_downloader

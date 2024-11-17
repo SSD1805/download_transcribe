@@ -1,10 +1,10 @@
-from src.download_pipeline.download_manager import DownloadManager
-from src.download_pipeline.youtube_downloader import YouTubeDownloader
-from src.core.performance_tracker import PerformanceTracker
-from src.core.logger_manager import LoggerManager
+from src.pipelines.download.download_manager import DownloadManager
+from src.pipelines.download import YouTubeDownloader
+from src.core.services import CoreServices
 
-# Initialize logger
-logger = LoggerManager().get_logger()
+# Initialize logger and performance tracker
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 def main():
     try:

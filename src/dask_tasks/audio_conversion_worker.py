@@ -1,13 +1,15 @@
-from dask.distributed import Client, worker
-from src.audio_pipeline.audio_converter import AudioConverter
-from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceTracker
+from dask.distributed import Client
+from src.pipelines.audio.audio_converter import AudioConverter
+from src.core.services import CoreServices
+
+# Get logger and performance tracker from CoreServices
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 
 # Initialize Dask client, logger, and performance tracker
 client = Client()
-logger = LoggerManager().get_logger()
-perf_tracker = PerformanceTracker()
+
 
 def convert_audio(file_path):
     """
@@ -26,4 +28,4 @@ def convert_audio(file_path):
 client.register_worker_plugin(convert_audio)  # Register function as plugin
 
 if __name__ == "__main__":
-    client.run(convert_audio, "/app/audio_files/file.mp3")  # Sample execution
+    client.run(convert_audio, "/data/audio_files/file.mp3")  # Sample execution

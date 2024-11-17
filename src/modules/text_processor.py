@@ -1,10 +1,10 @@
 import click
-from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceTracker
+from src.core.services import CoreServices
 
 # Initialize logger and performance tracker
-logger = LoggerManager().get_logger(__name__)
-perf_tracker = PerformanceTracker()
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
+
 
 class TextProcessor:
     def process_text(self, text, output_filepath):

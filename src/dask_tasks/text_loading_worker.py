@@ -1,12 +1,14 @@
 from dask.distributed import Client
-from src.nlp_pipeline.text_loader import TextLoader
-from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceTracker
+from src.pipelines.text.text_loader import TextLoader
+from src.core.services import CoreServices
+
+# Initialize logger and performance tracker
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 # Initialize Dask client, logger, and performance tracker
 client = Client()
-logger = LoggerManager().get_logger()
-perf_tracker = PerformanceTracker()
+
 
 
 def load_text_task(text):

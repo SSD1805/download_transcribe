@@ -1,13 +1,15 @@
 from dask.distributed import Client
-from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceTracker
-from src.audio_pipeline.audio_converter import AudioConverter
-from src.transcription_pipeline.audio_transcriber import AudioTranscriber
+from src.pipelines.audio.audio_converter import AudioConverter
+from src.pipelines.transcription.audio_transcriber import AudioTranscriber
+from src.core.services import CoreServices
+
+# Get logger and performance tracker from CoreServices
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 # Initialize Dask client, logger, and performance tracker
 client = Client("tcp://dask_scheduler:8786")
-logger = LoggerManager().get_logger()
-perf_tracker = PerformanceTracker()
+
 
 
 def execute_pipeline(input_file, output_file):
@@ -56,7 +58,7 @@ def execute_pipeline(input_file, output_file):
 
 if __name__ == "__main__":
     # Example input/output files
-    input_audio_file = "/app/audio_files/file.mp3"
-    transcription_output_file = "/app/audio_files/transcription.txt"
+    input_audio_file = "/data/audio_files/file.mp3"
+    transcription_output_file = "/data/audio_files/transcription.txt"
 
     execute_pipeline(input_audio_file, transcription_output_file)

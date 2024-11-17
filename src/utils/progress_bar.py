@@ -1,6 +1,9 @@
 from tqdm import tqdm
-from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceTracker
+from src.core.services import CoreServices
+
+# Get logger and performance tracker from CoreServices
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 class ProgressBar:
     def __init__(self, tracker=None):
@@ -43,3 +46,20 @@ class ProgressBar:
         except Exception as e:
             self.logger.error(f"Error during progress bar execution: {e}")
             raise
+from tqdm import tqdm
+
+class ProgressBar:
+    @staticmethod
+    def wrap(iterable, description="Processing", **kwargs):
+        """
+        Displays a progress bar for the given iterable.
+
+        Args:
+            iterable (iterable): The iterable to wrap with a progress bar.
+            description (str): The description for the progress bar.
+            **kwargs: Additional customization for the progress bar.
+
+        Returns:
+            generator: A tqdm-wrapped iterable.
+        """
+        return tqdm(iterable, desc=description, **kwargs)

@@ -1,13 +1,12 @@
-from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceTracker
-from src.utils.filename_sanitizer import FilenameSanitizer
+from src.utils.file_utilities import FilenameSanitizer
 from src.utils.timestamp_formatter import TimestampFormatter
 from src.utils.progress_bar import ProgressBar
 from src.utils.message_logger import MessageLogger
+from src.core.services import CoreServices
 
 # Initialize logger and performance tracker
-logger = LoggerManager().get_logger()
-perf_tracker = PerformanceTracker()
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 
 class HelperFunctions:
@@ -78,3 +77,25 @@ if __name__ == "__main__":
     for _ in helper.progress_bar(range(10), description="Processing"):
         pass
     helper.log_message("This is an info message.")
+
+from src.utils.file_utilities import FilenameSanitizer
+from src.utils.timestamp_formatter import TimestampFormatter
+from src.utils.progress_bar import ProgressBar
+from src.utils.message_logger import MessageLogger
+
+class HelperFunctions:
+    @staticmethod
+    def sanitize_filename(file_name):
+        return FilenameSanitizer.sanitize(file_name)
+
+    @staticmethod
+    def format_timestamp(total_seconds):
+        return TimestampFormatter.format(total_seconds)
+
+    @staticmethod
+    def progress_bar(iterable, description="Processing"):
+        return ProgressBar.wrap(iterable, description)
+
+    @staticmethod
+    def log_message(log_message, log_level='INFO'):
+        MessageLogger.log(log_message, log_level)

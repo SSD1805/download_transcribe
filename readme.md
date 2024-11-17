@@ -192,9 +192,9 @@ docker-compose down
 
 ```bash
 # Full Workflow
-poetry run python app.py download --url "https://youtube.com/your-video"
-poetry run python app.py transcribe /app/audio_files/downloaded_audio.mp3
-poetry run python app.py process --directory "/app/transcriptions"
+poetry run python data.py download --url "https://youtube.com/your-video"
+poetry run python data.py transcribe /data/audio_files/downloaded_audio.mp3
+poetry run python data.py process --directory "/app/transcriptions"
 ```
 
 ## Configuration

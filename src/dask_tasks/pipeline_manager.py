@@ -1,14 +1,17 @@
 from dask.distributed import Client
 from src.core.batch_processor import BatchProcessor
-from src.core.logger_manager import LoggerManager
 from src.core.memory_monitor import MemoryMonitor
-from src.core.performance_tracker import PerformanceTracker
 from src.modules.config_manager import ConfigManager
-from src.nlp_pipeline.text_loader import TextLoader
-from src.nlp_pipeline.text_segmenter import TextSegmenter
-from src.nlp_pipeline.text_tokenizer import TextTokenizer
-from src.nlp_pipeline.ner_processor import NERProcessor
-from src.nlp_pipeline.text_saver import TextSaver
+from src.pipelines.text.text_loader import TextLoader
+from src.pipelines.text.text_segmenter import TextSegmenter
+from src.pipelines.text.text_tokenizer import TextTokenizer
+from src.pipelines.text.ner_processor import NERProcessor
+from src.pipelines.text.text_saver import TextSaver
+from src.core.services import CoreServices
+
+# Get logger and performance tracker from CoreServices
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 class PipelineManager:
     def __init__(self, config_manager):
@@ -79,7 +82,7 @@ class PipelineManager:
 if __name__ == "__main__":
     # Sample data and output filepath
     sample_texts = ["This is a sample text.", "Another text for processing."]
-    sample_output_filepath = "/app/data/processed_output.csv"
+    sample_output_filepath = "/data/data/processed_output.csv"
 
     # Assume config_manager is initialized
     config_manager = ConfigManager()

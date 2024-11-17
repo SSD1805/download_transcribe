@@ -1,8 +1,11 @@
 import psutil
 import time
 import threading
-from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceTracker
+from src.core.services import CoreServices
+
+# Get logger and performance tracker from CoreServices
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 class MemoryMonitor:
     def __init__(self, interval=5, performance_tracker=None):

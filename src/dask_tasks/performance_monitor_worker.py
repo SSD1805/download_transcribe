@@ -1,10 +1,13 @@
 from dask.distributed import Client, WorkerPlugin
-from src.core.performance_tracker import PerformanceTracker
-from src.core.logger_manager import LoggerManager
+from src.core.services import CoreServices
+
+# Get logger and performance tracker from CoreServices
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
+
 
 # Initialize Dask client and logger
 client = Client()
-logger = LoggerManager().get_logger()
 
 class PerformanceMonitoringPlugin(WorkerPlugin):
     def __init__(self, interval=5):

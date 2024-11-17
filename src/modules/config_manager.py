@@ -1,9 +1,11 @@
 # config_manager.py
 import yaml
 import os
-from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceTracker
+from src.core.services import CoreServices
 
+# Initialize logger and performance tracker
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 class ConfigManager:
     def __init__(self, config_path='config.yaml', logger=None):
@@ -103,6 +105,25 @@ class ConfigManager:
         self.config_data = self._load_config()
         self.logger.info("Configuration reloaded.")
 
+from yaml_parser import YAMLParser
+
+class ConfigManager:
+    def __init__(self, config_path, performance_configurator=None):
+        self.config_path = config_path
+        self.config_data = YAMLParser.parse(config_path)
+        self.performance_configurator = performance_configurator
+
+    def get(self, key, default=None):
+        return self.config_data.get(key, default)
+
+    def validate_keys(self, required_keys):
+        missing_keys = [key for key in required_keys if key not in self.config_data]
+        if missing_keys:
+            raise KeyError(f"Missing required configuration keys: {', '.join(missing_keys)}")
+
+    def configure_performance(self):
+        if self.performance_configurator:
+            self.performance_configurator.configure(self.config_data.get("performance", {}))
 
 # Example usage
 if __name__ == "__main__":

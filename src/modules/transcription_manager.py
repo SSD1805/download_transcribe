@@ -1,13 +1,12 @@
 import whisperx
 import whisper
 import torch
-from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceTracker
-from src.download_pipeline.custom_exceptions import ConfigurationError
+from src.pipelines.download.custom_exceptions import ConfigurationError
+from src.core.services import CoreServices
 
-# Initialize logger and performance tracker
-logger = LoggerManager().get_logger()
-perf_tracker = PerformanceTracker()
+# Get logger and performance tracker from CoreServices
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 
 class ModelLoader:

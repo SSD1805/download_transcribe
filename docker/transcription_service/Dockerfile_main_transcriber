@@ -27,5 +27,5 @@ ENV LAMBDA_IP=${LAMBDA_IP}
 ENV LAMBDA_USER=${LAMBDA_USER}
 ENV LAMBDA_PATH=${LAMBDA_PATH}
 
-# Define the default command to run main_transcriber.py using Poetry
+# Define the default command to run audio_processing_pipeline.py using Poetry
 CMD ["poetry", "run", "python", "src/transcription_pipeline/main_transcriber.py"]

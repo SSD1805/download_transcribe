@@ -1,12 +1,13 @@
 from dask.distributed import Client
-from src.transcription_pipeline.audio_transcriber import AudioTranscriber
-from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceTracker
+from src.pipelines.transcription.audio_transcriber import AudioTranscriber
+from src.core.services import CoreServices
+
+# Initialize logger and performance tracker
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 # Initialize Dask client, logger, and performance tracker
 client = Client()
-logger = LoggerManager().get_logger()
-perf_tracker = PerformanceTracker()
 
 def transcribe_audio(file_path):
     """
@@ -33,6 +34,6 @@ def transcribe_audio(file_path):
 client.register_worker_plugin(transcribe_audio)
 
 if __name__ == "__main__":
-    sample_file_path = "/app/audio_files/file.wav"
+    sample_file_path = "/data/audio_files/file.wav"
     future = client.submit(transcribe_audio, sample_file_path)
     print(future.result())

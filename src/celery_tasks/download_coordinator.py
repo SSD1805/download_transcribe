@@ -1,9 +1,13 @@
 # download_coordinator.py
 
 from src.celery_tasks.download_tasks import download_video_task
-from src.download_pipeline.download_manager import DownloadManager
-from src.core.performance_tracker import PerformanceTracker
+from src.pipelines.download.download_manager import DownloadManager
 from src.modules.config_manager import ConfigManager
+from src.core.services import CoreServices
+
+# Get logger and performance tracker from CoreServices
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 def main():
     # Initialize configuration and performance tracker

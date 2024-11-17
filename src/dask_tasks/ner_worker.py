@@ -1,12 +1,14 @@
 from dask.distributed import Client
-from src.nlp_pipeline.ner_processor import NERProcessor
-from src.core.logger_manager import LoggerManager
-from src.core.performance_tracker import PerformanceTracker
+from src.pipelines.text.ner_processor import NERProcessor
+from src.core.services import CoreServices
+
+# Get logger and performance tracker from CoreServices
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 # Initialize Dask client, logger, and performance tracker
 client = Client()
-logger = LoggerManager().get_logger()
-perf_tracker = PerformanceTracker()
+
 
 
 def ner_task(text):

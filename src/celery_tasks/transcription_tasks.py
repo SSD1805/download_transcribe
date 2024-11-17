@@ -1,12 +1,12 @@
 from celery import shared_task
-from src.core.logger_manager import LoggerManager
-from src.transcription_pipeline.audio_transcriber import AudioTranscriber
-from src.download_pipeline.custom_exceptions import ConfigurationError
-from src.transcription_pipeline.transcription_saver import TranscriptionSaver
-from src.core.performance_tracker import PerformanceTracker
+from src.core.services import CoreServices
+from src.pipelines.transcription.audio_transcriber import AudioTranscriber
+from src.pipelines.download.custom_exceptions import ConfigurationError
+from src.pipelines.transcription.transcription_saver import TranscriptionSaver
 
-logger = LoggerManager().get_logger()
-performance_tracker = PerformanceTracker()
+# Get logger and performance tracker from CoreServices
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 
 @shared_task(bind=True, max_retries=3)

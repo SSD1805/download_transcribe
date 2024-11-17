@@ -1,25 +1,32 @@
-# audio_handler.py
-
-from src.audio_pipeline.audio_converter import AudioConverter
-from src.audio_pipeline.audio_splitter import AudioSplitter
-from src.audio_pipeline.audio_normalizer import AudioNormalizer
-from src.audio_pipeline.audio_trimmer import AudioTrimmer
-
+# src/pipelines/audio/audio_handler.py
 class AudioHandler:
-    def __init__(self, input_directory='/app/audio_files', output_directory='/app/processed_audio', format='wav'):
-        self.audio_converter = AudioConverter(output_directory, format)
-        self.audio_splitter = AudioSplitter(output_directory, format)
-        self.audio_normalizer = AudioNormalizer(output_directory, format)
-        self.audio_trimmer = AudioTrimmer(output_directory, format)
+    """
+    Audio handler that uses a registry to retrieve pre-configured handlers.
+    """
+    def handle_audio(self, operation_name, **kwargs):
+        """
+        Handle an audio operation by delegating to the appropriate handler.
 
-    def convert(self, input_file, output_format=None):
-        return self.audio_converter.convert_audio_format(input_file, output_format)
+        Args:
+            operation_name (str): The operation to perform (e.g., 'convert', 'normalize').
+            **kwargs: Arguments required by the handler.
 
-    def split(self, input_file, segment_duration=30000):
-        return self.audio_splitter.split(input_file, segment_duration)
+        Returns:
+            Result of the handler's operation.
+        """
+        handler = AudioHandlerRegistry.get_handler(operation_name)
+        return handler.process(**kwargs)
 
-    def normalize(self, input_file):
-        return self.audio_normalizer.normalize(input_file)
+audio_handler = AudioHandler()
 
-    def trim(self, input_file):
-        return self.audio_trimmer.trim(input_file)
+# Convert audio
+audio_handler.handle_audio("convert", input_file="input.mp3", output_file="output.wav", target_format="wav")
+
+# Normalize audio
+audio_handler.handle_audio("normalize", input_file="input.wav", output_file="normalized.wav")
+
+# Split audio
+audio_handler.handle_audio("split", input_file="input.wav", chunk_duration_ms=30000, output_file_prefix="chunk_")
+
+# Trim audio
+audio_handler.handle_audio("trim", input_file="input.wav", output_file="trimmed.wav", silence_thresh=-40)

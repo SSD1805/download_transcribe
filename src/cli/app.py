@@ -1,16 +1,30 @@
 import click
-from src.download_pipeline.youtube_downloader import YouTubeDownloader
-from src.modules.audio_handler import Transcriber
+from src.pipelines.download.youtube_downloader import YouTubeDownloader
+from src.modules.audio_handler import AudioHandler
 from src.modules.whisper_ai_fallback import WhisperAIFallback
 from src.modules.transcription_manager import TranscriptionManagerWhisperX
-from src.core.file_manager import FileManager
+from src.utils.file_utilities import FileManager
 from src.modules.text_processor import TextProcessor
 from src.modules.config_manager import ConfigManager
-from src.core.logger_manager import LoggerManager
+from src.core.services import CoreServices
+
+# Get logger and performance tracker from CoreServices
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 # Initialize the logger
-log_manager = LoggerManager()
-logger = log_manager.get_logger()
+from core.settings_registry import SettingsRegistry
+from modules.config_manager import ConfigManager
+from modules.performance_configurator import PerformanceConfigurator
+
+# Initialize settings instances
+config_manager = ConfigManager(config_path="config.yaml")
+performance_configurator = PerformanceConfigurator(performance_tracker)
+
+# Register settings with the registry
+SettingsRegistry.register("config", config_manager)
+SettingsRegistry.register("performance", performance_configurator)
+
 
 @click.group()
 def cli():
@@ -46,7 +60,7 @@ def transcribe(audio_file, title, use_whisperx, fallback_to_whisper):
         transcriber.transcribe_audio(audio_file, title)
 
 @cli.command()
-@click.option('--directory', default='/app/audio_files', help='Directory to process transcriptions.')
+@click.option('--directory', default='/data/audio_files', help='Directory to process transcriptions.')
 @click.option('--use-whisperx', is_flag=True, default=False, help='Use WhisperX modules module.')
 def process(directory, use_whisperx):
     """Process transcriptions for NER and sentence segmentation"""
@@ -70,7 +84,7 @@ def setup(config_path):
     config_manager.load_config()
 
 @cli.command()
-@click.option('--directory', default='/app/audio_files', help='Directory to manage files.')
+@click.option('--directory', default='/data/audio_files', help='Directory to manage files.')
 def manage_files(directory):
     """Run file management tasks"""
     logger.info(f"Managing files in directory: {directory}")

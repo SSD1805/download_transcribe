@@ -1,7 +1,10 @@
 from src.core.batch_processor import BatchProcessor
-from src.core.logger_manager import LoggerManager
 from src.core.memory_monitor import MemoryMonitor
-from src.core.performance_tracker import PerformanceTracker
+from src.core.services import CoreServices
+
+# Initialize logger and performance tracker
+logger = CoreServices.get_logger()
+perf_tracker = CoreServices.get_performance_tracker()
 
 class PipelineManager:
     def __init__(self, config_manager):

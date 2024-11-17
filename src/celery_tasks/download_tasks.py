@@ -1,9 +1,9 @@
 # celery_tasks/download_tasks.py
 
 from celery import shared_task
-from src.core.logger_manager import LoggerManager
-from src.download_pipeline.download_manager import DownloadManager  # Ensure the path aligns with your project structure
-from src.download_pipeline.custom_exceptions import DownloadError
+from src.core.services import LoggerManager
+from src.pipelines.download.download_manager import DownloadManager  # Ensure the path aligns with your project structure
+from src.pipelines.download.custom_exceptions import DownloadError
 
 logger = LoggerManager().get_logger()
 
