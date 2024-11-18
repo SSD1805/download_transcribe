@@ -1,6 +1,8 @@
 # src/pipelines/transcription/transcription_pipeline.py
 import os
+
 from src.pipelines.registry.handler_registry import HandlerRegistry
+
 
 class TranscriptionPipeline:
     def __init__(self, input_directory, output_directory, registry=None):
@@ -11,7 +13,7 @@ class TranscriptionPipeline:
         self.perf_tracker = self.registry.get("performance_tracker")
         self.converter = self.registry.get("audio_converter")(output_directory=output_directory)
         self.transcriber = self.registry.get("audio_transcriber")()
-        , performance_tracker=self.perf_tracker
+        self.perf_tracker = self.registry.get("performance_tracker")
 
     def process_files(self):
         """

@@ -2,7 +2,7 @@
 import os
 import json
 from src.utils.logger_service import LoggerService
-from src.utils.performance_tracker_service import PerformanceTrackerService
+from src.utils.performance_tracker import PerformanceTrackerService
 
 class TranscriptionSaver:
     def __init__(self, output_directory, logger=None, performance_tracker=None):

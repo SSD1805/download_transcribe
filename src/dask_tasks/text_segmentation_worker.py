@@ -15,7 +15,7 @@ def segment_text_task(text):
     """
     Segment text into sentences and track performance.
     """
-    segmenter = TextSegmenter(logger)
+    segmenter = TextSegmenter()
 
     with perf_tracker.track_execution("Text Segmentation"):
         logger.info("Starting text segmentation task.")

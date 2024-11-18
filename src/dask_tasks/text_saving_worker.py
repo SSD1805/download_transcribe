@@ -15,7 +15,7 @@ def save_text_task(processed_sentences, identified_entities, output_filepath):
     """
     Save processed text and track performance.
     """
-    saver = TextSaver(logger)
+    saver = TextSaver()
 
     with perf_tracker.track_execution("Text Saving"):
         logger.info("Starting text saving task.")

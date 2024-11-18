@@ -15,7 +15,7 @@ def tokenize_text_task(text):
     """
     Tokenize text into words and track performance.
     """
-    tokenizer = TextTokenizer(logger)
+    tokenizer = TextTokenizer()
 
     with perf_tracker.track_execution("Text Tokenization"):
         logger.info("Starting text tokenization task.")

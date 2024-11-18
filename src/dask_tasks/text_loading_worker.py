@@ -15,7 +15,7 @@ def load_text_task(text):
     """
     Load text for processing and track performance.
     """
-    loader = TextLoader(logger)
+    loader = TextLoader()
 
     with perf_tracker.track_execution("Text Loading"):
         logger.info("Starting text loading task.")

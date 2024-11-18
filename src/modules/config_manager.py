@@ -1,11 +1,14 @@
 # config_manager.py
 import yaml
 import os
-from src.core.services import CoreServices
+
+from src.pipelines.text.text_saver import logger
+from src.utils.logger_service import LoggerService
+from src.utils.performance_tracker import PerformanceTrackerService
 
 # Initialize logger and performance tracker
-logger = CoreServices.get_logger()
-perf_tracker = LoggerService.get_instance()
+logger = LoggerService.get_logger()
+perf_tracker = PerformanceTrackerService
 
 class ConfigManager:
     def __init__(self, config_path='config.yaml', logger=None):
