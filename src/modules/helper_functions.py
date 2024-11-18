@@ -1,9 +1,3 @@
-from src.utils.file_utilities import FilenameSanitizer
-from src.utils.timestamp_formatter import TimestampFormatter
-from src.utils.progress_bar import ProgressBar
-from src.utils.logger_service import MessageLogger
-from src.core.services import CoreServices
-
 # Initialize logger and performance tracker
 logger = CoreServices.get_logger()
 perf_tracker = CoreServices.get_performance_tracker()
@@ -79,9 +73,10 @@ if __name__ == "__main__":
     helper.log_message("This is an info message.")
 
 from src.utils.file_utilities import FilenameSanitizer
-from src.utils.timestamp_formatter import TimestampFormatter
-from src.utils.progress_bar import ProgressBar
 from src.utils.logger_service import MessageLogger
+from src.utils.progress_bar import ProgressBar
+from src.utils.timestamp_formatter import TimestampFormatter
+
 
 class HelperFunctions:
     @staticmethod

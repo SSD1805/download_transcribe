@@ -1,6 +1,6 @@
 from threading import Lock
-from src.utils.logger_manager import LoggerManager
-from src.utils.performance_tracker import PerformanceTracker
+from src.utils.logger_service import LoggerService
+from src.utils.performance_tracker import PerformanceTrackerService
 
 class LoggerService:
     """

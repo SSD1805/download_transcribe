@@ -1,7 +1,7 @@
 import spacy
-from src.core.services import CoreServices
+from src.utils.logger_service import LoggerService
 
-logger = CoreServices.get_logger()
+logger = LoggerService.get_logger()
 perf_tracker = CoreServices.get_performance_tracker()
 
 # Initialize logger and performance tracker

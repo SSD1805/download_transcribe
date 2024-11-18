@@ -1,9 +1,9 @@
 from celery import shared_task
-from src.core.services import CoreServices
-
+from src.utils.logger_service import LoggerService
+from src.utils.performance_tracker import PerformanceTrackerService
 # Get logger and performance tracker from CoreServices
-logger = CoreServices.get_logger()
-perf_tracker = CoreServices.get_performance_tracker()
+logger = LoggerService.get_logger()
+perf_tracker = PerformanceTrackerService.get_performance_tracker()
 
 @shared_task
 def update_task_status(task_id, status):

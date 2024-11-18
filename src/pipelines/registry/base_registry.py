@@ -1,4 +1,4 @@
-from typing import Type, Callable, Dict, Any, Union, TypeVar, Generic
+from typing import Callable, Dict, Union, TypeVar, Generic
 
 # Define a generic type for the registry.
 T = TypeVar('T')

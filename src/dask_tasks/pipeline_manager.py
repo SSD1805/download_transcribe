@@ -1,13 +1,13 @@
 from dask.distributed import Client
+
 from src.core.batch_processor import BatchProcessor
 from src.core.memory_monitor import MemoryMonitor
 from src.modules.config_manager import ConfigManager
+from src.pipelines.text.ner_processor import NERProcessor
 from src.pipelines.text.text_loader import TextLoader
+from src.pipelines.text.text_saver import TextSaver
 from src.pipelines.text.text_segmenter import TextSegmenter
 from src.pipelines.text.text_tokenizer import TextTokenizer
-from src.pipelines.text.ner_processor import NERProcessor
-from src.pipelines.text.text_saver import TextSaver
-from src.core.services import CoreServices
 
 # Get logger and performance tracker from CoreServices
 logger = CoreServices.get_logger()

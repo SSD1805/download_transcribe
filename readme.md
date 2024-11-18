@@ -11,20 +11,20 @@ It is scalable, containerized for easy deployment, and integrates distributed wo
 
 ## **Features**
 
-| Feature                      | Description                                                                                                                   |
-|------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| **Audio Download**           | Uses `yt-dlp` to download audio in `.mp3` format from videos or channels.                                                     |
-| **Transcription**            | Transcribes audio with WhisperX, supporting speaker tagging and timestamps, saved as `.txt` files.                            |
-| **Skip Existing Files**      | Prevents redundant downloads or processing by checking for existing audio and transcription files.                            |
-| **Audio Processing**         | Converts, normalizes, splits, and trims audio using modular pipelines.                                                        |
-| **Text Processing**          | Advanced NLP tasks, including Named Entity Recognition (NER), tokenization, and segmentation using spaCy and NLTK.            |
-| **Configurable Pipelines**   | Centralized configuration with `config.yaml` and dynamic updates via `SettingsRegistry`.                                       |
-| **Task Distribution**        | Distributed task execution with Celery, Dask, and optional Ray for scalability.                                               |
-| **Containerized Architecture** | Docker-based architecture with isolated services for fault tolerance and scalability.                                         |
-| **Logging and Monitoring**   | Advanced logging and performance tracking using custom trackers and configurable logging via `.env`.                          |
-| **Reusable Utilities**       | Modular utilities for file operations, logging, and performance tracking to simplify integration.                             |
-| **Folder Management**        | Organizes files in structured directories (`/data/audio_files`, `/data/transcriptions`) for easy access and management.        |
-| **Environment Variables**    | Stores sensitive data in environment variables loaded from `.env`.                                                            |
+| Feature                        | Description                                                                                                             |
+|--------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| **Audio Download**             | Uses `yt-dlp` to download audio in `.mp3` format from videos or channels.                                               |
+| **Transcription**              | Transcribes audio with WhisperX, supporting speaker tagging and timestamps, saved as `.txt` files.                      |
+| **Skip Existing Files**        | Prevents redundant downloads or processing by checking for existing audio and transcription files.                      |
+| **Audio Processing**           | Converts, normalizes, splits, and trims audio using modular pipelines.                                                  |
+| **Text Processing**            | Advanced NLP tasks, including Named Entity Recognition (NER), tokenization, and segmentation using spaCy and NLTK.      |
+| **Configurable Pipelines**     | Centralized configuration with `config.yaml` and dynamic updates via `SettingsRegistry`.                                |
+| **Task Distribution**          | Distributed task execution with Celery, Dask, and optional Ray for scalability.                                         |
+| **Containerized Architecture** | Docker-based architecture with isolated services for fault tolerance and scalability.                                   |
+| **Logging and Monitoring**     | Advanced logging and performance tracking using custom trackers and configurable logging via `.env`.                    |
+| **Reusable Utilities**         | Modular utilities for file operations, logging, and performance tracking to simplify integration.                       |
+| **Folder Management**          | Organizes files in structured directories (`/data/audio_files`, `/data/transcriptions`) for easy access and management. |
+| **Environment Variables**      | Stores sensitive data in environment variables loaded from `.env`.                                                      |
 
 ---
 
@@ -131,48 +131,48 @@ It is scalable, containerized for easy deployment, and integrates distributed wo
 ## **Task Mapping and Framework Selection**
 
 ### **1. Celery-Specific Tasks**
-| **Task**              | **Files**                                                                                   |
-|-----------------------|---------------------------------------------------------------------------------------------|
-| **Video Downloading** | `src/celery_tasks/download_tasks.py`, `src/modules/download_coordinator.py`, `src/pipelines/download/youtube_downloader.py` |
-| **Task Orchestration**| `src/celery_tasks/schedule.py`, `src/celery_tasks/shared_tasks.py`                          |
-| **Cleanup Tasks**     | `src/celery_tasks/cleanup_tasks.py`                                                        |
-| **User Requests**     | `src/django/views.py`, `src/cli/app.py`                                                    |
+| **Task**               | **Files**                                                                                                                   |
+|------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| **Video Downloading**  | `src/celery_tasks/download_tasks.py`, `src/modules/download_coordinator.py`, `src/pipelines/download/youtube_downloader.py` |
+| **Task Orchestration** | `src/celery_tasks/schedule.py`, `src/celery_tasks/shared_tasks.py`                                                          |
+| **Cleanup Tasks**      | `src/celery_tasks/cleanup_tasks.py`                                                                                         |
+| **User Requests**      | `src/django/views.py`, `src/cli/app.py`                                                                                     |
 
 ### **2. Dask-Specific Tasks**
-| **Task**                  | **Files**                                                                                     |
-|---------------------------|-----------------------------------------------------------------------------------------------|
-| **Audio Processing**       | `src/dask_tasks/audio_conversion_worker.py`, `src/pipelines/audio/audio_converter.py`, `src/pipelines/audio/audio_normalizer.py` |
-| **Text Processing**        | `src/dask_tasks/text_tokenization_worker.py`, `src/pipelines/text/text_tokenizer.py`, `src/pipelines/text/text_segmenter.py`     |
-| **Transcription Processing**| `src/dask_tasks/transcription_worker.py`, `src/pipelines/transcription/audio_transcriber.py`                                      |
-| **Performance Monitoring** | `src/dask_tasks/performance_monitor_worker.py`, `src/utils/performance_tracker.py`                                               |
+| **Task**                     | **Files**                                                                                                                        |
+|------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| **Audio Processing**         | `src/dask_tasks/audio_conversion_worker.py`, `src/pipelines/audio/audio_converter.py`, `src/pipelines/audio/audio_normalizer.py` |
+| **Text Processing**          | `src/dask_tasks/text_tokenization_worker.py`, `src/pipelines/text/text_tokenizer.py`, `src/pipelines/text/text_segmenter.py`     |
+| **Transcription Processing** | `src/dask_tasks/transcription_worker.py`, `src/pipelines/transcription/audio_transcriber.py`                                     |
+| **Performance Monitoring**   | `src/dask_tasks/performance_monitor_worker.py`, `src/utils/performance_tracker.py`                                               |
 
 ### **3. Ray-Specific Tasks (Optional)**
-| **Task**                   | **Files**                                                                                   |
-|----------------------------|---------------------------------------------------------------------------------------------|
-| **Unified Orchestration**   | Refactor existing Celery and Dask tasks using Ray APIs                                     |
-| **GPU-Accelerated Tasks**   | Whisper transcription tasks with GPU support                                               |
+| **Task**                  | **Files**                                              |
+|---------------------------|--------------------------------------------------------|
+| **Unified Orchestration** | Refactor existing Celery and Dask tasks using Ray APIs |
+| **GPU-Accelerated Tasks** | Whisper transcription tasks with GPU support           |
 
 ---
 
 ## **Updated Docker Containers**
 
-| Container                   | Purpose                                           | Benefits                                                         |
-|-----------------------------|---------------------------------------------------|-----------------------------------------------------------------|
-| **YouTube Downloader**      | Downloads audio using `yt-dlp`.                   | Decoupled download logic for scalability and fault isolation.   |
-| **Audio Processor**         | Handles normalization, conversion, and trimming. | Modular processing pipelines for audio workflows.              |
-| **Transcription Service**   | Transcribes audio with WhisperX.                  | Efficient transcription with GPU acceleration (Lambda Labs).   |
-| **Text Processing Service** | Handles NLP tasks (NER, segmentation).            | Independent scaling of NLP workflows.                          |
-| **Celery Worker**           | Asynchronous task processing.                     | Enables background task management.                            |
-| **Dask Worker**             | Distributed processing of data tasks.             | Parallelism for computationally heavy tasks.                   |
-| **Reverse Proxy (Nginx)**   | Manages SSL and request routing.                  | Provides load balancing and security.                          |
-| **Database (PostgreSQL)**   | Stores metadata and transcript data.              | Reliable and scalable data storage.                            |
+| Container                   | Purpose                                          | Benefits                                                      |
+|-----------------------------|--------------------------------------------------|---------------------------------------------------------------|
+| **YouTube Downloader**      | Downloads audio using `yt-dlp`.                  | Decoupled download logic for scalability and fault isolation. |
+| **Audio Processor**         | Handles normalization, conversion, and trimming. | Modular processing pipelines for audio workflows.             |
+| **Transcription Service**   | Transcribes audio with WhisperX.                 | Efficient transcription with GPU acceleration (Lambda Labs).  |
+| **Text Processing Service** | Handles NLP tasks (NER, segmentation).           | Independent scaling of NLP workflows.                         |
+| **Celery Worker**           | Asynchronous task processing.                    | Enables background task management.                           |
+| **Dask Worker**             | Distributed processing of data tasks.            | Parallelism for computationally heavy tasks.                  |
+| **Reverse Proxy (Nginx)**   | Manages SSL and request routing.                 | Provides load balancing and security.                         |
+| **Database (PostgreSQL)**   | Stores metadata and transcript data.             | Reliable and scalable data storage.                           |
 
 ---
 
 ## **Technologies and Dependencies**
 
 | Component                  | Technology            | Purpose                                     | Docker Container      |
-| -------------------------- | --------------------- | ------------------------------------------- | --------------------- |
+|----------------------------|-----------------------|---------------------------------------------|-----------------------|
 | **Framework**              | Django                | Backend structure and logic                 | Django App            |
 | **Frontend**               | React or Vue          | Interactive user interface                  | Django App            |
 | **API Layer**              | Django REST Framework | REST API for frontend/backend communication | Django App            |
@@ -200,11 +200,11 @@ docker-compose up --build
 ---
 
 ### CLI Commands
-| Command          | Description                       | Example Usage                                        |
-|------------------|-----------------------------------|-----------------------------------------------------|
-| **download**     | Downloads YouTube audio.          | `poetry run python app.py download --url <URL>`      |
-| **transcribe**   | Transcribes an audio file.        | `poetry run python app.py transcribe <file>`         |
-| **process**      | NLP processing on transcriptions. | `poetry run python app.py process --directory <dir>` |
+| Command        | Description                       | Example Usage                                        |
+|----------------|-----------------------------------|------------------------------------------------------|
+| **download**   | Downloads YouTube audio.          | `poetry run python app.py download --url <URL>`      |
+| **transcribe** | Transcribes an audio file.        | `poetry run python app.py transcribe <file>`         |
+| **process**    | NLP processing on transcriptions. | `poetry run python app.py process --directory <dir>` |
 
 ---
 

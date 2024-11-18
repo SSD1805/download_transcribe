@@ -2,7 +2,6 @@
 import yaml
 import os
 
-from src.pipelines.text.text_saver import logger
 from src.utils.logger_service import LoggerService
 from src.utils.performance_tracker import PerformanceTrackerService
 

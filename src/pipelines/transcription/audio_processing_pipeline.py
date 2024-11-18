@@ -3,8 +3,8 @@ from tqdm import tqdm
 from src.pipelines.audio.audio_converter import AudioConverter
 from src.pipelines.transcription.audio_transcriber import AudioTranscriber
 from src.pipelines.transcription.transcription_saver import TranscriptionSaver
-from src.core.services import CoreServices
-
+from src.utils.logger_service import LoggerService
+from src.utils.performance_tracker import PerformanceTrackerService
 
 class AudioProcessingPipeline:
     def __init__(self, input_directory, output_directory, converter=None, transcriber=None, saver=None):
@@ -20,8 +20,8 @@ class AudioProcessingPipeline:
         """
         self.input_directory = input_directory
         self.output_directory = output_directory
-        self.logger = CoreServices.get_logger()
-        self.perf_tracker = CoreServices.get_performance_tracker()
+        self.logger = LoggerService.get_logger()
+        self.perf_tracker = PerformanceTrackerService.get_performance_tracker()
 
         self.converter = converter or AudioConverter(output_directory=output_directory)
         self.transcriber = transcriber or AudioTranscriber()

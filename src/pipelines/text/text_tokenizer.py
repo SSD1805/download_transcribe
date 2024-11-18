@@ -1,11 +1,11 @@
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from src.core.services import CoreServices
-
+from src.utils.logger_service import LoggerService
+from src.utils.performance_tracker import PerformanceTrackerService
 # Initialize logger and performance tracker
-logger = CoreServices.get_logger()
-perf_tracker = CoreServices.get_performance_tracker()
+logger = LoggerService.get_logger()
+perf_tracker = PerformanceTrackerService.get_performance_tracker()
 
 
 class TextTokenizer:

@@ -1,8 +1,8 @@
 # src/pipelines/audio/audio_splitter.py
-from src.core.services import CoreServices
-
-logger = CoreServices.get_logger()
-perf_tracker = CoreServices.get_performance_tracker()
+from src.utils.logger_service import LoggerService
+from src.utils.performance_tracker import PerformanceTrackerService
+logger = LoggerService.get_logger()
+perf_tracker = PerformanceTrackerService.get_performance_tracker()
 
 
 class AudioSplitter(AudioProcessorBase):

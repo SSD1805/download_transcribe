@@ -1,10 +1,11 @@
 # src/pipelines/audio/audio_normalizer.py
-from pydub import effects
+from pydub import pydub
 from src.pipelines.audio.audio_processor_base import AudioProcessorBase
-from src.core.services import CoreServices
+from src.utils.logger_service import LoggerService
+from src.utils.performance_tracker import PerformanceTrackerService
 
-logger = CoreServices.get_logger()
-perf_tracker = CoreServices.get_performance_tracker()
+logger = LoggerService.get_logger()
+perf_tracker = PerformanceTrackerService.get_performance_tracker()
 
 class AudioNormalizer(AudioProcessorBase):
     def normalize(self, input_file, output_file):

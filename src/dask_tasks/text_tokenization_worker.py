@@ -1,6 +1,6 @@
 from dask.distributed import Client
+
 from src.pipelines.text.text_tokenizer import TextTokenizer
-from src.core.services import CoreServices
 
 # Initialize logger and performance tracker
 logger = CoreServices.get_logger()

@@ -1,6 +1,6 @@
 # src/registry/configuration_registry.py
 from typing import Any
-from src.registry.base_registry import BaseRegistry
+from src.pipelines.registry.base_registry import BaseRegistry
 import logging
 
 class ConfigurationRegistry(BaseRegistry[Any]):

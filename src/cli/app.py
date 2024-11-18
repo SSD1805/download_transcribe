@@ -1,11 +1,11 @@
 import click
-from src.pipelines.download.youtube_downloader import YouTubeDownloader
-from src.modules.audio_handler import AudioHandler
 from src.modules.whisper_ai_fallback import WhisperAIFallback
-from src.modules.transcription_manager import TranscriptionManagerWhisperX
-from src.utils.file_utilities import FileManager
-from src.modules.text_processor import TextProcessor
+
 from src.modules.config_manager import ConfigManager
+from src.modules.text_processor import TextProcessor
+from src.modules.transcription_manager import TranscriptionManagerWhisperX
+from src.pipelines.download.youtube_downloader import YouTubeDownloader
+from src.utils.file_utilities import FileManager
 from src.utils.logger_service import LoggerService
 
 # Get logger and performance tracker from CoreServices

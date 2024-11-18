@@ -1,6 +1,4 @@
 # src/pipelines/audio/audio_trimmer.py
-from src.core.services import CoreServices
-
 logger = CoreServices.get_logger()
 perf_tracker = CoreServices.get_performance_tracker()
 

@@ -1,7 +1,6 @@
-import whisperx
-import whisper
 import torch
-from src.core.services import CoreServices
+import whisper
+import whisperx
 
 
 class AudioTranscriber:

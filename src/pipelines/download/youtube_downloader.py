@@ -1,8 +1,9 @@
 from src.pipelines.download.download_handler import DownloadManager
-from src.core.services import CoreServices
+from src.utils.logger_service import LoggerService
+from src.utils.performance_tracker import PerformanceTrackerService
 
-logger = CoreServices.get_logger()
-perf_tracker = CoreServices.get_performance_tracker()
+logger = LoggerService.get_logger()
+perf_tracker = PerformanceTrackerService.get_performance_tracker()
 
 # Initialize logger
 download_manager = DownloadManager(logger=logger, tracker=perf_tracker)
