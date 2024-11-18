@@ -1,22 +1,21 @@
-
 # YouTube Audio Downloader and Transcriber
 
 This project is a microservices-based application designed to download audio from YouTube videos, transcribe it using Whisper AI, and process the transcriptions for further analysis. It is modular, scalable, and fully containerized for easy deployment.
 
 ## Features
 
-| Feature                     | Description                                                                                                                                   |
-|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-| **Audio Download**          | Uses `yt-dlp` to download audio in `.mp3` format from videos or channels.                                                                    |
-| **Transcription**           | Transcribes audio with WhisperX, supporting speaker tagging and timestamps, saved as `.txt` files.                                          |
-| **Skip Existing Files**     | Prevents redundant downloads or processing by checking for existing audio and transcription files.                                           |
-| **Modular Structure**       | Organized into modules for audio processing, transcription, configuration, and text processing, ensuring a scalable codebase.                |
-| **Text Processing**         | Includes Named Entity Recognition (NER) with spaCy and sentence segmentation with NLTK.                                                     |
-| **Folder Management**       | Manages files in structured directories (`/app/audio_files`, `/app/transcriptions`).                                                        |
-| **Configurable**            | Central configuration with `config.yaml` for customizable settings (e.g., download delay, model size).                                      |
-| **Logging**                 | Configurable logging based on `.env`, supporting both console and file logging.                                                             |
-| **Environment Variables**   | Sensitive data is stored in environment variables loaded from `.env`.                                                                       |
-| **Containerized**           | Docker-based architecture allows each component to run in separate containers for modularity and fault isolation.                          |
+| Feature                   | Description                                                                                                                   |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Audio Download**        | Uses `yt-dlp` to download audio in `.mp3` format from videos or channels.                                                     |
+| **Transcription**         | Transcribes audio with WhisperX, supporting speaker tagging and timestamps, saved as `.txt` files.                            |
+| **Skip Existing Files**   | Prevents redundant downloads or processing by checking for existing audio and transcription files.                            |
+| **Modular Structure**     | Organized into modules for audio processing, transcription, configuration, and text processing, ensuring a scalable codebase. |
+| **Text Processing**       | Includes Named Entity Recognition (NER) with spaCy and sentence segmentation with NLTK.                                       |
+| **Folder Management**     | Manages files in structured directories (`/app/audio_files`, `/app/transcriptions`).                                          |
+| **Configurable**          | Central configuration with `config.yaml` for customizable settings (e.g., download delay, model size).                        |
+| **Logging**               | Configurable logging based on `.env`, supporting both console and file logging.                                               |
+| **Environment Variables** | Sensitive data is stored in environment variables loaded from `.env`.                                                         |
+| **Containerized**         | Docker-based architecture allows each component to run in separate containers for modularity and fault isolation.             |
 
 ## Project Structure
 
@@ -107,39 +106,39 @@ download_transcribe/
 
 ## Docker Containers
 
-| Container                   | Purpose                                              | Benefits                                                                                        |
-|-----------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| **YouTube Downloader**      | Downloads YouTube audio using `yt-dlp`.              | Handles video/audio download requests independently.                                            |
-| **Audio Converter**         | Converts downloaded audio to the required format.    | Isolated audio conversion, enabling scalable audio tasks.                                       |
-| **Audio Normalizer**        | Normalizes audio levels.                             | Ensures consistent audio quality across files.                                                  |
-| **Audio Splitter**          | Splits audio into smaller segments if necessary.     | Enables modular processing of audio.                                                            |
-| **Audio Trimmer**           | Trims silence or unwanted sections in audio.         | Ensures cleaner and more concise audio files.                                                   |
-| **Transcription Service**   | Transcribes audio with WhisperX.                     | GPU-enabled for efficient transcription tasks.                                                  |
-| **Text Processing Modules** | NLP tasks (NER, segmentation).                       | Independent scaling and updates for NLP processes.                                              |
-| **Django App**              | Main web application and API backend.                | Centralized interface for UI, authentication, and API handling.                                 |
-| **Celery Worker**           | Asynchronous task processing.                        | Offloads background tasks from Django app to keep it responsive.                                |
-| **Dask Worker**             | Distributed processing of data tasks.                | Parallel processing for computationally heavy tasks.                                            |
-| **Reverse Proxy (Nginx)**   | Manages SSL and request routing.                     | Provides load balancing and security.                                                           |
-| **Database (PostgreSQL)**   | Stores metadata and transcript data.                 | Reliable storage for metadata and transcription files.                                          |
+| Container                   | Purpose                                           | Benefits                                                         |
+| --------------------------- | ------------------------------------------------- | ---------------------------------------------------------------- |
+| **YouTube Downloader**      | Downloads YouTube audio using `yt-dlp`.           | Handles video/audio download requests independently.             |
+| **Audio Converter**         | Converts downloaded audio to the required format. | Isolated audio conversion, enabling scalable audio tasks.        |
+| **Audio Normalizer**        | Normalizes audio levels.                          | Ensures consistent audio quality across files.                   |
+| **Audio Splitter**          | Splits audio into smaller segments if necessary.  | Enables modular processing of audio.                             |
+| **Audio Trimmer**           | Trims silence or unwanted sections in audio.      | Ensures cleaner and more concise audio files.                    |
+| **Transcription Service**   | Transcribes audio with WhisperX.                  | GPU-enabled for efficient transcription tasks.                   |
+| **Text Processing Modules** | NLP tasks (NER, segmentation).                    | Independent scaling and updates for NLP processes.               |
+| **Django App**              | Main web application and API backend.             | Centralized interface for UI, authentication, and API handling.  |
+| **Celery Worker**           | Asynchronous task processing.                     | Offloads background tasks from Django app to keep it responsive. |
+| **Dask Worker**             | Distributed processing of data tasks.             | Parallel processing for computationally heavy tasks.             |
+| **Reverse Proxy (Nginx)**   | Manages SSL and request routing.                  | Provides load balancing and security.                            |
+| **Database (PostgreSQL)**   | Stores metadata and transcript data.              | Reliable storage for metadata and transcription files.           |
 
 ## Technologies and Dependencies
 
-| Component                  | Technology               | Purpose                                       | Docker Container     |
-|----------------------------|--------------------------|-----------------------------------------------|-----------------------|
-| **Framework**              | Django                   | Backend structure and logic                  | Django App           |
-| **Frontend**               | React or Vue             | Interactive user interface                    | Django App           |
-| **API Layer**              | Django REST Framework    | REST API for frontend/backend communication   | Django App           |
-| **Real-Time Updates**      | Django Channels          | WebSocket for real-time updates               | Django App           |
-| **Task Queue**             | Celery                   | Background task management                    | Celery Worker        |
-| **Distributed Processing** | Dask                     | Parallel processing of heavy tasks            | Dask Worker          |
-| **GPU Processing**         | Paperspace/AWS GPU       | Runs WhisperX model on GPU                    | Transcription Service |
-| **Transcription/NLP**      | WhisperX                 | ASR tool for audio transcription              | Transcription Service |
-| **Data Storage**           | PostgreSQL               | Stores metadata and transcription data        | Database             |
-| **Static/Media Storage**   | Linode/AWS S3            | Stores audio and transcript files             | External             |
-| **NLP Libraries**          | spaCy, NLTK              | Text processing tools                         | Text Processing      |
-| **Reverse Proxy**          | Nginx                    | Routes requests and handles SSL               | Reverse Proxy        |
-| **Logging**                | Django Logging           | Logs events and errors                        | Django App           |
-| **Monitoring**             | Grafana, Prometheus      | Application performance monitoring            | Optional             |
+| Component                  | Technology            | Purpose                                     | Docker Container      |
+| -------------------------- | --------------------- | ------------------------------------------- | --------------------- |
+| **Framework**              | Django                | Backend structure and logic                 | Django App            |
+| **Frontend**               | React or Vue          | Interactive user interface                  | Django App            |
+| **API Layer**              | Django REST Framework | REST API for frontend/backend communication | Django App            |
+| **Real-Time Updates**      | Django Channels       | WebSocket for real-time updates             | Django App            |
+| **Task Queue**             | Celery                | Background task management                  | Celery Worker         |
+| **Distributed Processing** | Dask                  | Parallel processing of heavy tasks          | Dask Worker           |
+| **GPU Processing**         | Paperspace/AWS GPU    | Runs WhisperX model on GPU                  | Transcription Service |
+| **Transcription/NLP**      | WhisperX              | ASR tool for audio transcription            | Transcription Service |
+| **Data Storage**           | PostgreSQL            | Stores metadata and transcription data      | Database              |
+| **Static/Media Storage**   | Linode/AWS S3         | Stores audio and transcript files           | External              |
+| **NLP Libraries**          | spaCy, NLTK           | Text processing tools                       | Text Processing       |
+| **Reverse Proxy**          | Nginx                 | Routes requests and handles SSL             | Reverse Proxy         |
+| **Logging**                | Django Logging        | Logs events and errors                      | Django App            |
+| **Monitoring**             | Grafana, Prometheus   | Application performance monitoring          | Optional              |
 
 ## Installation
 
@@ -178,15 +177,13 @@ docker-compose down
 
 ### CLI Commands
 
-| Command         | Description                           |
-
- Example Usage                                      |
-|-----------------|---------------------------------------|----------------------------------------------------|
-| **download**    | Downloads YouTube audio.             | `poetry run python app.py download --url <URL>`    |
-| **transcribe**  | Transcribes an audio file.           | `poetry run python app.py transcribe <file>`       |
-| **process**     | NLP processing on transcriptions.    | `poetry run python app.py process --directory <dir>`|
-| **setup**       | Configures the application.          | `poetry run python app.py setup`                   |
-| **manage_files**| Manages files in a directory.        | `poetry run python app.py manage_files <directory>`|
+| Command          | Description                       | Example Usage                                        |
+| ---------------- | --------------------------------- | ---------------------------------------------------- |
+| **download**     | Downloads YouTube audio.          | `poetry run python app.py download --url <URL>`      |
+| **transcribe**   | Transcribes an audio file.        | `poetry run python app.py transcribe <file>`         |
+| **process**      | NLP processing on transcriptions. | `poetry run python app.py process --directory <dir>` |
+| **setup**        | Configures the application.       | `poetry run python app.py setup`                     |
+| **manage_files** | Manages files in a directory.     | `poetry run python app.py manage_files <directory>`  |
 
 ### Sample Workflow
 
@@ -247,6 +244,3 @@ docker-compose up --build
 ```
 
 Access the app at `http://localhost:8000`.
-
-
-
