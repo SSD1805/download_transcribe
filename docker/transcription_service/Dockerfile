@@ -1,4 +1,4 @@
-# Dockerfile_loader
+# Dockerfile
 FROM python:3.12-slim
 
 # Install system dependencies
@@ -23,4 +23,4 @@ RUN poetry config virtualenvs.create false && poetry install --no-dev
 COPY . /app
 
 # Define the default command
-CMD ["poetry", "run", "python", "src/text_pipeline/text_loader.py"]
+CMD ["poetry", "run", "python", "src/cli/cli_transcription.py"]

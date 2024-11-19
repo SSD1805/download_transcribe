@@ -41,10 +41,10 @@ class AudioTranscriber:
 
     def transcribe(self, audio_file, use_whisperx=True):
         """
-        Transcribe an audio file using WhisperX or Whisper as a fallback.
+        Transcribe an audio_processor file using WhisperX or Whisper as a fallback.
 
         Args:
-            audio_file (str): Path to the audio file.
+            audio_file (str): Path to the audio_processor file.
             use_whisperx (bool): Whether to attempt transcription with WhisperX first.
 
         Returns:
@@ -65,7 +65,7 @@ class AudioTranscriber:
 
         Args:
             model: Loaded transcription model.
-            audio_file (str): Path to the audio file.
+            audio_file (str): Path to the audio_processor file.
             model_name (str): Name of the transcription model.
 
         Returns:

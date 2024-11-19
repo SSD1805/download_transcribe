@@ -13,10 +13,10 @@ client = Client()
 
 def convert_audio(file_path):
     """
-    Convert audio file to WAV format if necessary.
+    Convert audio_processor file to WAV format if necessary.
 
     Args:
-        file_path (str): Path to the audio file.
+        file_path (str): Path to the audio_processor file.
 
     Returns:
         str: Path to the converted WAV file or original path if already WAV.

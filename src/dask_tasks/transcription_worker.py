@@ -12,7 +12,7 @@ client = Client()
 
 def transcribe_audio(file_path):
     """
-    Transcribe an audio file with logging and performance tracking.
+    Transcribe an audio_processor file with logging and performance tracking.
 
     Args:
         file_path (str): Path to the WAV file.

@@ -2,7 +2,7 @@ import os
 import yt_dlp
 from src.utils.structlog_logger import StructLogger
 from src.utils.performance_tracker import PerformanceTracker
-from src.pipelines.registry.error_registry import DownloadError, ConfigurationError, FileError
+from src.infrastructure.registries import DownloadError, ConfigurationError, FileError
 
 logger = StructLogger.get_logger()
 perf_tracker = PerformanceTracker.get_instance()

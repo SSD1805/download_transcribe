@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from src.pipelines.registry.preconfigured_audio_handler_registry import PreConfiguredAudioHandlerRegistry
+from src.infrastructure.registries import PreConfiguredAudioHandlerRegistry
 from src.utils.structlog_logger import StructLogger
 
 logger = StructLogger.get_logger()

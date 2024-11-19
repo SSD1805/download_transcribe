@@ -13,6 +13,8 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"  # Python version
 django = "^4.0"  # Core Django framework
+dependency-injector = "^4.40.0"  # Dependency injection framework
+django-environ = "^0.4"  # Environment variable handling
 
 # API and Real-time
 djangorestframework = "^3.13"  # Django REST Framework
@@ -40,7 +42,7 @@ spacy-transformers = "^1.2"  # Transformer integration for NLP
 
 # Audio Processing Utilities
 pydub = "^0.25"  # Audio handling
-soundfile = "^0.12"  # Read/write audio files
+soundfile = "^0.12"  # Read/write audio_processor files
 
 # HTTP and CLI Utilities
 requests = "^2.31"  # HTTP client
@@ -55,7 +57,7 @@ pybreaker = "^0.7.0"  # Circuit breaker library
 structlog = "^23.0.0"  # Structlog for advanced logging
 
 # Date/Time Library
-pendulum = "^2.1.2"  # Date/Time library
+pendulum = "^2.1.1"  # Date/Time library
 
 # Memory Profiling
 memory_profiler = "^0.61.0"  # Memory profiling library

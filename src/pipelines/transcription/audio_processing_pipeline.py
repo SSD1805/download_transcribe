@@ -29,12 +29,12 @@ class AudioProcessingPipeline:
             ]
 
             if not audio_files:
-                self.logger.warning(f"No audio files found in '{self.input_directory}'.")
+                self.logger.warning(f"No audio_processor files found in '{self.input_directory}'.")
                 return
 
-            self.logger.info(f"Found {len(audio_files)} audio files to process.")
+            self.logger.info(f"Found {len(audio_files)} audio_processor files to process.")
 
-            for file_name in tqdm(audio_files, desc="Processing audio files"):
+            for file_name in tqdm(audio_files, desc="Processing audio_processor files"):
                 self._process_single_file(file_name)
 
     def _process_single_file(self, file_name):

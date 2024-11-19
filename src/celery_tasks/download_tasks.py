@@ -1,6 +1,6 @@
 from celery import shared_task
 from src.pipelines.download.download_handler import DownloadManager
-from src.pipelines.registry.error_registry import DownloadError
+from src.infrastructure.registries import DownloadError
 from src.utils.structlog_logger import StructLogger
 
 logger = StructLogger.get_logger()

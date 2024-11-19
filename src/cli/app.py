@@ -21,7 +21,7 @@ from modules.performance_configurator import PerformanceConfigurator
 config_manager = ConfigManager(config_path="config.yaml")
 performance_configurator = PerformanceConfigurator(performance_tracker)
 
-# Register settings with the registry
+# Register settings with the registries
 SettingsRegistry.register("config", config_manager)
 SettingsRegistry.register("performance", performance_configurator)
 
