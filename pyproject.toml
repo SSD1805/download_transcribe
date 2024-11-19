@@ -15,6 +15,7 @@ python = ">=3.10,<3.13"  # Python version
 django = "^4.0"  # Core Django framework
 dependency-injector = "^4.40.0"  # Dependency injection framework
 django-environ = "^0.4"  # Environment variable handling
+pendulum = "==2.1.1"  # Date/Time library
 
 # API and Real-time
 djangorestframework = "^3.13"  # Django REST Framework
@@ -55,9 +56,6 @@ pybreaker = "^0.7.0"  # Circuit breaker library
 
 # Logging
 structlog = "^23.0.0"  # Structlog for advanced logging
-
-# Date/Time Library
-pendulum = "^2.1.1"  # Date/Time library
 
 # Memory Profiling
 memory_profiler = "^0.61.0"  # Memory profiling library

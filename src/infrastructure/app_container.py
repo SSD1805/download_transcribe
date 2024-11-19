@@ -1,4 +1,4 @@
-from dependency_injector import containers, providers
+from src.infrastructure.app_container import containers, providers
 from src.utils.structlog_logger import StructLogger
 from src.utils.performance_tracker import PerformanceTracker
 from src.modules.config_manager import ConfigManager
