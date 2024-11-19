@@ -7,15 +7,15 @@ import psutil  # Assuming psutil is used for memory monitoring
 
 
 # Singleton Pattern with Dependency Injection and Factory Method
-class PerformanceTrackerService:
+class PerformanceTracker:
     """
     Singleton PerformanceTrackerService that provides methods to track performance metrics.
     Implements a factory pattern to create and configure the tracker if none exists.
     """
-    _instance: Optional['PerformanceTrackerService'] = None
+    _instance: Optional['PerformanceTracker'] = None
 
     @classmethod
-    def get_instance(cls) -> 'PerformanceTrackerService':
+    def get_instance(cls) -> 'PerformanceTracker':
         """
         Returns the singleton instance of the PerformanceTrackerService.
         If no instance exists, it creates one.
@@ -28,7 +28,7 @@ class PerformanceTrackerService:
         return cls._instance
 
     def __init__(self):
-        if PerformanceTrackerService._instance is not None:
+        if PerformanceTracker._instance is not None:
             raise Exception("This is a singleton class. Use the get_instance() method.")
 
         self.logger = logging.getLogger("performance_tracker")
@@ -126,7 +126,7 @@ class PerformanceTrackerService:
 
 # Example usage
 if __name__ == "__main__":
-    tracker = PerformanceTrackerService.get_instance()
+    tracker = PerformanceTracker.get_instance()
 
     # Configure and start monitoring
     tracker.configure_monitoring(interval=10)

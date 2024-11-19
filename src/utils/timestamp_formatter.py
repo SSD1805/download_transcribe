@@ -1,8 +1,13 @@
+from src.utils.structlog_logger import StructLogger
+import pendulum
+
+logger = StructLogger.get_logger()
+
 class TimestampFormatter:
     @staticmethod
     def format(seconds: int) -> str:
         """
-        Formats seconds into a human-readable HH:MM:SS format.
+        Formats seconds into a human-readable HH:MM:SS format using pendulum.
 
         Args:
             seconds (int): Total time in seconds.
@@ -10,9 +15,7 @@ class TimestampFormatter:
         Returns:
             str: Formatted time as HH:MM:SS.
         """
-        hours = seconds // 3600
-        minutes = (seconds % 3600) // 60
-        sec = seconds % 60
-        formatted_time = f"{hours:02}:{minutes:02}:{sec:02}"
+        duration = pendulum.duration(seconds=seconds)
+        formatted_time = duration.format("HH:mm:ss", formatter="alternative")
         logger.info(f"Formatted timestamp: {formatted_time}")
         return formatted_time

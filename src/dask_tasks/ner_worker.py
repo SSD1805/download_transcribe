@@ -1,11 +1,11 @@
 from dask.distributed import Client
 
 from src.pipelines.text.ner_processor import NERProcessor
-from src.utils.logger_service import LoggerService
+from src.utils.structlog_logger import LoguruLogger
 from src.utils.performance_tracker import PerformanceTrackerService
 
 # Get logger and performance tracker from CoreServices
-logger = LoggerService.get_logger()
+logger = LoguruLogger.get_logger()
 perf_tracker = PerformanceTrackerService.get_performance_tracker()
 
 # Initialize Dask client, logger, and performance tracker

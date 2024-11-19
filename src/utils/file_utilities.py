@@ -1,12 +1,12 @@
 import os
 import shutil
-from src.utils.logger_service import LoggerService
-from src.utils.performance_tracker import PerformanceTrackerService
+from src.utils.structlog_logger import StructLogger
+from src.utils.performance_tracker import PerformanceTracker
 from typing import Optional
 
-# Get logger and performance tracker from CoreServices
-logger = LoggerService.get_logger()
-perf_tracker = PerformanceTrackerService.get_performance_tracker()
+# Logger and Tracker Instances
+logger = StructLogger.get_logger()
+perf_tracker = PerformanceTracker.get_instance()
 
 class FileManager:
     """

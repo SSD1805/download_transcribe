@@ -1,25 +1,18 @@
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from src.utils.logger_service import LoggerService
-from src.utils.performance_tracker import PerformanceTrackerService
-# Initialize logger and performance tracker
-logger = LoggerService.get_logger()
-perf_tracker = PerformanceTrackerService.get_performance_tracker()
+from src.utils.structlog_logger import StructLogger
+from src.utils.performance_tracker import PerformanceTracker
+
+logger = StructLogger.get_logger()
+perf_tracker = PerformanceTracker.get_instance()
 
 
 class TextTokenizer:
-    """
-    Tokenizes input text into individual words, removing punctuation and stopwords.
-    """
     _stopwords = None
 
     @staticmethod
     def _ensure_nltk_resources():
-        """
-        Ensure necessary NLTK resources are downloaded.
-        This method is called lazily to avoid global downloads.
-        """
         try:
             nltk.data.find("tokenizers/punkt")
             nltk.data.find("corpora/stopwords")
@@ -30,9 +23,6 @@ class TextTokenizer:
 
     @classmethod
     def get_stopwords(cls):
-        """
-        Lazily initializes and retrieves the English stopwords set.
-        """
         if cls._stopwords is None:
             cls._ensure_nltk_resources()
             cls._stopwords = set(stopwords.words("english"))
@@ -41,15 +31,6 @@ class TextTokenizer:
 
     @perf_tracker.track
     def tokenize_text(self, text):
-        """
-        Tokenizes the input text after removing punctuation and stopwords.
-
-        Args:
-            text (str): The input text to tokenize.
-
-        Returns:
-            list: A list of filtered tokens.
-        """
         if not text:
             logger.warning("No input text to tokenize. Please provide text before processing.")
             return []

@@ -1,15 +1,13 @@
-# src/cli/cli_audio.py
 import click
 from src.pipelines.audio.audio_handler import AudioHandler
 from src.pipelines.transcription.transcription_pipeline import TranscriptionPipeline
-
 
 @click.group()
 def cli():
     """CLI for audio processing tasks."""
     pass
 
-@cli.command()
+@click.command()
 @click.argument('input_file')
 @click.argument('output_file')
 def normalize(input_file, output_file):
@@ -18,7 +16,7 @@ def normalize(input_file, output_file):
     result = handler.normalize_audio(input_file, output_file)
     click.echo(f"Normalized file saved at {result}")
 
-@cli.command()
+@click.command()
 @click.argument('input_file')
 @click.argument('chunk_duration', type=int)
 @click.argument('output_file_prefix')
@@ -28,7 +26,7 @@ def split(input_file, chunk_duration, output_file_prefix):
     result = handler.split_audio(input_file, chunk_duration, output_file_prefix)
     click.echo(f"Audio split into {len(result)} chunks.")
 
-@cli.command()
+@click.command()
 @click.argument('input_file')
 @click.argument('output_file')
 @click.option('--silence-thresh', default=-40, help='Silence threshold in dBFS.')
@@ -37,7 +35,6 @@ def trim(input_file, output_file, silence_thresh):
     handler = AudioHandler()
     result = handler.trim_audio(input_file, output_file, silence_thresh)
     click.echo(f"Trimmed file saved at {result}")
-
 
 @click.command()
 @click.argument('input_file')

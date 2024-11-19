@@ -1,8 +1,10 @@
-from src.utils.logger_service import LoggerService
-from src.utils.performance_tracker import PerformanceTrackerService
-# Get logger and performance tracker from CoreServices
-logger = LoggerService.get_logger()
-perf_tracker = PerformanceTrackerService.get_performance_tracker()
+from src.utils.structlog_logger import StructLogger
+from src.utils.performance_tracker import PerformanceTracker
+from tqdm import tqdm
+
+# Logger and Tracker Instances
+logger = StructLogger.get_logger()
+perf_tracker = PerformanceTracker.get_instance()
 
 class ProgressBar:
     def __init__(self, tracker=None):
@@ -12,7 +14,7 @@ class ProgressBar:
         Args:
             tracker (PerformanceTracker, optional): Instance of PerformanceTracker for tracking performance.
         """
-        self.logger = LoggerManager().get_logger()
+        self.logger = LoguruLogger().get_logger()
         self.tracker = tracker or PerformanceTracker()
 
     def progress_bar(self, iterable, description="Processing", **kwargs):

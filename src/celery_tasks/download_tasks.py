@@ -1,11 +1,9 @@
-# celery_tasks/download_tasks.py
-
 from celery import shared_task
-from src.utils.logger_service import LoggerManager
-from src.pipelines.download.download_handler import DownloadManager  # Ensure the path aligns with your project structure
+from src.pipelines.download.download_handler import DownloadManager
 from src.pipelines.registry.error_registry import DownloadError
+from src.utils.structlog_logger import StructLogger
 
-logger = LoggerManager().get_logger()
+logger = StructLogger.get_logger()
 
 @shared_task(bind=True, max_retries=3)
 def download_video_task(self, url, config_manager):
@@ -13,9 +11,8 @@ def download_video_task(self, url, config_manager):
     Celery task to download a video using DownloadManager.
 
     Args:
-        self:
         url (str): The video URL to download.
-        config_manager (ConfigManager): Configuration manager for centralized settings.
+        config_manager (ConfigManager): Configuration manager.
 
     Raises:
         DownloadError: If the download fails after retries.
@@ -28,4 +25,4 @@ def download_video_task(self, url, config_manager):
         return result
     except DownloadError as e:
         logger.error(f"Download failed for URL: {url} with error: {e}")
-        self.retry(countdown=60, exc=e)  # Retry in 60 seconds if it fails
+        self.retry(countdown=60, exc=e)

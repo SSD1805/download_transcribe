@@ -1,26 +1,16 @@
-from src.utils.logger_service import LoggerService
-from src.utils.performance_tracker import PerformanceTrackerService
-logger = LoggerService.get_logger()
-perf_tracker = PerformanceTrackerService.get_performance_tracker()
+from src.utils.structlog_logger import StructLogger
+from src.utils.performance_tracker import PerformanceTracker
 
-# Initialize logger and performance tracker
+logger = StructLogger.get_logger()
+perf_tracker = PerformanceTracker.get_instance()
 
 
 class TextLoader:
     def __init__(self):
         self.input_text = ""
 
-    @perf_tracker.track  # Decorator to measure performance of load_text
+    @perf_tracker.track
     def load_text(self, text):
-        """
-        Loads the provided text for processing.
-
-        Args:
-            text (str): The input text to load.
-
-        Returns:
-            bool: True if text is loaded successfully, False if text is empty.
-        """
         if not text:
             logger.warning("Empty text provided for loading.")
             return False

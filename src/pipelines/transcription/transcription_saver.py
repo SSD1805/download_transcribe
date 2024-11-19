@@ -1,15 +1,14 @@
-# src/pipelines/transcription/transcription_saver.py
 import os
 import json
-from src.utils.logger_service import LoggerService
-from src.utils.performance_tracker import PerformanceTrackerService
+from src.utils.structlog_logger import StructLogger
+from src.utils.performance_tracker import PerformanceTracker
 
 class TranscriptionSaver:
-    def __init__(self, output_directory, logger=None, performance_tracker=None):
+    def __init__(self, output_directory):
         self.output_directory = output_directory
         os.makedirs(self.output_directory, exist_ok=True)
-        self.logger = logger or LoggerService.get_instance()
-        self.performance_tracker = performance_tracker or PerformanceTrackerService.get_instance()
+        self.logger = StructLogger.get_logger()
+        self.performance_tracker = PerformanceTracker.get_instance()
 
     def save_transcription(self, segments, audio_file, format='txt'):
         output_file = os.path.join(

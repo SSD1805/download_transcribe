@@ -1,6 +1,6 @@
 # celery_tasks/schedule.py
 
-from celery.schedules import crontab
+from src.celery_tasks.schedule import CELERY_BEAT_SCHEDULE
 
 CELERY_BEAT_SCHEDULE = {
     'cleanup_old_data': {

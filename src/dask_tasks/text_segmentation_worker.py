@@ -1,7 +1,7 @@
 from dask.distributed import Client
 
 from src.pipelines.text.text_segmenter import TextSegmenter
-from src.utils.logger_service import LoggerService
+from src.utils.structlog_logger import LoggerService
 from src.utils.performance_tracker import PerformanceTrackerService
 
 # Initialize logger and performance tracker

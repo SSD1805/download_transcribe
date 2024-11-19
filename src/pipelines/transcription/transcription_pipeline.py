@@ -1,24 +1,15 @@
-# src/pipelines/transcription/transcription_pipeline.py
 import os
-
-from src.pipelines.registry.handler_registry import HandlerRegistry
-
+from src.utils.structlog_logger import StructLogger
+from src.utils.performance_tracker import PerformanceTracker
 
 class TranscriptionPipeline:
-    def __init__(self, input_directory, output_directory, registry=None):
+    def __init__(self, input_directory, output_directory):
         self.input_directory = input_directory
         self.output_directory = output_directory
-        self.registry = registry or HandlerRegistry
-        self.logger = self.registry.get("logger")
-        self.perf_tracker = self.registry.get("performance_tracker")
-        self.converter = self.registry.get("audio_converter")(output_directory=output_directory)
-        self.transcriber = self.registry.get("audio_transcriber")()
-        self.perf_tracker = self.registry.get("performance_tracker")
+        self.logger = StructLogger.get_logger()
+        self.perf_tracker = PerformanceTracker.get_instance()
 
     def process_files(self):
-        """
-        Process all audio files in the input directory.
-        """
         self.logger.info(f"Starting transcription pipeline for {self.input_directory}")
         audio_files = [
             f for f in os.listdir(self.input_directory) if f.endswith(('.mp3', '.wav', '.flac'))
@@ -28,9 +19,6 @@ class TranscriptionPipeline:
             self._process_file(input_path)
 
     def _process_file(self, input_file):
-        """
-        Process a single audio file: convert, transcribe, and save.
-        """
         with self.perf_tracker.track_execution(f"Processing {input_file}"):
             # Convert if necessary
             wav_file = self.converter.convert_to_wav(input_file)

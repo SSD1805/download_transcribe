@@ -1,4 +1,4 @@
-import yaml
+import pyyaml
 import os
 
 class YAMLParser:
@@ -11,6 +11,6 @@ class YAMLParser:
             raise FileNotFoundError(f"Configuration file not found at {file_path}")
         try:
             with open(file_path, 'r') as config_file:
-                return yaml.safe_load(config_file)
-        except yaml.YAMLError as e:
+                return pyyaml.safe_load(config_file)
+        except pyyaml.YAMLError as e:
             raise ValueError(f"Error parsing YAML file {file_path}: {e}")

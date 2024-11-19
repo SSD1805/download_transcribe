@@ -1,9 +1,11 @@
 import json
-
 import pandas as pd
+from src.utils.structlog_logger import StructLogger
+from src.utils.performance_tracker import PerformanceTracker
 
-logger = CoreServices.get_logger()
-perf_tracker = CoreServices.get_performance_tracker()
+logger = StructLogger.get_logger()
+perf_tracker = PerformanceTracker.get_instance()
+
 
 class TextSaver:
     def __init__(self):
@@ -11,14 +13,6 @@ class TextSaver:
 
     @perf_tracker.track
     def save_to_csv(self, sentences, entities, filepath):
-        """
-        Saves processed text data to a CSV file.
-
-        Args:
-            sentences (list): List of sentences.
-            entities (list): List of entities corresponding to each sentence.
-            filepath (str): Path to save the processed CSV file.
-        """
         if not sentences:
             logger.warning("No sentences to save. Please process text before saving.")
             return
@@ -36,19 +30,6 @@ class TextSaver:
 
     @perf_tracker.track
     def save_to_text(self, sentences, entities, tokens, output_file: str):
-        """
-        Save processed text data, including sentences, entities, and tokens, to a plain text file.
-
-        Args:
-            sentences (list): List of sentences.
-            entities (list): List of entities corresponding to each sentence.
-            tokens (list): List of tokens corresponding to each sentence.
-            output_file (str): Path to save the processed text file.
-        """
-        if not isinstance(output_file, str):
-            logger.error(f"Invalid output_file type: {type(output_file)}. Expected a string.")
-            raise ValueError("The output_file argument must be a string representing a file path.")
-
         if not sentences:
             logger.warning("No sentences to save. Please process text before saving.")
             return
@@ -64,19 +45,6 @@ class TextSaver:
 
     @perf_tracker.track
     def save_to_json(self, sentences, entities, tokens, filepath: str):
-        """
-        Save processed text data to a JSON file.
-
-        Args:
-            sentences (list): List of sentences.
-            entities (list): List of entities corresponding to each sentence.
-            tokens (list): List of tokens corresponding to each sentence.
-            filepath (str): Path to save the JSON file.
-        """
-        if not isinstance(filepath, str):
-            logger.error(f"Invalid filepath type: {type(filepath)}. Expected a string.")
-            raise ValueError("The filepath argument must be a string representing a file path.")
-
         if not sentences:
             logger.warning("No sentences to save. Please process text before saving.")
             return
@@ -89,25 +57,4 @@ class TextSaver:
             logger.info(f"Processed text saved to JSON file at {filepath}.")
         except Exception as e:
             logger.error(f"Error saving processed text to JSON at {filepath}: {e}")
-            raise
-
-    def save_to_jsonb(self, sentences, entities, tokens):
-        """
-        Returns processed text data in a JSON-B compatible format.
-
-        Args:
-            sentences (list): List of sentences.
-            entities (list): List of entities corresponding to each sentence.
-            tokens (list): List of tokens corresponding to each sentence.
-
-        Returns:
-            dict: Data in JSON-B compatible format.
-        """
-        try:
-            data = [{"Sentence": sentence, "Entities": entity, "Tokens": token}
-                    for sentence, entity, token in zip(sentences, entities, tokens)]
-            logger.info("Processed text converted to JSON-B format.")
-            return data
-        except Exception as e:
-            logger.error(f"Error converting processed text to JSON-B format: {e}")
             raise

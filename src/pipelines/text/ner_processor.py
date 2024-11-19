@@ -1,19 +1,13 @@
 import spacy
-from src.utils.logger_service import LoggerService
+from src.utils.structlog_logger import StructLogger
+from src.utils.performance_tracker import PerformanceTracker
 
-logger = LoggerService.get_logger()
-perf_tracker = CoreServices.get_performance_tracker()
+logger = StructLogger.get_logger()
+perf_tracker = PerformanceTracker.get_instance()
 
-# Initialize logger and performance tracker
 
 class NERProcessor:
     def __init__(self, spacy_model='en_core_web_sm'):
-        """
-        Initializes the NERProcessor with the specified spaCy model.
-
-        Args:
-            spacy_model (str): Name of the spaCy model to load.
-        """
         try:
             self.spacy_model = spacy.load(spacy_model)
             logger.info(f"spaCy model '{spacy_model}' loaded successfully.")
@@ -21,17 +15,8 @@ class NERProcessor:
             logger.error(f"Error loading spaCy model '{spacy_model}': {e}")
             raise
 
-    @perf_tracker.track  # Track performance of NER processing
+    @perf_tracker.track
     def perform_ner(self, text):
-        """
-        Performs Named Entity Recognition (NER) on the given text.
-
-        Args:
-            text (str): The input text for NER processing.
-
-        Returns:
-            list: A list of dictionaries containing entity details.
-        """
         if not text:
             logger.warning("No input text for NER. Please provide text before processing.")
             return []

@@ -3,34 +3,21 @@ from tqdm import tqdm
 from src.pipelines.audio.audio_converter import AudioConverter
 from src.pipelines.transcription.audio_transcriber import AudioTranscriber
 from src.pipelines.transcription.transcription_saver import TranscriptionSaver
-from src.utils.logger_service import LoggerService
-from src.utils.performance_tracker import PerformanceTrackerService
+from src.utils.structlog_logger import StructLogger
+from src.utils.performance_tracker import PerformanceTracker
 
 class AudioProcessingPipeline:
     def __init__(self, input_directory, output_directory, converter=None, transcriber=None, saver=None):
-        """
-        Initialize the audio processing pipeline.
-
-        Args:
-            input_directory (str): Directory containing input audio files.
-            output_directory (str): Directory to save transcriptions.
-            converter (AudioConverter, optional): AudioConverter instance.
-            transcriber (AudioTranscriber, optional): AudioTranscriber instance.
-            saver (TranscriptionSaver, optional): TranscriptionSaver instance.
-        """
         self.input_directory = input_directory
         self.output_directory = output_directory
-        self.logger = LoggerService.get_logger()
-        self.perf_tracker = PerformanceTrackerService.get_performance_tracker()
+        self.logger = StructLogger.get_logger()
+        self.perf_tracker = PerformanceTracker.get_instance()
 
         self.converter = converter or AudioConverter(output_directory=output_directory)
         self.transcriber = transcriber or AudioTranscriber()
         self.saver = saver or TranscriptionSaver(output_directory=output_directory)
 
     def process_files(self):
-        """
-        Process audio files: convert to WAV, transcribe, and save results.
-        """
         with self.perf_tracker.track_execution("Audio Processing Pipeline"):
             if not os.path.exists(self.input_directory):
                 self.logger.error(f"Input directory '{self.input_directory}' does not exist.")
@@ -51,12 +38,6 @@ class AudioProcessingPipeline:
                 self._process_single_file(file_name)
 
     def _process_single_file(self, file_name):
-        """
-        Process a single audio file: convert, transcribe, and save.
-
-        Args:
-            file_name (str): Name of the file to process.
-        """
         input_path = os.path.join(self.input_directory, file_name)
 
         if not file_name.endswith(".wav"):

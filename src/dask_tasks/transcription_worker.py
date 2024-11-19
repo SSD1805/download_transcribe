@@ -1,10 +1,10 @@
 from dask.distributed import Client
 from src.pipelines.transcription.audio_transcriber import AudioTranscriber
-from src.utils.logger_service import LoggerService
+from src.utils.structlog_logger import LoguruLogger
 from src.utils.performance_tracker import PerformanceTrackerService
 
 # Initialize logger and performance tracker
-logger = LoggerService.get_logger()
+logger = LoguruLogger.get_logger()
 perf_tracker = PerformanceTrackerService.get_performance_tracker()
 
 # Initialize Dask client, logger, and performance tracker

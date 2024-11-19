@@ -1,23 +1,21 @@
 from celery import shared_task
-from src.utils.logger_service import LoggerService
-from src.utils.performance_tracker import PerformanceTrackerService
-# Get logger and performance tracker from CoreServices
-logger = LoggerService.get_logger()
-perf_tracker = PerformanceTrackerService.get_performance_tracker()
+from src.utils.structlog_logger import StructLogger
+from src.utils.performance_tracker import PerformanceTracker
+
+logger = StructLogger.get_logger()
+perf_tracker = PerformanceTracker.get_instance()
 
 @shared_task
 def update_task_status(task_id, status):
     """
-    Shared task to update task status in the database.
+    Shared task to update task status.
 
     Args:
         task_id (str): The ID of the task.
         status (str): The new status to set.
     """
     try:
-        # Track the execution of the status update
-        with performance_tracker.track_execution(f"Update Task Status {task_id}"):
-            # Update task status in the database or logging system
+        with perf_tracker.track_execution(f"Update Task Status {task_id}"):
             logger.info(f"Updating status of task {task_id} to {status}.")
             # Placeholder for database update
             # db.update_task_status(task_id, status)
