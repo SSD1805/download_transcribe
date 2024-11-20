@@ -1,5 +1,5 @@
 from dependency_injector.wiring import inject, Provide
-from src.infrastructure.app_container import AppContainer
+from infrastructure.app_container import AppContainer
 
 class ModelLoader:
     @inject
@@ -103,7 +103,6 @@ class ModelLoader:
 
 # Example usage
 if __name__ == "__main__":
-    from dependency_injector import containers
 
     container = AppContainer()
     container.wire(modules=[__name__])

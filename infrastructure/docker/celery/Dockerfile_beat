@@ -1,0 +1,25 @@
+# Stage 1: Builder
+FROM python:3.11-slim AS builder
+
+WORKDIR /app
+
+# Install Poetry and dependencies
+RUN pip install --upgrade pip && pip install poetry
+COPY pyproject.toml poetry.lock /app/
+RUN poetry config virtualenvs.create false && poetry install --no-dev
+
+# Copy the application code
+COPY . .
+
+# Stage 2: Runner
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy the environment from the builder stage
+COPY --from=builder /app /app
+
+# Environment variables like DATABASE_URL will be provided through Docker Compose
+
+# Run Celery Beat with logging
+CMD ["poetry", "run", "celery", "-A", "your_project_name", "beat", "--loglevel=info"]

@@ -1,6 +1,6 @@
 import click
 from dependency_injector.wiring import inject, Provide
-from src.infrastructure.dependency_setup import container
+from infrastructure.dependency_setup import container
 
 @click.group()
 def cli():

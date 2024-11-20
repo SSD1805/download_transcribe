@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from src.infrastructure.dependency_setup import container, di_inject, di_Provide
+from infrastructure.dependency_setup import container, di_inject, di_Provide
 
 
 # Base Command Class

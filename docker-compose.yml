@@ -3,8 +3,8 @@ version: "3.8"
 services:
   youtube_downloader:
     build:
-      context: ./docker/downloaders
-      dockerfile: Dockerfile_download_manager
+      context: infrastructure/docker/downloaders
+      dockerfile: docker/downloaders/Dockerfile
     volumes:
       - youtube_data:/data
     networks:
@@ -13,7 +13,7 @@ services:
 
   audio_processor:
     build:
-      context: ./docker/audio_processor
+      context: infrastructure/docker/audio_processor
       dockerfile: Dockerfile
     volumes:
       - audio_data:/data
@@ -23,7 +23,7 @@ services:
 
   text_processor:
     build:
-      context: ./docker/text_processor
+      context: infrastructure/docker/text_processor
       dockerfile: Dockerfile
     volumes:
       - text_data:/data
@@ -33,7 +33,7 @@ services:
 
   transcription_service:
     build:
-      context: ./docker/transcription_service
+      context: infrastructure/docker/transcription_service
       dockerfile: Dockerfile
     volumes:
       - transcription_data:/data
@@ -43,7 +43,7 @@ services:
 
   celery_worker:
     build:
-      context: ./docker/celery
+      context: infrastructure/docker/celery
       dockerfile: Dockerfile_worker
     depends_on:
       - django_app
@@ -56,7 +56,7 @@ services:
 
   django_app:
     build:
-      context: ./docker/django_app
+      context: infrastructure/docker/django_app
       dockerfile: Dockerfile_django
     volumes:
       - django_data:/data
@@ -72,7 +72,7 @@ services:
 
   reverse_proxy:
     build:
-      context: ./docker/reverse_proxy
+      context: infrastructure/docker/reverse_proxy
       dockerfile: Dockerfile_nginx
     depends_on:
       - django_app

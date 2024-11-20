@@ -1,6 +1,6 @@
 ### Improved app.py with Dependency Setup Integration ###
 import click
-from src.infrastructure.dependency_setup import container, di_inject, di_Provide
+from infrastructure.dependency_setup import container, di_inject, di_Provide
 from src.utils.structlog_logger import StructLogger
 from src.utils.performance_tracker import PerformanceTracker
 

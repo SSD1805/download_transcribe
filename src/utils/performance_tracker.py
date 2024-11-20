@@ -1,6 +1,8 @@
-import time
 from typing import Optional
 from contextlib import contextmanager
+from dependency_injector.wiring import inject, Provide
+from src.infrastructure.app_container import AppContainer
+import time
 import logging
 import threading
 import psutil  # Assuming psutil is used for memory monitoring
@@ -17,27 +19,22 @@ class PerformanceTracker:
     @classmethod
     def get_instance(cls) -> 'PerformanceTracker':
         """
-        Returns the singleton instance of the PerformanceTrackerService.
+        Returns the singleton instance of the PerformanceTracker.
         If no instance exists, it creates one.
 
         Returns:
-            PerformanceTrackerService: Configured performance tracker instance.
+            PerformanceTracker: Configured performance tracker instance.
         """
         if cls._instance is None:
             cls._instance = cls()
         return cls._instance
 
-    def __init__(self):
+    @inject
+    def __init__(self, logger: logging.Logger = Provide[AppContainer.logger]):
         if PerformanceTracker._instance is not None:
             raise Exception("This is a singleton class. Use the get_instance() method.")
 
-        self.logger = logging.getLogger("performance_tracker")
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
-        self.logger.setLevel(logging.INFO)
-
+        self.logger = logger
         self.metrics = {}
         self._monitor_thread = None
         self._stop_monitoring = threading.Event()
@@ -124,8 +121,14 @@ class PerformanceTracker:
             self.logger.info("Performance monitoring stopped.")
 
 
-# Example usage
+# Example usage with dependency injection wiring
 if __name__ == "__main__":
+    from src.infrastructure.dependency_setup import container
+
+    # Wire the AppContainer dependencies to this module
+    container.wire(modules=[__name__])
+
+    # Get instance of PerformanceTracker
     tracker = PerformanceTracker.get_instance()
 
     # Configure and start monitoring

@@ -1,5 +1,5 @@
 from dependency_injector.wiring import inject, Provide
-from src.infrastructure.dependency_setup import AppContainer
+from infrastructure.dependency_setup import AppContainer
 
 
 class HelperFunctions:

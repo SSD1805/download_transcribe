@@ -1,5 +1,5 @@
 from dependency_injector.wiring import inject, Provide
-from src.infrastructure.app_container import AppContainer
+from infrastructure.app_container import AppContainer
 import click
 
 class TextProcessor:

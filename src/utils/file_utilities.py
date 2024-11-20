@@ -1,22 +1,21 @@
+from typing import Optional
+from dependency_injector.wiring import inject, Provide
+from infrastructure.app_container import AppContainer
 import os
 import shutil
-from src.utils.structlog_logger import StructLogger
-from src.utils.performance_tracker import PerformanceTracker
-from typing import Optional
 
-# Logger and Tracker Instances
-logger = StructLogger.get_logger()
-perf_tracker = PerformanceTracker.get_instance()
 
 class FileManager:
     """
     Handles file operations such as saving, loading, copying, and deleting files.
     """
-    def __init__(self, logger=logger, tracker=perf_tracker):
+
+    @inject
+    def __init__(self, logger=Provide[AppContainer.logger], tracker=Provide[AppContainer.performance_tracker]):
         self.logger = logger
         self.tracker = tracker
 
-    @perf_tracker.track
+    @inject
     def save_file(self, content: bytes, file_path: str):
         """
         Save binary content to a specified file path.
@@ -25,15 +24,16 @@ class FileManager:
             content (bytes): Content to save.
             file_path (str): Destination file path.
         """
-        try:
-            with open(file_path, 'wb') as file:
-                file.write(content)
-            self.logger.info(f"File saved successfully: {file_path}")
-        except Exception as e:
-            self.logger.error(f"Failed to save file {file_path}: {e}")
-            raise
+        with self.tracker.track_execution("Save File"):
+            try:
+                with open(file_path, 'wb') as file:
+                    file.write(content)
+                self.logger.info(f"File saved successfully: {file_path}")
+            except Exception as e:
+                self.logger.error(f"Failed to save file {file_path}: {e}")
+                raise
 
-    @perf_tracker.track
+    @inject
     def load_file(self, file_path: str) -> bytes:
         """
         Load and return binary content from a file.
@@ -44,16 +44,17 @@ class FileManager:
         Returns:
             bytes: File content.
         """
-        try:
-            with open(file_path, 'rb') as file:
-                content = file.read()
-            self.logger.info(f"File loaded successfully: {file_path}")
-            return content
-        except Exception as e:
-            self.logger.error(f"Failed to load file {file_path}: {e}")
-            raise
+        with self.tracker.track_execution("Load File"):
+            try:
+                with open(file_path, 'rb') as file:
+                    content = file.read()
+                self.logger.info(f"File loaded successfully: {file_path}")
+                return content
+            except Exception as e:
+                self.logger.error(f"Failed to load file {file_path}: {e}")
+                raise
 
-    @perf_tracker.track
+    @inject
     def delete_file(self, file_path: str):
         """
         Delete a specified file.
@@ -61,14 +62,15 @@ class FileManager:
         Args:
             file_path (str): Path of the file to delete.
         """
-        try:
-            os.remove(file_path)
-            self.logger.info(f"File deleted successfully: {file_path}")
-        except Exception as e:
-            self.logger.error(f"Failed to delete file {file_path}: {e}")
-            raise
+        with self.tracker.track_execution("Delete File"):
+            try:
+                os.remove(file_path)
+                self.logger.info(f"File deleted successfully: {file_path}")
+            except Exception as e:
+                self.logger.error(f"Failed to delete file {file_path}: {e}")
+                raise
 
-    @perf_tracker.track
+    @inject
     def copy_file(self, source: str, destination: str):
         """
         Copy a file from source to destination.
@@ -77,20 +79,25 @@ class FileManager:
             source (str): Path of the source file.
             destination (str): Destination path for the copied file.
         """
-        try:
-            shutil.copy2(source, destination)
-            self.logger.info(f"File copied from {source} to {destination}")
-        except Exception as e:
-            self.logger.error(f"Failed to copy file from {source} to {destination}: {e}")
-            raise
+        with self.tracker.track_execution("Copy File"):
+            try:
+                shutil.copy2(source, destination)
+                self.logger.info(f"File copied from {source} to {destination}")
+            except Exception as e:
+                self.logger.error(f"Failed to copy file from {source} to {destination}: {e}")
+                raise
+
 
 class DirectoryManager:
     """
     Handles directory operations such as ensuring existence, listing files, and creating directories.
     """
-    def __init__(self, logger=logger):
+
+    @inject
+    def __init__(self, logger=Provide[AppContainer.logger]):
         self.logger = logger
 
+    @inject
     def ensure_directory_exists(self, directory_path: str):
         """
         Ensure a directory exists, creating it if necessary.
@@ -105,6 +112,7 @@ class DirectoryManager:
             self.logger.error(f"Failed to ensure directory {directory_path}: {e}")
             raise
 
+    @inject
     def list_files(self, directory_path: str, extensions: Optional[tuple] = None) -> list:
         """
         List files in a directory with optional filtering by extensions.
@@ -129,13 +137,17 @@ class DirectoryManager:
             self.logger.error(f"Failed to list files in directory {directory_path}: {e}")
             raise
 
+
 class FilenameSanitizer:
     """
     Provides utilities for sanitizing file names.
     """
-    def __init__(self, logger=logger):
+
+    @inject
+    def __init__(self, logger=Provide[AppContainer.logger]):
         self.logger = logger
 
+    @inject
     def sanitize(self, filename: str) -> str:
         """
         Sanitize a filename to make it safe for file systems.

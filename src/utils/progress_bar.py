@@ -1,33 +1,37 @@
-from src.utils.structlog_logger import StructLogger
-from src.utils.performance_tracker import PerformanceTracker
+from typing import Iterable
 from tqdm import tqdm
+from dependency_injector.wiring import inject, Provide
+from infrastructure.app_container import AppContainer
 
-# Logger and Tracker Instances
-logger = StructLogger.get_logger()
-perf_tracker = PerformanceTracker.get_instance()
 
 class ProgressBar:
-    def __init__(self, tracker=None):
+    """
+    Utility for creating progress bars with optional performance tracking.
+    """
+
+    @inject
+    def __init__(self, logger=Provide[AppContainer.logger], tracker=Provide[AppContainer.performance_tracker]):
         """
         Initialize the ProgressBar.
 
         Args:
-            tracker (PerformanceTracker, optional): Instance of PerformanceTracker for tracking performance.
+            logger: Logger instance for logging progress.
+            tracker: Performance tracker instance for tracking performance.
         """
-        self.logger = LoguruLogger().get_logger()
-        self.tracker = tracker or PerformanceTracker()
+        self.logger = logger
+        self.tracker = tracker
 
-    def progress_bar(self, iterable, description="Processing", **kwargs):
+    def wrap(self, iterable: Iterable, description: str = "Processing", **kwargs):
         """
-        Display a progress bar for the given iterable with performance tracking.
+        Wraps an iterable with a progress bar and tracks the performance.
 
         Args:
-            iterable (iterable): The iterable to process with a progress bar.
-            description (str): A short description for the progress bar.
-            **kwargs: Additional arguments to customize the tqdm progress bar.
+            iterable (Iterable): The iterable to process with a progress bar.
+            description (str): A description for the progress bar.
+            **kwargs: Additional arguments for customizing the tqdm progress bar.
 
-        Returns:
-            generator: A tqdm-wrapped iterable with performance tracking.
+        Yields:
+            Each element of the iterable, while displaying progress.
         """
         if iterable is None:
             self.logger.warning("Provided iterable is None. Returning an empty iterable.")
@@ -39,28 +43,12 @@ class ProgressBar:
             # Track overall execution time
             with self.tracker.track_execution(description):
                 for item in tqdm(iterable, desc=description, **kwargs):
-                    # Track each iteration
+                    # Optionally, track each iteration (if needed)
                     with self.tracker.track_execution(f"Step in {description}"):
                         yield item
 
             self.logger.info(f"Progress bar '{description}' completed.")
+
         except Exception as e:
             self.logger.error(f"Error during progress bar execution: {e}")
             raise
-from tqdm import tqdm
-
-class ProgressBar:
-    @staticmethod
-    def wrap(iterable, description="Processing", **kwargs):
-        """
-        Displays a progress bar for the given iterable.
-
-        Args:
-            iterable (iterable): The iterable to wrap with a progress bar.
-            description (str): The description for the progress bar.
-            **kwargs: Additional customization for the progress bar.
-
-        Returns:
-            generator: A tqdm-wrapped iterable.
-        """
-        return tqdm(iterable, desc=description, **kwargs)

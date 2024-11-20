@@ -1,19 +1,28 @@
-# This module is responsible for downloading audio files from YouTube URLs using the yt-dlp library.
+from dependency_injector.wiring import inject, Provide
+from src.infrastructure.app_container import AppContainer
 import os
 import yt_dlp
-from src.utils.structlog_logger import StructLogger
-from src.utils.performance_tracker import PerformanceTracker
-from src.infrastructure.registries import DownloadError, ConfigurationError, FileError
-
-logger = StructLogger.get_logger()
-perf_tracker = PerformanceTracker.get_instance()
-
 
 class DownloadManager:
-    def __init__(self, config_manager):
+    @inject
+    def __init__(self,
+                 config_manager=Provide[AppContainer.configuration_registry],
+                 logger=Provide[AppContainer.logger],
+                 perf_tracker=Provide[AppContainer.performance_tracker],
+                 error_registry=Provide[AppContainer.error_registry]):
+        """
+        Initialize the DownloadManager.
+
+        Args:
+            config_manager: The configuration registry to fetch configurations.
+            logger: Logger instance for logging activities.
+            perf_tracker: Performance tracker for measuring execution times.
+            error_registry: Error registry for custom exceptions like DownloadError, ConfigurationError, FileError.
+        """
         self.config_manager = config_manager
         self.logger = logger
         self.tracker = perf_tracker
+        self.error_registry = error_registry
 
         try:
             self.download_directory = self.config_manager.get('download_directory', '/data/audio_files')
@@ -27,13 +36,13 @@ class DownloadManager:
                 }]
             })
             if not os.path.exists(self.download_directory):
-                raise FileError(f"Download directory does not exist: {self.download_directory}")
+                raise self.error_registry.FileError(f"Download directory does not exist: {self.download_directory}")
             self.logger.info(f"DownloadManager initialized with directory: {self.download_directory}")
         except KeyError as e:
             message = f"Missing configuration key: {e}"
             self.logger.error(message)
-            raise ConfigurationError(message) from e
-        except FileError as e:
+            raise self.error_registry.ConfigurationError(message) from e
+        except self.error_registry.FileError as e:
             self.logger.error(str(e))
             raise
 
@@ -52,8 +61,8 @@ class DownloadManager:
             except yt_dlp.DownloadError as e:
                 message = f"Error during download from {url}: {e}"
                 self.logger.error(message)
-                raise DownloadError(message) from e
+                raise self.error_registry.DownloadError(message) from e
             except Exception as e:
                 message = f"Unexpected error while downloading from {url}: {e}"
                 self.logger.error(message)
-                raise DownloadError(message) from e
+                raise self.error_registry.DownloadError(message) from e

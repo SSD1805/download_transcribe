@@ -1,0 +1,13 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY pyproject.toml poetry.lock /app/
+RUN pip install poetry && poetry config virtualenvs.create false && poetry install --no-dev
+
+# Copy application code
+COPY . .
+
+# The environment variables such as DATABASE_URL will be injected by Docker Compose
+CMD ["poetry", "run", "celery", "-A", "your_project_name", "worker", "--loglevel=info"]
