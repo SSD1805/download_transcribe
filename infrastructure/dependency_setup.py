@@ -37,6 +37,7 @@ container.wire(modules=[
     "src.utils.concurrency_utilities",
 
     # CLI modules
+    "src.cli.commands.base_command",
     "src.cli.cli_audio",
     "src.cli.cli_download",
     "src.cli.cli_text",

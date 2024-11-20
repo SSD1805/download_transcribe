@@ -1,12 +1,12 @@
 import click
 from dependency_injector.wiring import inject, Provide
 from infrastructure.app_container import AppContainer
-from src.cli.commands.base_command import BaseCommand
 
 # Refactored CLI Command Classes
-class DownloadCommand(BaseCommand):
+
+class DownloadCommand:
     """
-    Command to handle downloading videos from YouTube.
+    Command to handle downloading a single video from YouTube.
     """
 
     @inject
@@ -24,7 +24,7 @@ class DownloadCommand(BaseCommand):
             self.logger.error(f"Failed to download video from URL {url}: {e}")
             raise
 
-class TranscribeCommand(BaseCommand):
+class TranscribeCommand:
     """
     Command to handle transcribing an audio file.
     """
@@ -58,6 +58,26 @@ class TranscribeCommand(BaseCommand):
             self.logger.error(f"Transcription failed for {audio_file}: {e}")
             raise
 
+class BatchProcessCommand:
+    """
+    Command to handle batch processing tasks.
+    """
+
+    @inject
+    def __init__(self, batch_processor=Provide[AppContainer.batch_processor],
+                 logger=Provide[AppContainer.struct_logger]):
+        self.batch_processor = batch_processor
+        self.logger = logger
+
+    def execute(self, input_directory, output_directory):
+        try:
+            self.logger.info(f"Starting batch processing for input directory: {input_directory}")
+            self.batch_processor.process(input_directory, output_directory)
+            self.logger.info(f"Batch processing completed. Output saved in: {output_directory}")
+        except Exception as e:
+            self.logger.error(f"Batch processing failed for input directory {input_directory}: {e}")
+            raise
+
 # CLI Commands with Click
 
 @click.group()
@@ -84,6 +104,15 @@ def transcribe(ctx, audio_file, title, use_whisperx, fallback_to_whisper):
     command = ctx.obj.get('transcribe_command')
     command.execute(audio_file, title, use_whisperx, fallback_to_whisper)
 
+@cli.command()
+@click.argument('input_directory')
+@click.argument('output_directory')
+@click.pass_context
+def batch_process(ctx, input_directory, output_directory):
+    """Process batch tasks for input directory"""
+    command = ctx.obj.get('batch_command')
+    command.execute(input_directory, output_directory)
+
 # Main Entry Point
 
 @click.pass_context
@@ -95,8 +124,9 @@ def setup_context(ctx):
     ctx.ensure_object(dict)
 
     # Instantiate command classes and add them to the context
-    ctx.obj['download_command'] = DownloadCommand()
-    ctx.obj['transcribe_command'] = TranscribeCommand()
+    ctx.obj['download_command'] = container.download_command()
+    ctx.obj['transcribe_command'] = container.transcribe_command()
+    ctx.obj['batch_command'] = container.batch_command()
 
 # Inject the setup_context to initialize commands
 if __name__ == '__main__':
