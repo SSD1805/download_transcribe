@@ -2,7 +2,7 @@
 import json
 import pandas as pd
 from src.utils.structlog_logger import StructLogger
-from src.utils.performance_tracker import PerformanceTracker
+from src.utils.tracking_utilities import PerformanceTracker
 
 logger = StructLogger.get_logger()
 perf_tracker = PerformanceTracker.get_instance()

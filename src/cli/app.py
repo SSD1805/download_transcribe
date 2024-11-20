@@ -2,7 +2,7 @@
 import click
 from infrastructure.dependency_setup import container, di_inject, di_Provide
 from src.utils.structlog_logger import StructLogger
-from src.utils.performance_tracker import PerformanceTracker
+from src.utils.tracking_utilities import PerformanceTracker
 
 # Get logger and performance tracker from the container
 logger = StructLogger.get_logger()

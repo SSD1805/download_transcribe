@@ -2,7 +2,7 @@
 import os
 import json
 from src.utils.structlog_logger import StructLogger
-from src.utils.performance_tracker import PerformanceTracker
+from src.utils.tracking_utilities import PerformanceTracker
 
 class TranscriptionSaver:
     def __init__(self, output_directory):

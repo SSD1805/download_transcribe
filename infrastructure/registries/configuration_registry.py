@@ -1,23 +1,30 @@
 from typing import Any, Callable, Union
-from threading import Lock
 from dependency_injector.wiring import inject, Provide
 from infrastructure.app_container import AppContainer
 
 class ConfigurationRegistry:
-    _lock = Lock()  # Thread-safe lock for lazy-loaded configs
+    _instance = None  # Singleton instance
 
     @inject
-    def __init__(self, logger=Provide[AppContainer.logger], base_registry=Provide[AppContainer.base_registry]):
-        """
-        Initialize the ConfigurationRegistry.
+    def __new__(cls, base_registry=Provide[AppContainer.generic_registry], concurrency=Provide[AppContainer.concurrency_utilities]):
+        if not cls._instance:
+            with concurrency.get_lock():  # Using concurrency utility lock for singleton instantiation
+                if not cls._instance:
+                    cls._instance = super(ConfigurationRegistry, cls).__new__(cls)
+                    cls._instance._init_singleton(base_registry, concurrency)
+        return cls._instance
 
-        Args:
-            logger: Logger instance for logging purposes.
-            base_registry: Base registry instance for extending registry functionality.
+    @inject
+    def _init_singleton(self, base_registry, concurrency, logger=Provide[AppContainer.struct_logger], tracker=Provide[AppContainer.performance_tracker]):
         """
-        self.logger = logger
+        Initialize the singleton instance.
+        """
         self.base_registry = base_registry
-        self._lazy_loaded_configs: dict[str, Union[Any, Callable[[], Any]]] = {}
+        self.logger = logger
+        self.tracker = tracker
+        self.concurrency = concurrency
+        self._lazy_loaded_configs: Dict[str, Union[Any, Callable[[], Any]]] = {}
+        self.logger.info("Initialized ConfigurationRegistry singleton.")
 
     def register(self, name: str, config: Union[Any, Callable[[], Any]], lazy_load: bool = False):
         """
@@ -28,13 +35,14 @@ class ConfigurationRegistry:
             config (Any or Callable[[], Any]): The configuration value or a callable that returns it.
             lazy_load (bool): Whether to lazy-load the configuration.
         """
-        if lazy_load:
-            with self._lock:
-                self._lazy_loaded_configs[name] = config
-                self.logger.info(f"Lazy configuration '{name}' registered.")
-        else:
-            self.base_registry.register(name, config)
-            self.logger.info(f"Configuration '{name}' registered immediately.")
+        with self.concurrency.get_lock():  # Using concurrency utility lock for thread safety
+            with self.tracker.track_execution("Register Configuration Item"):
+                if lazy_load:
+                    self._lazy_loaded_configs[name] = config
+                    self.logger.info(f"Lazy configuration '{name}' registered.")
+                else:
+                    self.base_registry.register(name, config)
+                    self.logger.info(f"Configuration '{name}' registered immediately.")
 
     def get(self, name: str) -> Any:
         """
@@ -46,10 +54,10 @@ class ConfigurationRegistry:
         Returns:
             Any: The configuration value.
         """
-        if name in self._lazy_loaded_configs:
-            with self._lock:
-                # Double-check to avoid race conditions
+        with self.concurrency.get_lock():  # Using concurrency utility lock for thread safety
+            with self.tracker.track_execution("Get Configuration Item"):
                 if name in self._lazy_loaded_configs:
+                    # Double-check to avoid race conditions
                     config = self._lazy_loaded_configs.pop(name)
                     if callable(config):
                         config = config()  # Call the lazy-loaded function to get the actual config
@@ -57,7 +65,28 @@ class ConfigurationRegistry:
                     self.logger.info(f"Lazy configuration '{name}' loaded and registered.")
                     return config
 
-        return self.base_registry.get(name)
+                return self.base_registry.get(name)
 
-# This instantiation is handled by the AppContainer, so we do not need to manually instantiate it:
-# configuration_registry = ConfigurationRegistry()
+# Example Usage
+if __name__ == "__main__":
+    from infrastructure.dependency_setup import container
+
+    # Wire the AppContainer dependencies to this module
+    container.wire(modules=[__name__])
+
+    # Get the singleton instance of ConfigurationRegistry
+    config_registry = ConfigurationRegistry()
+
+    # Register a lazy configuration
+    config_registry.register("lazy_config", lambda: {"key": "value"}, lazy_load=True)
+
+    # Register an immediate configuration
+    config_registry.register("immediate_config", {"key": "immediate_value"})
+
+    # Retrieve the lazy configuration (will initialize it)
+    lazy_config_value = config_registry.get("lazy_config")
+    print(f"Lazy Config Value: {lazy_config_value}")
+
+    # Retrieve the immediate configuration
+    immediate_config_value = config_registry.get("immediate_config")
+    print(f"Immediate Config Value: {immediate_config_value}")

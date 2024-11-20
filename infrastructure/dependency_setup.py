@@ -16,10 +16,10 @@ container.wire(modules=[
     "src.core.services",
 
     # Infrastructure modules
-    "src.infrastructure.registries.configuration_registry",
-    "src.infrastructure.registries.error_registry",
-    "src.infrastructure.registries.model_registry",
-    "src.infrastructure.registries.pipeline_component_registry",
+    "infrastructure.registries.configuration_registry",
+    "infrastructure.registries.model_registry",
+    "infrastructure.registries.pipeline_registry",
+    "infrastructure.registries.generic_registry",
 
     # Pipeline and module managers
     "src.modules.config_manager",
@@ -31,10 +31,10 @@ container.wire(modules=[
     "src.modules.text_processor",
 
     # Utility modules
-    "src.utils.timestamp_formatter",
-    "src.utils.performance_tracker",
-    "src.utils.progress_bar",
+    "src.utils.structlog_logger",
+    "src.utils.tracking_utilities",
     "src.utils.file_utilities",
+    "src.utils.concurrency_utilities",
 
     # CLI modules
     "src.cli.cli_audio",

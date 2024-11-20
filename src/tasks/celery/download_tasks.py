@@ -1,30 +1,35 @@
-from celery_app import shared_task
+from celery import Celery
+from .observable_task import ObservableTask
+from .observers import LoggerObserver, TaskCoordinatorObserver
 from dependency_injector.wiring import inject, Provide
-from infrastructure.dependency_setup import container
+from infrastructure.app_container import AppContainer
 
-@shared_task(bind=True, max_retries=3)
+app = Celery('tasks', broker='pyamqp://guest@localhost//')
+
+
+class ObservableCeleryTask(ObservableTask):
+    def __init__(self):
+        super().__init__()
+
+
+@app.task(bind=True)
 @inject
-def download_video_task(self,
-                        url: str,
-                        download_manager=Provide[container.download_manager],
-                        logger=Provide[container.logger]):
-    """
-    Celery task to download a video using DownloadManager.
+def download_file(self, file_url: str, logger_observer=Provide[AppContainer.logger_observer], *args, **kwargs):
+    observable_task = ObservableCeleryTask()
 
-    Args:
-        self:
-        url (str): The video URL to download.
-        download_manager: Injected DownloadManager instance for handling video downloads.
-        logger: Injected Logger instance for logging information.
+    # Add observers
+    coordinator_observer = TaskCoordinatorObserver()
+    observable_task.add_observer(logger_observer.update)
+    observable_task.add_observer(coordinator_observer.update)
 
-    Raises:
-        Exception: If the download fails after retries.
-    """
     try:
-        logger.info(f"Starting download task for URL: {url}")
-        result = download_manager.download(url)
-        logger.info(f"Download completed for URL: {url}")
+        observable_task.notify_observers('task_started', {"task_id": self.request.id, "file_url": file_url})
+
+        # Task logic here - e.g., download the file
+        result = f"Downloaded content from {file_url}"  # Placeholder for actual download logic
+
+        observable_task.notify_observers('task_completed', {"task_id": self.request.id, "result": result})
         return result
     except Exception as e:
-        logger.error(f"Download failed for URL: {url} with error: {e}")
-        raise self.retry(countdown=60, exc=e)
+        observable_task.notify_observers('task_failed', {"task_id": self.request.id, "error": str(e)})
+        raise e

@@ -1,7 +1,7 @@
 # Description: AudioTranscriber class to transcribe audio_processor files using WhisperX or Whisper.
 import torch
 from src.utils.structlog_logger import StructLogger
-from src.utils.performance_tracker import PerformanceTracker
+from src.utils.tracking_utilities import PerformanceTracker
 
 
 class AudioTranscriber:

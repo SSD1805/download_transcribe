@@ -5,7 +5,7 @@ from src.pipelines.audio.audio_converter import AudioConverter
 from src.pipelines.transcription.audio_transcriber import AudioTranscriber
 from src.pipelines.transcription.transcription_saver import TranscriptionSaver
 from src.utils.structlog_logger import StructLogger
-from src.utils.performance_tracker import PerformanceTracker
+from src.utils.tracking_utilities import PerformanceTracker
 
 class AudioProcessingPipeline:
     def __init__(self, input_directory, output_directory, converter=None, transcriber=None, saver=None):

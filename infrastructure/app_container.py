@@ -1,10 +1,7 @@
 from dependency_injector import containers, providers
 from src.utils.structlog_logger import StructLogger
-from src.utils.concurrency_manager import ConcurrencyManager
+from src.utils.concurrency_utilities import ConcurrencyManager
 from src.utils.file_utilities import FileManager, DirectoryManager, FilenameSanitizer
-from src.utils.progress_bar import ProgressBar
-from src.utils.timestamp_formatter import TimestampFormatter
-from src.utils.yaml_parser import YAMLParser
 from src.pipelines.transcription.audio_transcriber import AudioTranscriber
 from src.pipelines.transcription.transcription_pipeline import TranscriptionPipeline
 from src.pipelines.transcription.transcription_saver import TranscriptionSaver
@@ -17,9 +14,8 @@ from src.pipelines.text.text_saver import TextSaver
 from src.pipelines.text.text_segmenter import TextSegmenter
 from src.pipelines.text.text_tokenizer import TextTokenizer
 from infrastructure.registries.configuration_registry import ConfigurationRegistry
-from infrastructure.registries.error_registry import ErrorRegistry
 from infrastructure.registries.model_registry import ModelRegistry
-from infrastructure.registries.pipeline_component_registry import PipelineComponentRegistry
+from infrastructure.registries.pipeline_registry import PipelineRegistry
 from src.core.batch_processor import BatchProcessor
 from src.core.memory_monitor import MemoryMonitor
 from src.core.services import SingletonLogger, SingletonPerformanceTracker
@@ -31,6 +27,7 @@ from src.modules.transcription_manager import ModelLoader
 from src.modules.helper_functions import HelperFunctions
 import structlog
 import logging
+from tasks.observers import LoggerObserver
 
 
 class AppContainer(containers.DeclarativeContainer):
