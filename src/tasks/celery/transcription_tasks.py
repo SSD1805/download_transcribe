@@ -1,42 +1,33 @@
-from celery_app import shared_task
+from celery import Celery
+from .observable_task import ObservableTask
+from .observers import LoggerObserver
 from dependency_injector.wiring import inject, Provide
-from infrastructure.dependency_setup import container
+from infrastructure.app_container import AppContainer
 
-@shared_task(bind=True, max_retries=3)
+app = Celery('tasks', broker='pyamqp://guest@localhost//')
+
+
+class ObservableCeleryTask(ObservableTask):
+    def __init__(self):
+        super().__init__()
+
+
+@app.task(bind=True)
 @inject
-def transcribe_audio_task(
-    self,
-    audio_file_path: str,
-    logger=Provide[container.logger],
-    performance_tracker=Provide[container.performance_tracker],
-    audio_transcriber=Provide[container.transcriber],
-    transcription_saver=Provide[container.pipeline_component_registry.provide_pipeline_components().get("transcription_saver")]
-):
-    """
-    Celery task to transcribe an audio file.
+def transcribe_audio(self, audio_file: str, logger_observer=Provide[AppContainer.logger_observer], *args, **kwargs):
+    observable_task = ObservableCeleryTask()
 
-    Args:
-        self:
-        audio_file_path (str): The file path of the audio to transcribe.
-        logger: Logger instance for logging (injected).
-        performance_tracker: Performance tracker instance for tracking execution (injected).
-        audio_transcriber: AudioTranscriber instance for transcribing audio (injected).
-        transcription_saver: TranscriptionSaver instance for saving transcriptions (injected).
-    """
+    # Add observers
+    observable_task.add_observer(logger_observer.update)
+
     try:
-        logger.info(f"Starting transcription task for audio file: {audio_file_path}")
+        observable_task.notify_observers('task_started', {"task_id": self.request.id, "audio_file": audio_file})
 
-        # Track the transcription task
-        with performance_tracker.track_execution("Transcription Task"):
-            segments = audio_transcriber.transcribe(audio_file_path)
+        # Task logic here - e.g., transcribe the audio file
+        result = f"Transcribed content from {audio_file}"  # Placeholder for actual transcription logic
 
-        # Track the save transcription task
-        with performance_tracker.track_execution("Save Transcription Task"):
-            transcription_saver.save_transcription(segments, audio_file_path)
-
-        logger.info(f"Transcription completed and saved for file: {audio_file_path}")
-        return segments
-
+        observable_task.notify_observers('task_completed', {"task_id": self.request.id, "result": result})
+        return result
     except Exception as e:
-        logger.error(f"Transcription failed for file: {audio_file_path} with error: {e}")
-        raise self.retry(countdown=120, exc=e)
+        observable_task.notify_observers('task_failed', {"task_id": self.request.id, "error": str(e)})
+        raise e

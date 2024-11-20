@@ -1,48 +1,30 @@
 from dask.distributed import Client
+from .observable_task import ObservableTask
 from dependency_injector.wiring import inject, Provide
-from src.infrastructure.app_container import AppContainer
-from src.pipelines.text.ner_processor import NERProcessor
+from infrastructure.app_container import AppContainer
+from tasks.observers import LoggerObserver
 
-
-# Initialize Dask client
-client = Client()
+# Set up Dask client
+client = Client('localhost:8786')
 
 @inject
-def ner_task(
-    text: str,
-    logger=Provide[AppContainer.logger],
-    perf_tracker=Provide[AppContainer.performance_tracker],
-):
-    """
-    Perform Named Entity Recognition (NER) on text and track performance.
+def ner_task(text: str, logger_observer=Provide[AppContainer.logger_observer], *args, **kwargs):
+    observable_task = ObservableDaskTask()
 
-    Args:
-        text (str): The text on which to perform NER.
-        logger: Logger instance to log information.
-        perf_tracker: Performance tracker to track execution time.
-    """
-    ner_processor = NERProcessor(logger)
+    # Add observers
+    observable_task.add_observer(logger_observer.update)
 
-    with perf_tracker.track_execution("Named Entity Recognition"):
-        logger.info("Starting Named Entity Recognition task.")
-        try:
-            result = ner_processor.perform_ner(text)
-            logger.info("NER task completed successfully.")
-            return result
-        except Exception as e:
-            logger.error(f"Error during NER task: {e}")
-            raise
+    try:
+        observable_task.notify_observers('task_started', {"text": text})
 
+        # Task logic here - e.g., perform NER on the text
+        result = f"NER performed on text: {text}"  # Placeholder for actual NER logic
 
-# Register the task function with Dask as a worker plugin
-client.register_worker_plugin(ner_task)
+        observable_task.notify_observers('task_completed', {"text": text, "result": result})
+        return result
+    except Exception as e:
+        observable_task.notify_observers('task_failed', {"text": text, "error": str(e)})
+        raise e
 
-if __name__ == "__main__":
-    # Wire the dependencies for this module
-    container = AppContainer()
-    container.wire(modules=[__name__])
-
-    # Example usage: submitting an NER task
-    sample_text = "Elon Musk founded SpaceX and Tesla in California."
-    future = client.submit(ner_task, sample_text)
-    print(future.result())
+# Submit the task to Dask
+future = client.submit(ner_task, 'Sample text for NER.')

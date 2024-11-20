@@ -1,45 +1,111 @@
 from dask.distributed import Client
+from .observable_task import ObservableTask
 from dependency_injector.wiring import inject, Provide
-from src.infrastructure.app_container import AppContainer
-import click
+from infrastructure.app_container import AppContainer
+from tasks.observers import LoggerObserver
 
-# Initialize Dask client
-client = Client()
+# Set up Dask client
+client = Client('localhost:8786')
 
 @inject
-def segment_text_task(
-    text: str,
-    segmenter=Provide[AppContainer.pipeline_component_registry.provide("text_segmenter")],
-    logger=Provide[AppContainer.logger],
-    perf_tracker=Provide[AppContainer.performance_tracker]
-):
-    """
-    Segment text into sentences and track performance.
-    """
-    with perf_tracker.track_execution("Text Segmentation"):
-        logger.info("Starting text segmentation task.")
-        try:
-            result = segmenter.segment_sentences(text)
-            logger.info("Text segmentation completed successfully.")
-            return result
-        except Exception as e:
-            logger.error(f"Error during text segmentation: {e}")
-            raise
+def text_segmentation_task(text: str, logger_observer=Provide[AppContainer.logger_observer], *args, **kwargs):
+    observable_task = ObservableDaskTask()
 
+    # Add observers
+    observable_task.add_observer(logger_observer.update)
 
-client.register_worker_plugin(segment_text_task)
+    try:
+        observable_task.notify_observers('task_started', {"text": text})
 
-@click.command()
-@click.argument('sample_text')
+        # Task logic here - e.g., segment the text
+        result = f"Text segmented: {text}"  # Placeholder for actual segmentation logic
+
+        observable_task.notify_observers('task_completed', {"text": text, "result": result})
+        return result
+    except Exception as e:
+        observable_task.notify_observers('task_failed', {"text": text, "error": str(e)})
+        raise e
+
+# Submit the task to Dask
+future = client.submit(text_segmentation_task, 'Sample text for segmentation.')
+
+from tasks.observers import LoggerObserver, DaskCoordinatorObserver
+
 @inject
-def main(sample_text: str):
-    """Command-line entry for the text segmentation."""
-    future = client.submit(segment_text_task, sample_text)
-    click.echo(f"Segmentation Result: {future.result()}")
+def text_segmentation_task(text: str,
+                           logger_observer=Provide[AppContainer.logger_observer],
+                           coordinator_observer=Provide[AppContainer.dask_coordinator_observer],
+                           *args, **kwargs):
+    observable_task = ObservableDaskTask()
 
+    # Add observers
+    observable_task.add_observer(logger_observer.update)
+    observable_task.add_observer(coordinator_observer.update)
 
-if __name__ == "__main__":
-    # Wire dependencies for this module
-    container = AppContainer()
-    container.wire(modules=[__name__])
-    main()
+    try:
+        observable_task.notify_observers('task_started', {"text": text})
+
+        # Task logic here - e.g., segment the text
+        result = f"Text segmented: {text}"  # Placeholder for actual segmentation logic
+
+        observable_task.notify_observers('task_completed', {"text": text, "result": result})
+        return result
+    except Exception as e:
+        observable_task.notify_observers('task_failed', {"text": text, "error": str(e)})
+        raise e
+
+from dask.distributed import Client
+from .observable_task import ObservableTask
+from dependency_injector.wiring import inject, Provide
+from infrastructure.app_container import AppContainer
+from tasks.observers import LoggerObserver
+
+# Set up Dask client
+client = Client('localhost:8786')
+
+@inject
+def text_segmentation_task(text: str, logger_observer=Provide[AppContainer.logger_observer], *args, **kwargs):
+    observable_task = ObservableDaskTask()
+
+    # Add observers
+    observable_task.add_observer(logger_observer.update)
+
+    try:
+        observable_task.notify_observers('task_started', {"text": text})
+
+        # Task logic here - e.g., segment the text
+        result = f"Text segmented: {text}"  # Placeholder for actual segmentation logic
+
+        observable_task.notify_observers('task_completed', {"text": text, "result": result})
+        return result
+    except Exception as e:
+        observable_task.notify_observers('task_failed', {"text": text, "error": str(e)})
+        raise e
+
+# Submit the task to Dask
+future = client.submit(text_segmentation_task, 'Sample text for segmentation.')
+
+from tasks.observers import LoggerObserver, DaskCoordinatorObserver
+
+@inject
+def text_segmentation_task(text: str,
+                           logger_observer=Provide[AppContainer.logger_observer],
+                           coordinator_observer=Provide[AppContainer.dask_coordinator_observer],
+                           *args, **kwargs):
+    observable_task = ObservableDaskTask()
+
+    # Add observers
+    observable_task.add_observer(logger_observer.update)
+    observable_task.add_observer(coordinator_observer.update)
+
+    try:
+        observable_task.notify_observers('task_started', {"text": text})
+
+        # Task logic here - e.g., segment the text
+        result = f"Text segmented: {text}"  # Placeholder for actual segmentation logic
+
+        observable_task.notify_observers('task_completed', {"text": text, "result": result})
+        return result
+    except Exception as e:
+        observable_task.notify_observers('task_failed', {"text": text, "error": str(e)})
+        raise e

@@ -1,32 +1,20 @@
-from celery_app import shared_task
 from dependency_injector.wiring import inject, Provide
-from infrastructure.dependency_setup import container
+from infrastructure.app_container import AppContainer
+from .transcription_tasks import transcribe_audio
 
-@shared_task(bind=True, max_retries=3)
-@inject
-def download_video_task(
-    self,
-    url: str,
-    download_manager=Provide[container.download_manager],
-    logger=Provide[container.logger]
-):
-    """
-    Celery task to download a video using DownloadManager.
+class DownloadCoordinatorObserver:
+    @inject
+    def __init__(self, logger=Provide[AppContainer.struct_logger]):
+        self.logger = logger
 
-    Args:
-        self:
-        url (str): The video URL to download.
-        download_manager: DownloadManager instance for handling video downloads (injected).
-        logger: Logger instance for logging (injected).
+    def update(self, event: str, data: dict):
+        if event == 'task_completed':
+            self.logger.info(f"Download completed: {data}. Initiating transcription.")
+            audio_file = data.get("result")
+            # Trigger the transcription task with the completed download file.
+            transcribe_audio.delay(audio_file)
+        elif event == 'task_failed':
+            self.logger.error(f"Download failed: {data}. No further actions will be taken.")
 
-    Raises:
-        Exception: If the download fails after retries.
-    """
-    try:
-        logger.info(f"Starting download task for URL: {url}")
-        result = download_manager.download(url)
-        logger.info(f"Download completed for URL: {url}")
-        return result
-    except Exception as e:
-        logger.error(f"Download failed for URL: {url} with error: {e}")
-        raise self.retry(countdown=60, exc=e)
+# Example usage:
+# This coordinator observer can be added to any download task that we want to coordinate.

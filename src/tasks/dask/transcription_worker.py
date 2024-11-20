@@ -1,40 +1,29 @@
 from dask.distributed import Client
-from src.pipelines.transcription.audio_transcriber import AudioTranscriber
-from src.utils.structlog_logger import LoguruLogger
-from src.utils.tracking_utilities import PerformanceTrackerService
+from .observable_task import ObservableTask
+from dependency_injector.wiring import inject, Provide
+from infrastructure.app_container import AppContainer
+from tasks.observers import LoggerObserver
 
-# Initialize logger and performance tracker
-logger = LoguruLogger.get_logger()
-perf_tracker = PerformanceTrackerService.get_performance_tracker()
+# Set up Dask client
+client = Client('localhost:8786')
 
-# Initialize Dask client, logger, and performance tracker
-client = Client()
+@inject
+def transcription_task(audio_file: str, logger_observer=Provide[AppContainer.logger_observer], *args, **kwargs):
+    observable_task = ObservableDaskTask()
 
-def transcribe_audio(file_path):
-    """
-    Transcribe an audio_processor file with logging and performance tracking.
+    # Add observers
+    observable_task.add_observer(logger_observer.update)
 
-    Args:
-        file_path (str): Path to the WAV file.
+    try:
+        observable_task.notify_observers('task_started', {"audio_file": audio_file})
 
-    Returns:
-        list: List of transcription segments.
-    """
-    transcriber = AudioTranscriber()
+        # Task logic here - e.g., transcribe the audio file
+        result = f"Transcribed content from {audio_file}"  # Placeholder for actual transcription logic
 
-    with perf_tracker.track_execution("Audio Transcription"):
-        logger.info(f"Starting transcription task for file: {file_path}")
-        try:
-            result = transcriber.transcribe(file_path)
-            logger.info(f"Transcription completed successfully for file: {file_path}")
-            return result
-        except Exception as e:
-            logger.error(f"Error during transcription of {file_path}: {e}")
-            raise
+        observable_task.notify_observers('task_completed', {"audio_file": audio_file, "result": result})
+        return result
+    except Exception as e:
+        observable_task.notify_observers('task_failed', {"audio_file": audio_file, "error": str(e)})
+        raise e
 
-client.register_worker_plugin(transcribe_audio)
-
-if __name__ == "__main__":
-    sample_file_path = "/data/audio_files/file.wav"
-    future = client.submit(transcribe_audio, sample_file_path)
-    print(future.result())
+# This worker can be submitted by the coordinator or another workflow step

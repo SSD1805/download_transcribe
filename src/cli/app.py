@@ -1,12 +1,64 @@
-### Improved app.py with Dependency Setup Integration ###
 import click
-from infrastructure.dependency_setup import container, di_inject, di_Provide
-from src.utils.structlog_logger import StructLogger
-from src.utils.tracking_utilities import PerformanceTracker
+from dependency_injector.wiring import inject, Provide
+from infrastructure.app_container import AppContainer
+from src.cli.commands.base_command import BaseCommand
 
-# Get logger and performance tracker from the container
-logger = StructLogger.get_logger()
-performance_tracker = PerformanceTracker.get_instance()
+# Refactored CLI Command Classes
+class DownloadCommand(BaseCommand):
+    """
+    Command to handle downloading videos from YouTube.
+    """
+
+    @inject
+    def __init__(self, downloader=Provide[AppContainer.pipeline_component_registry.provide_pipeline_components().get("youtube_downloader")],
+                 logger=Provide[AppContainer.struct_logger]):
+        self.downloader = downloader
+        self.logger = logger
+
+    def execute(self, url):
+        try:
+            self.logger.info(f"Starting download for URL: {url}")
+            self.downloader.download_video(url)
+            self.logger.info(f"Download completed for URL: {url}")
+        except Exception as e:
+            self.logger.error(f"Failed to download video from URL {url}: {e}")
+            raise
+
+class TranscribeCommand(BaseCommand):
+    """
+    Command to handle transcribing an audio file.
+    """
+
+    @inject
+    def __init__(self, transcriber=Provide[AppContainer.transcriber],
+                 pipeline=Provide[AppContainer.pipeline_component_registry.provide_pipeline_components().get("transcription_pipeline")],
+                 logger=Provide[AppContainer.struct_logger],
+                 performance_tracker=Provide[AppContainer.tracking_utility]):
+        self.transcriber = transcriber
+        self.pipeline = pipeline
+        self.logger = logger
+        self.performance_tracker = performance_tracker
+
+    def execute(self, audio_file, title, use_whisperx, fallback_to_whisper):
+        try:
+            if use_whisperx:
+                self.logger.info(f"Using WhisperX to transcribe audio file: {audio_file}")
+                with self.performance_tracker.track_execution("transcription_pipeline"):
+                    success = self.pipeline.transcribe_audio(audio_file, title)
+                if not success and fallback_to_whisper:
+                    self.logger.warning(f"WhisperX failed. Falling back to Whisper AI for audio file: {audio_file}")
+                    self.transcriber.transcribe_audio(audio_file, title)
+            else:
+                self.logger.info(f"Using Whisper AI to transcribe audio file: {audio_file}")
+                with self.performance_tracker.track_execution("transcription_pipeline"):
+                    self.transcriber.transcribe_audio(audio_file, title)
+
+            self.logger.info(f"Transcription completed for file: {audio_file}")
+        except Exception as e:
+            self.logger.error(f"Transcription failed for {audio_file}: {e}")
+            raise
+
+# CLI Commands with Click
 
 @click.group()
 def cli():
@@ -15,42 +67,37 @@ def cli():
 
 @cli.command()
 @click.option('--url', prompt='Enter YouTube URL', help='YouTube video or channel URL to download.')
-@di_inject
-def download(url, downloader=di_Provide[container.pipeline_component_registry.provide("youtube_downloader")]):
+@click.pass_context
+def download(ctx, url):
     """Download video from YouTube"""
-    try:
-        logger.info(f"Starting download for URL: {url}")
-        downloader.download_video(url)
-        logger.info(f"Download completed for URL: {url}")
-    except Exception as e:
-        logger.error(f"Failed to download video: {e}")
+    command = ctx.obj.get('download_command')
+    command.execute(url)
 
 @cli.command()
 @click.argument('audio_file')
 @click.option('--title', prompt='Enter video title', help='Title for the audio file.')
 @click.option('--use-whisperx', is_flag=True, default=False, help='Use WhisperX for transcription.')
 @click.option('--fallback-to-whisper', is_flag=True, default=False, help='Use Whisper AI as a fallback if WhisperX fails.')
-@di_inject
-def transcribe(audio_file, title, use_whisperx, fallback_to_whisper, transcriber=di_Provide[container.transcriber]):
+@click.pass_context
+def transcribe(ctx, audio_file, title, use_whisperx, fallback_to_whisper):
     """Transcribe the provided audio file"""
-    try:
-        if use_whisperx:
-            logger.info(f"Using WhisperX to transcribe audio file: {audio_file}")
-            whisperx_transcriber = di_Provide[container.pipeline_component_registry.provide("transcription_pipeline")]()
-            success = whisperx_transcriber.transcribe_audio(audio_file, title)
-            if not success and fallback_to_whisper:
-                logger.warning(f"WhisperX failed. Falling back to Whisper AI for audio file: {audio_file}")
-                transcriber.transcribe_audio(audio_file, title)
-        else:
-            logger.info(f"Using Whisper AI to transcribe audio file: {audio_file}")
-            transcriber.transcribe_audio(audio_file, title)
-        logger.info(f"Transcription completed for file: {audio_file}")
-    except Exception as e:
-        logger.error(f"Transcription failed for {audio_file}: {e}")
+    command = ctx.obj.get('transcribe_command')
+    command.execute(audio_file, title, use_whisperx, fallback_to_whisper)
 
-# Other command definitions follow the same pattern...
+# Main Entry Point
 
+@click.pass_context
+def setup_context(ctx):
+    """
+    Set up the dependency context for CLI commands.
+    """
+    container = AppContainer()
+    ctx.ensure_object(dict)
+
+    # Instantiate command classes and add them to the context
+    ctx.obj['download_command'] = DownloadCommand()
+    ctx.obj['transcribe_command'] = TranscribeCommand()
+
+# Inject the setup_context to initialize commands
 if __name__ == '__main__':
-    cli()
-
-
+    cli(obj={})  # Initialize with an empty context dictionary and let Click pass it to commands
