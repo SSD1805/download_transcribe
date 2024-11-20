@@ -1,3 +1,4 @@
+# Description: Abstract Base Class for all audio_processor processors.
 from abc import ABC, abstractmethod
 from pydub import AudioSegment
 import os

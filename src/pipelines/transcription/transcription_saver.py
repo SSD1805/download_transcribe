@@ -1,3 +1,4 @@
+# This module is responsible for saving the transcriptions to a file.
 import os
 import json
 from src.utils.structlog_logger import StructLogger

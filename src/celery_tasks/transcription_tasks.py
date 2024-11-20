@@ -1,36 +1,41 @@
 from celery import shared_task
-from src.utils.structlog_logger import StructLogger
-from src.utils.performance_tracker import PerformanceTracker
-from src.pipelines.transcription.audio_transcriber import AudioTranscriber
-from src.pipelines.transcription.transcription_saver import TranscriptionSaver
-from src.infrastructure.registries import ErrorRegistry
-
-logger = StructLogger.get_logger()
-perf_tracker = PerformanceTracker.get_instance()
+from dependency_injector.wiring import inject, Provide
+from src.infrastructure.dependency_setup import container
 
 @shared_task(bind=True, max_retries=3)
-def transcribe_audio_task(self, audio_file_path):
+@inject
+def transcribe_audio_task(
+    self,
+    audio_file_path: str,
+    logger=Provide[container.logger],
+    performance_tracker=Provide[container.performance_tracker],
+    audio_transcriber=Provide[container.transcriber],
+    transcription_saver=Provide[container.pipeline_component_registry.provide_pipeline_components().get("transcription_saver")]
+):
     """
-    Celery task to transcribe an audio_processor file.
+    Celery task to transcribe an audio file.
 
     Args:
-        audio_file_path (str): The file path of the audio_processor to transcribe.
-
-    Raises:
-        ConfigurationError: If transcription setup fails.
+        audio_file_path (str): The file path of the audio to transcribe.
+        logger: Logger instance for logging (injected).
+        performance_tracker: Performance tracker instance for tracking execution (injected).
+        audio_transcriber: AudioTranscriber instance for transcribing audio (injected).
+        transcription_saver: TranscriptionSaver instance for saving transcriptions (injected).
     """
     try:
-        logger.info(f"Starting transcription task for audio_processor file: {audio_file_path}")
-        with perf_tracker.track_execution("Transcription Task"):
-            transcriber = AudioTranscriber()
-            segments = transcriber.transcribe(audio_file_path)
+        logger.info(f"Starting transcription task for audio file: {audio_file_path}")
 
-            with perf_tracker.track_execution("Save Transcription Task"):
-                TranscriptionSaver().save_transcription(segments, audio_file_path)
+        # Track the transcription task
+        with performance_tracker.track_execution("Transcription Task"):
+            segments = audio_transcriber.transcribe(audio_file_path)
+
+        # Track the save transcription task
+        with performance_tracker.track_execution("Save Transcription Task"):
+            transcription_saver.save_transcription(segments, audio_file_path)
 
         logger.info(f"Transcription completed and saved for file: {audio_file_path}")
         return segments
 
-    except ErrorRegistry as e:
+    except Exception as e:
         logger.error(f"Transcription failed for file: {audio_file_path} with error: {e}")
-        self.retry(countdown=120, exc=e)
+        raise self.retry(countdown=120, exc=e)

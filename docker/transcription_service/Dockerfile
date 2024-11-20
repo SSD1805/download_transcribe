@@ -1,4 +1,4 @@
-# Dockerfile
+# Dockerfile for Transcription Service
 FROM python:3.12-slim
 
 # Install system dependencies
@@ -9,18 +9,18 @@ RUN apt-get update && \
 # Set working directory
 WORKDIR /app
 
-# Copy only the necessary files for dependencies first
+# Copy dependency files first
 COPY pyproject.toml poetry.lock /app/
 
 # Install Poetry
 RUN pip install --upgrade pip && \
     pip install poetry
 
-# Configure Poetry to not use virtual environments
+# Configure Poetry and install dependencies
 RUN poetry config virtualenvs.create false && poetry install --no-dev
 
-# Copy the rest of the application code
+# Copy application code
 COPY . /app
 
-# Define the default command
+# Default command to run the CLI for transcription
 CMD ["poetry", "run", "python", "src/cli/cli_transcription.py"]

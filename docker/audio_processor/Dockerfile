@@ -1,16 +1,26 @@
-# Base image
-FROM python:3.10-slim
+# Dockerfile for Audio Processor
+FROM python:3.12-slim
 
-# Install dependencies
-RUN apt-get update && apt-get install -y ffmpeg \
-    && pip install --no-cache-dir poetry
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy dependency files first
+COPY pyproject.toml poetry.lock /app/
+
+# Install Poetry
+RUN pip install --upgrade pip && \
+    pip install poetry
+
+# Configure Poetry and install dependencies
+RUN poetry config virtualenvs.create false && poetry install --no-dev
 
 # Copy application code
-WORKDIR /app
-COPY . .
+COPY . /app
 
-# Install dependencies via Poetry
-RUN poetry install --no-dev
-
-# Entry point for multi-task processing
-ENTRYPOINT ["poetry", "run", "python", "src/cli/app.py"]
+# Default command to run the CLI for audio processing
+CMD ["poetry", "run", "python", "src/cli/cli_audio.py"]

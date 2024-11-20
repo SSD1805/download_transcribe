@@ -1,3 +1,4 @@
+# This module is responsible for segmenting text into sentences using NLTK's sentence tokenizer.
 import nltk
 from nltk.tokenize import sent_tokenize
 from src.utils.structlog_logger import StructLogger

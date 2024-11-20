@@ -1,28 +1,29 @@
 from celery import shared_task
-from src.pipelines.download.download_handler import DownloadManager
-from src.infrastructure.registries import DownloadError
-from src.utils.structlog_logger import StructLogger
-
-logger = StructLogger.get_logger()
+from dependency_injector.wiring import inject, Provide
+from src.infrastructure.dependency_setup import container
 
 @shared_task(bind=True, max_retries=3)
-def download_video_task(self, url, config_manager):
+@inject
+def download_video_task(self,
+                        url: str,
+                        download_manager=Provide[container.download_manager],
+                        logger=Provide[container.logger]):
     """
     Celery task to download a video using DownloadManager.
 
     Args:
         url (str): The video URL to download.
-        config_manager (ConfigManager): Configuration manager.
+        download_manager: Injected DownloadManager instance for handling video downloads.
+        logger: Injected Logger instance for logging information.
 
     Raises:
-        DownloadError: If the download fails after retries.
+        Exception: If the download fails after retries.
     """
     try:
         logger.info(f"Starting download task for URL: {url}")
-        download_manager = DownloadManager(config_manager)
         result = download_manager.download(url)
         logger.info(f"Download completed for URL: {url}")
         return result
-    except DownloadError as e:
+    except Exception as e:
         logger.error(f"Download failed for URL: {url} with error: {e}")
-        self.retry(countdown=60, exc=e)
+        raise self.retry(countdown=60, exc=e)

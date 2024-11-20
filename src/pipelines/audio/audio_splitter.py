@@ -1,3 +1,4 @@
+# This module contains the AudioSplitter class, which is responsible for splitting an audio file into smaller chunks.
 from src.pipelines.audio.audio_processor_base import AudioProcessorBase
 from src.utils.structlog_logger import StructLogger
 from src.utils.performance_tracker import PerformanceTracker

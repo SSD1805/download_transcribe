@@ -1,4 +1,4 @@
-# src/registries/model_registry.py
+# src/infrastructure/registries/model_registry.py
 from typing import Any, Type
 
 class ModelRegistry:

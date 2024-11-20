@@ -1,16 +1,20 @@
 from abc import ABC, abstractmethod
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
-from src.utils.structlog_logger import StructLogger
-from src.utils.performance_tracker import PerformanceTracker
+from dependency_injector.wiring import inject, Provide
+from src.infrastructure.app_container import AppContainer
 import traceback
 
-logger = StructLogger.get_logger()
-perf_tracker = PerformanceTracker.get_instance()
-
-
 class BatchProcessor(ABC):
-    def __init__(self, batch_size=10, use_threads=False, timeout=None):
+    @inject
+    def __init__(
+        self,
+        batch_size: int = 10,
+        use_threads: bool = False,
+        timeout: int = None,
+        logger=Provide[AppContainer.logger],
+        perf_tracker=Provide[AppContainer.performance_tracker]
+    ):
         """
         Initialize BatchProcessor.
 
@@ -23,6 +27,8 @@ class BatchProcessor(ABC):
         self.use_threads = use_threads
         self.timeout = timeout
         self._lock = Lock()  # Thread-safe lock
+        self.logger = logger
+        self.perf_tracker = perf_tracker
 
     @abstractmethod
     def process_item(self, item):
@@ -39,7 +45,7 @@ class BatchProcessor(ABC):
         Args:
             items (list): List of items to process.
         """
-        with perf_tracker.track_execution("Batch Processing"):
+        with self.perf_tracker.track_execution("Batch Processing"):
             if self.use_threads:
                 self._process_with_threads(items)
             else:
@@ -48,17 +54,19 @@ class BatchProcessor(ABC):
     def _process_sequentially(self, items):
         """
         Process items sequentially.
+
+        Args:
+            items (list): List of items to process.
         """
         total_items = len(items)
         for idx, item in enumerate(items, start=1):
             try:
                 with self._lock:  # Acquire lock
-                    with perf_tracker.track_execution(f"Processing Item: {item}"):
+                    with self.perf_tracker.track_execution(f"Processing Item: {item}"):
                         self.process_item(item)
-                logger.info(f"Item {idx}/{total_items} processed successfully: {item}")
+                self.logger.info(f"Item {idx}/{total_items} processed successfully: {item}")
             except Exception as e:
-                logger.error(f"Error processing item {item}: {e}")
-                logger.debug(traceback.format_exc())
+                self._handle_processing_exception(item, e)
 
     def _process_with_threads(self, items):
         """
@@ -77,12 +85,11 @@ class BatchProcessor(ABC):
                 try:
                     future.result()  # Raises exception if the task failed
                     completed += 1
-                    logger.info(f"Item {completed}/{total_items} processed successfully: {item}")
+                    self.logger.info(f"Item {completed}/{total_items} processed successfully: {item}")
                 except Exception as e:
-                    logger.error(f"Error processing item {item}: {e}")
-                    logger.debug(traceback.format_exc())
+                    self._handle_processing_exception(item, e)
 
-            logger.info(f"Batch processing completed: {completed}/{total_items} items processed.")
+            self.logger.info(f"Batch processing completed: {completed}/{total_items} items processed.")
 
     def _threaded_process_item(self, item):
         """
@@ -92,5 +99,16 @@ class BatchProcessor(ABC):
             item: Item to process.
         """
         with self._lock:  # Ensure thread-safe processing
-            with perf_tracker.track_execution(f"Threaded Processing Item: {item}"):
+            with self.perf_tracker.track_execution(f"Threaded Processing Item: {item}"):
                 self.process_item(item)
+
+    def _handle_processing_exception(self, item, exception):
+        """
+        Handle exceptions that occur during item processing.
+
+        Args:
+            item: The item that failed to process.
+            exception (Exception): The exception that occurred.
+        """
+        self.logger.error(f"Error processing item {item}: {exception}")
+        self.logger.debug(traceback.format_exc())

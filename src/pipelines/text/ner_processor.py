@@ -1,3 +1,4 @@
+# Description: NERProcessor class to perform Named Entity Recognition (NER) on input text using spaCy.
 import spacy
 from src.utils.structlog_logger import StructLogger
 from src.utils.performance_tracker import PerformanceTracker

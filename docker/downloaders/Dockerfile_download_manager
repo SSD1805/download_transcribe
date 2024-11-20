@@ -1,25 +1,26 @@
-# Base image
-FROM python:3.10-slim
+# Dockerfile for Download Manager
+FROM python:3.12-slim
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y curl git build-essential ffmpeg && apt-get clean
-
-# Install Poetry
-ENV POETRY_VERSION=1.5.1
-RUN curl -sSL https://install.python-poetry.org | python3 -
-
-# Add Poetry to PATH
-ENV PATH="/root/.local/bin:$PATH"
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
-# Copy project files
-COPY pyproject.toml poetry.lock ./
-COPY src ./src
+# Copy dependency files first
+COPY pyproject.toml poetry.lock /app/
 
-# Install dependencies
-RUN poetry install --no-dev
+# Install Poetry
+RUN pip install --upgrade pip && \
+    pip install poetry
 
-# Set the entry point to the CLI
+# Configure Poetry and install dependencies
+RUN poetry config virtualenvs.create false && poetry install --no-dev
+
+# Copy application code
+COPY . /app
+
+# Default command to run the CLI for downloading
 CMD ["poetry", "run", "python", "src/cli/cli_download.py"]

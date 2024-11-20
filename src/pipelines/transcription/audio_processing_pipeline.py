@@ -1,3 +1,4 @@
+# Description: This file defines the AudioProcessingPipeline class which is responsible for processing audio files
 import os
 from tqdm import tqdm
 from src.pipelines.audio.audio_converter import AudioConverter

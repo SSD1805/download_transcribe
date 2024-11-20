@@ -1,3 +1,4 @@
+# Description: Django settings for the project.
 import os
 import environ
 import structlog

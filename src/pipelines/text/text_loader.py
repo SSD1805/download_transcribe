@@ -1,3 +1,4 @@
+# Description: Module to load text for processing.
 from src.utils.structlog_logger import StructLogger
 from src.utils.performance_tracker import PerformanceTracker
 

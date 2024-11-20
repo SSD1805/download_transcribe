@@ -1,3 +1,4 @@
+# Description: Module to tokenize text data using NLTK library.
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords

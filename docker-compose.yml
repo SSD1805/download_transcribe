@@ -7,11 +7,9 @@ services:
       dockerfile: Dockerfile_download_manager
     volumes:
       - youtube_data:/data
-    environment:
-      - CONFIG_PATH=/app/config/config.yaml
     networks:
       - app_network
-    restart: always
+    restart: unless-stopped
 
   audio_processor:
     build:
@@ -19,11 +17,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - audio_data:/data
-    environment:
-      - CONFIG_PATH=/app/config/config.yaml
     networks:
       - app_network
-    restart: always
+    restart: unless-stopped
 
   text_processor:
     build:
@@ -31,11 +27,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - text_data:/data
-    environment:
-      - CONFIG_PATH=/app/config/config.yaml
     networks:
       - app_network
-    restart: always
+    restart: unless-stopped
 
   transcription_service:
     build:
@@ -43,11 +37,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - transcription_data:/data
-    environment:
-      - CONFIG_PATH=/app/config/config.yaml
     networks:
       - app_network
-    restart: always
+    restart: unless-stopped
 
   celery_worker:
     build:
@@ -58,11 +50,9 @@ services:
       - db
     volumes:
       - celery_data:/data
-    environment:
-      - CONFIG_PATH=/app/config/config.yaml
     networks:
       - app_network
-    restart: always
+    restart: unless-stopped
 
   django_app:
     build:
@@ -74,12 +64,11 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       DEBUG: ${DEBUG}
-      CONFIG_PATH: /app/config/config.yaml
     networks:
       - app_network
     ports:
       - "8000:8000"
-    restart: always
+    restart: unless-stopped
 
   reverse_proxy:
     build:
@@ -90,9 +79,11 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - ./nginx/certs:/etc/nginx/certs # Assuming you have SSL certificates mounted here
     networks:
       - app_network
-    restart: always
+    restart: unless-stopped
 
   db:
     image: postgres:latest
@@ -104,7 +95,7 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - app_network
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 10s

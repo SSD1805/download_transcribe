@@ -1,3 +1,4 @@
+# This module is responsible for saving the processed text to a file.
 import json
 import pandas as pd
 from src.utils.structlog_logger import StructLogger

@@ -1,22 +1,31 @@
-from src.celery_tasks.download_tasks import download_video_task
-from src.pipelines.download.download_handler import DownloadManager
-from src.modules.config_manager import ConfigManager
-from src.utils.structlog_logger import StructLogger
-from src.utils.performance_tracker import PerformanceTracker
+from celery import shared_task
+from dependency_injector.wiring import inject, Provide
+from src.infrastructure.dependency_setup import container
 
-logger = StructLogger.get_logger()
-perf_tracker = PerformanceTracker.get_instance()
+@shared_task(bind=True, max_retries=3)
+@inject
+def download_video_task(
+    self,
+    url: str,
+    download_manager=Provide[container.download_manager],
+    logger=Provide[container.logger]
+):
+    """
+    Celery task to download a video using DownloadManager.
 
-def main():
-    # Initialize configuration
-    config_manager = ConfigManager(config_path='config.yaml')
+    Args:
+        url (str): The video URL to download.
+        download_manager: DownloadManager instance for handling video downloads (injected).
+        logger: Logger instance for logging (injected).
 
-    # Asynchronous task
-    download_video_task.delay("https://youtube.com/watch?v=example_video_id", config_manager)
-
-    # Synchronous download
-    download_manager = DownloadManager(config_manager)
-    download_manager.download("https://youtube.com/watch?v=another_video_id")
-
-if __name__ == "__main__":
-    main()
+    Raises:
+        Exception: If the download fails after retries.
+    """
+    try:
+        logger.info(f"Starting download task for URL: {url}")
+        result = download_manager.download(url)
+        logger.info(f"Download completed for URL: {url}")
+        return result
+    except Exception as e:
+        logger.error(f"Download failed for URL: {url} with error: {e}")
+        raise self.retry(countdown=60, exc=e)
