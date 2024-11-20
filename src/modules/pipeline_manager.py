@@ -1,19 +1,25 @@
-from src.core.batch_processor import BatchProcessor
-from src.core.memory_monitor import MemoryMonitor
-from src.utils.structlog_logger import StructLogger
-from src.utils.performance_tracker import PerformanceTracker
-
-logger = StructLogger.get_logger()
-perf_tracker = PerformanceTracker.get_instance()
+from dependency_injector.wiring import inject, Provide
+from src.infrastructure.dependency_setup import AppContainer
 
 class PipelineManager:
-    def __init__(self, config_manager):
+    @inject
+    def __init__(
+        self,
+        config_manager=Provide[AppContainer.configuration_registry],
+        logger=Provide[AppContainer.logger],
+        performance_tracker=Provide[AppContainer.performance_tracker],
+        memory_monitor=Provide[AppContainer.memory_monitor],
+        batch_processor_factory=Provide[AppContainer.batch_processor]
+    ):
         self.config_manager = config_manager
-        self.memory_monitor = MemoryMonitor(interval=config_manager.get('memory_interval', 5))
-        self.performance_tracker = perf_tracker
-        batch_size = config_manager.get('batch_size', 5)  # Default batch size
-        self.batch_processor = BatchProcessor(batch_size=batch_size)
-        logger.info("PipelineManager initialized with batch size and memory monitoring.")
+        self.logger = logger
+        self.performance_tracker = performance_tracker
+        self.memory_monitor = memory_monitor
+
+        batch_size = self.config_manager.get('batch_size', 5)  # Default batch size
+        self.batch_processor = batch_processor_factory(batch_size=batch_size)
+
+        self.logger.info("PipelineManager initialized with batch size and memory monitoring.")
 
     def process_batch(self, func, items):
         """
@@ -23,5 +29,6 @@ class PipelineManager:
             func (callable): Function to process each item.
             items (iterable): Items to process in batches.
         """
-        self.batch_processor.process(func, items)
-        logger.info("Batch processing completed.")
+        with self.performance_tracker.track_execution("Batch Processing"):
+            self.batch_processor.process(func, items)
+            self.logger.info("Batch processing completed.")

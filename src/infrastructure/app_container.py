@@ -34,6 +34,7 @@ import structlog
 import logging
 import os
 
+
 class AppContainer(containers.DeclarativeContainer):
     """Unified Dependency Injection Container for the Application"""
 
@@ -43,7 +44,7 @@ class AppContainer(containers.DeclarativeContainer):
     # Shared Utilities
     logger = providers.Singleton(SingletonLogger.get_instance)
     performance_tracker = providers.Singleton(SingletonPerformanceTracker.get_instance)
-    error_registry = providers.Singleton(ErrorRegistry)
+    error_registry = providers.Singleton(ErrorRegistry, logger=logger)
     memory_monitor = providers.Singleton(
         MemoryMonitor, threshold=configuration_registry().get('memory', {}).get('threshold', 80)
     )  # Threshold set via configuration
@@ -57,8 +58,9 @@ class AppContainer(containers.DeclarativeContainer):
     yaml_parser = providers.Singleton(YAMLParser)
 
     # Structlog Configuration
-    @staticmethod
-    def configure_structlog():
+    @providers.Singleton
+    @performance_tracker().track
+    def configure_structlog() -> None:
         """Configure Structlog based on environment settings"""
         environment = AppContainer.configuration_registry().get("environment", "development")
         renderer = structlog.processors.JSONRenderer() if environment != "development" else structlog.dev.ConsoleRenderer()
@@ -79,20 +81,18 @@ class AppContainer(containers.DeclarativeContainer):
             cache_logger_on_first_use=True,
         )
 
-    configure_structlog()
-
     # Configure stdlib logger to integrate with structlog
-    logging.basicConfig(
-        format="%(message)s",
-        stream=sys.stdout,
-        level=configuration_registry().get("logging", {}).get("level", "INFO"),
-    )
-
-    # Adding File Handler for persistent logs
-    file_handler = logging.FileHandler(configuration_registry().get("logging", {}).get("file_path", "app.log"))
-    file_handler.setLevel(logging.INFO)
-    logger_instance = logging.getLogger("custom_logger")
-    logger_instance.addHandler(file_handler)
+    @providers.Singleton
+    @performance_tracker().track
+    def configure_stdlib_logger() -> None:
+        logging.basicConfig(
+            format="%(message)s",
+            level=AppContainer.configuration_registry().get("logging", {}).get("level", "INFO"),
+        )
+        file_handler = logging.FileHandler(AppContainer.configuration_registry().get("logging", {}).get("file_path", "app.log"))
+        file_handler.setLevel(logging.INFO)
+        custom_logger = logging.getLogger("custom_logger")
+        custom_logger.addHandler(file_handler)
 
     # Registries
     model_registry = providers.Singleton(ModelRegistry)
@@ -100,6 +100,7 @@ class AppContainer(containers.DeclarativeContainer):
 
     # Provide Pipeline Components
     @pipeline_component_registry.provider
+    @performance_tracker().track
     def provide_pipeline_components(self):
         registry = PipelineComponentRegistry()
 
@@ -144,11 +145,16 @@ class AppContainer(containers.DeclarativeContainer):
     )
 
     # Register Celery Tasks
-    @staticmethod
-    def register_celery_tasks():
-        """Dynamically register Celery tasks"""
-        task_names = ["cleanup_tasks", "download_tasks", "transcription_tasks", "shared_tasks"]
-        for task_name in task_names:
-            setattr(AppContainer, f"{task_name}", providers.Factory(f'src.celery_tasks.{task_name}'))
+    def register_celery_tasks(self):
+        """Register Celery tasks dynamically"""
+        task_mapping = {
+            "cleanup_tasks": "src.celery_tasks.cleanup_tasks.cleanup_old_data",
+            "download_tasks": "src.celery_tasks.download_tasks.download_video_task",
+            "transcription_tasks": "src.celery_tasks.transcription_tasks.transcribe_audio_task",
+            "shared_tasks": "src.celery_tasks.shared_tasks.update_task_status",
+        }
 
-    register_celery_tasks()
+        for name, task_path in task_mapping.items():
+            setattr(self, name, providers.Factory(task_path, logger=self.logger, progress_bar=self.progress_bar))
+
+    register_celery_tasks()  # Register Celery tasks

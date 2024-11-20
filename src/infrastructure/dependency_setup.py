@@ -15,11 +15,21 @@ container.wire(modules=[
     "src.core.memory_monitor",
     "src.core.services",
 
+    # Infrastructure modules
+    "src.infrastructure.registries.configuration_registry",
+    "src.infrastructure.registries.error_registry",
+    "src.infrastructure.registries.model_registry",
+    "src.infrastructure.registries.pipeline_component_registry",
+
     # Pipeline and module managers
     "src.modules.config_manager",
     "src.modules.pipeline_manager",
     "src.modules.transcription_manager",
     "src.modules.download_coordinator",
+    "src.modules.audio_handler",
+    "src.modules.helper_functions",
+    "src.modules.text_processor",
+
 
     # CLI modules
     "src.cli.cli_audio",
