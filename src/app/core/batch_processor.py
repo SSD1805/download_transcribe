@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
 from dependency_injector.wiring import inject, Provide
-from infrastructure.app_container import AppContainer
+from src.infrastructure import AppContainer
 import traceback
 
 class BatchProcessor(ABC):

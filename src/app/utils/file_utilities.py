@@ -5,7 +5,7 @@ import yaml
 import arrow  # Arrow is a library for handling dates and times in Python.
 from typing import Optional
 from dependency_injector.wiring import inject, Provide
-from infrastructure.app_container import AppContainer
+from src.infrastructure import AppContainer
 
 
 class FileUtilityFacade:

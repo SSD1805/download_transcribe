@@ -1,7 +1,7 @@
 from typing import Any, Type, Callable, Dict
 from dependency_injector.wiring import inject, Provide
-from infrastructure.app_container import AppContainer
-from infrastructure.registries.generic_registry import GenericRegistry
+from src.infrastructure import AppContainer
+from src.infrastructure import GenericRegistry
 
 
 class ModelRegistry(GenericRegistry[Any]):
@@ -125,7 +125,7 @@ class ModelRegistry(GenericRegistry[Any]):
 
 # Example Usage
 if __name__ == "__main__":
-    from infrastructure.dependency_setup import container
+    from src.infrastructure import container
 
     # Wire the AppContainer dependencies to this module
     container.wire(modules=[__name__])

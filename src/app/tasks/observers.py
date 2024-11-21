@@ -1,5 +1,5 @@
 from dependency_injector.wiring import inject, Provide
-from infrastructure.app_container import AppContainer
+from src.infrastructure import AppContainer
 
 class LoggerObserver:
     @inject
@@ -10,7 +10,7 @@ class LoggerObserver:
         self.logger.info(f"Event: {event}, Data: {data}")
 
 from dependency_injector.wiring import inject, Provide
-from infrastructure.app_container import AppContainer
+from src.infrastructure import AppContainer
 from .transcription_worker import transcription_task  # Assuming we need to coordinate with transcription
 
 class DaskCoordinatorObserver:
@@ -30,7 +30,7 @@ class DaskCoordinatorObserver:
             # Implement retry logic or error handling if needed
 
 from dependency_injector.wiring import inject, Provide
-from infrastructure.app_container import AppContainer
+from src.infrastructure import AppContainer
 from .ner_worker import ner_task
 from dask.distributed import Client
 

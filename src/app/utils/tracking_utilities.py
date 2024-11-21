@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Iterable
 from contextlib import contextmanager
 from dependency_injector.wiring import inject, Provide
-from infrastructure.app_container import AppContainer
+from src.infrastructure import AppContainer
 from tqdm import tqdm
 
 class TrackerStrategy(ABC):
@@ -115,7 +115,7 @@ class TrackerContext:
 
 # Example Usage
 if __name__ == "__main__":
-    from infrastructure.dependency_setup import container
+    from src.infrastructure import container
 
     # Wire the AppContainer dependencies to this module
     container.wire(modules=[__name__])

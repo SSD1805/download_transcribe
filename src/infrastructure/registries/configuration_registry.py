@@ -1,6 +1,6 @@
 from typing import Any, Callable, Union
 from dependency_injector.wiring import inject, Provide
-from infrastructure.app_container import AppContainer
+from src.infrastructure import AppContainer
 
 class ConfigurationRegistry:
     _instance = None  # Singleton instance
@@ -69,7 +69,7 @@ class ConfigurationRegistry:
 
 # Example Usage
 if __name__ == "__main__":
-    from infrastructure.dependency_setup import container
+    from src.infrastructure import container
 
     # Wire the AppContainer dependencies to this module
     container.wire(modules=[__name__])

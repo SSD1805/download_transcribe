@@ -1,7 +1,7 @@
 from dask.distributed import Client
 from .observable_task import ObservableTask
 from dependency_injector.wiring import inject, Provide
-from infrastructure.app_container import AppContainer
+from src.infrastructure import AppContainer
 from tasks.observers import LoggerObserver
 
 # Set up Dask client
@@ -33,7 +33,6 @@ def audio_conversion_task(audio_file: str, logger_observer=Provide[AppContainer.
 # Submit the task to Dask
 future = client.submit(audio_conversion_task, 'sample_audio.wav')
 
-from tasks.observers import LoggerObserver, DaskCoordinatorObserver
 
 @inject
 def audio_conversion_task(audio_file: str, logger_observer=Provide[AppContainer.logger_observer], coordinator_observer=Provide[AppContainer.dask_coordinator_observer], *args, **kwargs):
@@ -55,7 +54,6 @@ def audio_conversion_task(audio_file: str, logger_observer=Provide[AppContainer.
         observable_task.notify_observers('task_failed', {"audio_file": audio_file, "error": str(e)})
         raise e
 
-from tasks.observers import LoggerObserver, DaskCoordinatorObserver
 
 @inject
 def audio_conversion_task(audio_file: str, logger_observer=Provide[AppContainer.logger_observer], coordinator_observer=Provide[AppContainer.dask_coordinator_observer], *args, **kwargs):

@@ -1,8 +1,8 @@
 # This module is responsible for saving the processed text to a file.
 import json
 import pandas as pd
-from src.utils.structlog_logger import StructLogger
-from src.utils.tracking_utilities import PerformanceTracker
+from src.app.utils.structlog_logger import StructLogger
+from src.app.utils.tracking_utilities import PerformanceTracker
 
 logger = StructLogger.get_logger()
 perf_tracker = PerformanceTracker.get_instance()

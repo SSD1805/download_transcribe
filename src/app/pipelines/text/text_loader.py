@@ -1,6 +1,6 @@
 # Description: Module to load text for processing.
-from src.utils.structlog_logger import StructLogger
-from src.utils.tracking_utilities import PerformanceTracker
+from src.app.utils.structlog_logger import StructLogger
+from src.app.utils.tracking_utilities import PerformanceTracker
 
 logger = StructLogger.get_logger()
 perf_tracker = PerformanceTracker.get_instance()

@@ -1,7 +1,7 @@
 # This file contains the YouTubeDownloader class which is responsible for downloading videos, channels and playlists
-from src.pipelines.download.download_handler import DownloadManager
-from src.utils.structlog_logger import StructLogger
-from src.utils.tracking_utilities import PerformanceTracker
+from src.app.pipelines.download.download_handler import DownloadManager
+from src.app.utils.structlog_logger import StructLogger
+from src.app.utils.tracking_utilities import PerformanceTracker
 
 logger = StructLogger.get_logger()
 perf_tracker = PerformanceTracker.get_instance()

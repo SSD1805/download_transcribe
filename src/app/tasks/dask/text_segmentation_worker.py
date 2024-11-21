@@ -1,7 +1,7 @@
 from dask.distributed import Client
 from .observable_task import ObservableTask
 from dependency_injector.wiring import inject, Provide
-from infrastructure.app_container import AppContainer
+from src.infrastructure import AppContainer
 from tasks.observers import LoggerObserver
 
 # Set up Dask client
@@ -57,7 +57,7 @@ def text_segmentation_task(text: str,
 from dask.distributed import Client
 from .observable_task import ObservableTask
 from dependency_injector.wiring import inject, Provide
-from infrastructure.app_container import AppContainer
+from src.infrastructure import AppContainer
 from tasks.observers import LoggerObserver
 
 # Set up Dask client

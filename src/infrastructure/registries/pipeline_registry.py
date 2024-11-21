@@ -1,6 +1,6 @@
-from typing import Any, Callable, Type, Dict
+from typing import Callable, Type, Dict
 from dependency_injector.wiring import inject, Provide
-from infrastructure.app_container import AppContainer
+from src.infrastructure import AppContainer
 from abc import ABC, abstractmethod
 
 # Define an abstract PipelineComponent class for Composite Pattern
@@ -144,7 +144,7 @@ class PipelineRegistry:
 
 # Example Usage
 if __name__ == "__main__":
-    from infrastructure.dependency_setup import container
+    from src.infrastructure import container
 
     # Wire the AppContainer dependencies to this module
     container.wire(modules=[__name__])

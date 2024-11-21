@@ -1,8 +1,8 @@
 # This module is responsible for saving the transcriptions to a file.
 import os
 import json
-from src.utils.structlog_logger import StructLogger
-from src.utils.tracking_utilities import PerformanceTracker
+from src.app.utils.structlog_logger import StructLogger
+from src.app.utils.tracking_utilities import PerformanceTracker
 
 class TranscriptionSaver:
     def __init__(self, output_directory):

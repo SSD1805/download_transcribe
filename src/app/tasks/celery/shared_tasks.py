@@ -1,6 +1,6 @@
 from celery_app import shared_task
 from dependency_injector.wiring import inject, Provide
-from infrastructure.dependency_setup import container
+from src.infrastructure import container
 
 @shared_task
 @inject

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dependency_injector.wiring import inject, Provide
-from infrastructure.dependency_setup import AppContainer
+from src.infrastructure import AppContainer
 
 # Base Command Class
 class DownloadCommand(ABC):

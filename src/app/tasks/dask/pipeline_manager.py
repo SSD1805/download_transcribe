@@ -1,6 +1,6 @@
 from dask.distributed import Client
 from dependency_injector.wiring import inject, Provide
-from src.infrastructure.app_container import AppContainer
+from src.infrastructure.app.app_container import AppContainer
 
 class PipelineManager:
     @inject

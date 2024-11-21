@@ -1,6 +1,6 @@
 from celery_app import shared_task
 from dependency_injector.wiring import inject, Provide
-from infrastructure.dependency_setup import container  # This is used for wiring the dependencies.
+from src.infrastructure import container  # This is used for wiring the dependencies.
 
 
 @shared_task

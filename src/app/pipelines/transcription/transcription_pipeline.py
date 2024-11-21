@@ -1,7 +1,7 @@
 # Description: This file defines the transcription pipeline class which is responsible for processing audio files in a given directory.
 import os
-from src.utils.structlog_logger import StructLogger
-from src.utils.tracking_utilities import PerformanceTracker
+from src.app.utils.structlog_logger import StructLogger
+from src.app.utils.tracking_utilities import PerformanceTracker
 
 class TranscriptionPipeline:
     def __init__(self, input_directory, output_directory):

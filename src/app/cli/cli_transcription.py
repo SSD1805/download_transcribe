@@ -1,7 +1,7 @@
 import click
 from .commands.base_command import BaseCommand
 from dependency_injector.wiring import inject, Provide
-from infrastructure.app_container import AppContainer
+from src.infrastructure import AppContainer
 
 # Command Classes for Transcription Pipeline Tasks
 

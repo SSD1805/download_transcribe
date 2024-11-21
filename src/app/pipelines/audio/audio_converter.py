@@ -1,7 +1,7 @@
 # This module is responsible for converting audio files to a target format.
-from src.pipelines.audio.audio_processor_base import AudioProcessorBase
-from src.utils.structlog_logger import StructLogger
-from src.utils.tracking_utilities import PerformanceTracker
+from src.app.pipelines.audio.audio_processor_base import AudioProcessorBase
+from src.app.utils.structlog_logger import StructLogger
+from src.app.utils.tracking_utilities import PerformanceTracker
 
 logger = StructLogger.get_logger()
 perf_tracker = PerformanceTracker.get_instance()
