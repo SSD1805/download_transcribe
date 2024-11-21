@@ -38,7 +38,8 @@ class AppContainer(containers.DeclarativeContainer):
     performance_tracker = providers.Singleton(SingletonPerformanceTracker.get_instance)
     error_registry = providers.Singleton(ErrorRegistry, logger=logger)
     memory_monitor = providers.Singleton(
-        MemoryMonitor, threshold=configuration_registry().get('memory', {}).get('threshold', 80)
+        MemoryMonitor,
+        threshold=configuration_registry().get("memory", {}).get("threshold", 80),
     )  # Threshold set via configuration
     helper_functions = providers.Singleton(HelperFunctions)
     concurrency_manager = providers.Singleton(ConcurrencyManager)
@@ -54,8 +55,14 @@ class AppContainer(containers.DeclarativeContainer):
     @performance_tracker().track
     def configure_structlog(self) -> None:
         """Configure Structlog based on environment settings"""
-        environment = AppContainer.configuration_registry().get("environment", "development")
-        renderer = structlog.processors.JSONRenderer() if environment != "development" else structlog.dev.ConsoleRenderer()
+        environment = AppContainer.configuration_registry().get(
+            "environment", "development"
+        )
+        renderer = (
+            structlog.processors.JSONRenderer()
+            if environment != "development"
+            else structlog.dev.ConsoleRenderer()
+        )
 
         structlog.configure(
             processors=[
@@ -65,7 +72,7 @@ class AppContainer(containers.DeclarativeContainer):
                 structlog.processors.StackInfoRenderer(),
                 structlog.processors.format_exc_info,
                 StructLogger.add_custom_context,  # Custom processor for additional context
-                renderer
+                renderer,
             ],
             context_class=dict,
             logger_factory=structlog.stdlib.LoggerFactory(),
@@ -79,9 +86,15 @@ class AppContainer(containers.DeclarativeContainer):
     def configure_stdlib_logger(self) -> None:
         logging.basicConfig(
             format="%(message)s",
-            level=AppContainer.configuration_registry().get("logging", {}).get("level", "INFO"),
+            level=AppContainer.configuration_registry()
+            .get("logging", {})
+            .get("level", "INFO"),
         )
-        file_handler = logging.FileHandler(AppContainer.configuration_registry().get("logging", {}).get("file_path", "app.log"))
+        file_handler = logging.FileHandler(
+            AppContainer.configuration_registry()
+            .get("logging", {})
+            .get("file_path", "app.log")
+        )
         file_handler.setLevel(logging.INFO)
         custom_logger = logging.getLogger("custom_logger")
         custom_logger.addHandler(file_handler)
@@ -105,7 +118,11 @@ class AppContainer(containers.DeclarativeContainer):
         registry.register("audio_handler", AudioHandler)
 
         # Downloading Components
-        registry.register("download_manager", DownloadManager, config_manager=self.configuration_registry())
+        registry.register(
+            "download_manager",
+            DownloadManager,
+            config_manager=self.configuration_registry(),
+        )
         registry.register(
             "youtube_downloader",
             YouTubeDownloader,
@@ -133,7 +150,11 @@ class AppContainer(containers.DeclarativeContainer):
 
     # Pipeline Manager
     pipeline_manager = providers.Factory(
-        PipelineManager, batch_processor=batch_processor, memory_monitor=memory_monitor, logger=logger, concurrency_manager=concurrency_manager
+        PipelineManager,
+        batch_processor=batch_processor,
+        memory_monitor=memory_monitor,
+        logger=logger,
+        concurrency_manager=concurrency_manager,
     )
 
     # Register Celery Tasks
@@ -147,6 +168,12 @@ class AppContainer(containers.DeclarativeContainer):
         }
 
         for name, task_path in task_mapping.items():
-            setattr(self, name, providers.Factory(task_path, logger=self.logger, progress_bar=self.progress_bar))
+            setattr(
+                self,
+                name,
+                providers.Factory(
+                    task_path, logger=self.logger, progress_bar=self.progress_bar
+                ),
+            )
 
     register_celery_tasks()  # Register Celery tasks

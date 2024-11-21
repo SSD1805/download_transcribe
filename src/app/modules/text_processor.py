@@ -2,6 +2,7 @@ from dependency_injector.wiring import inject, Provide
 from src.infrastructure import AppContainer
 import click
 
+
 class TextProcessor:
     @inject
     def __init__(self, logger=Provide[AppContainer.logger]):
@@ -21,7 +22,7 @@ class TextProcessor:
             text (str): The input text to process.
             output_filepath (str): Path to save the processed text.
         """
-        with open(output_filepath, 'w') as f:
+        with open(output_filepath, "w") as f:
             processed_text = text.upper()  # Example processing
             f.write(processed_text)
         self.logger.info(f"Processed text saved to: {output_filepath}")
@@ -34,15 +35,17 @@ def cli():
 
 
 @cli.command()
-@click.argument('text')
-@click.argument('output_filepath')
+@click.argument("text")
+@click.argument("output_filepath")
 @inject
 def process(
     text,
     output_filepath,
     perf_tracker=Provide[AppContainer.performance_tracker],
     logger=Provide[AppContainer.logger],
-    text_processor=Provide[AppContainer.pipeline_component_registry.provide("text_processor")]
+    text_processor=Provide[
+        AppContainer.pipeline_component_registry.provide("text_processor")
+    ],
 ):
     """Process input text and save the output to a specified file."""
     try:
@@ -55,7 +58,7 @@ def process(
         click.echo(f"Error: Failed to process text. Check logs for more details.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Initialize the dependency container
     container = AppContainer()
     container.wire(modules=[__name__])

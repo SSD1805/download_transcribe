@@ -5,6 +5,7 @@ from dependency_injector.wiring import inject, Provide
 from src.infrastructure import AppContainer
 import traceback
 
+
 class BatchProcessor(ABC):
     @inject
     def __init__(
@@ -13,7 +14,7 @@ class BatchProcessor(ABC):
         use_threads: bool = False,
         timeout: int = None,
         logger=Provide[AppContainer.logger],
-        perf_tracker=Provide[AppContainer.performance_tracker]
+        perf_tracker=Provide[AppContainer.performance_tracker],
     ):
         """
         Initialize BatchProcessor.
@@ -64,7 +65,9 @@ class BatchProcessor(ABC):
                 with self._lock:  # Acquire lock
                     with self.perf_tracker.track_execution(f"Processing Item: {item}"):
                         self.process_item(item)
-                self.logger.info(f"Item {idx}/{total_items} processed successfully: {item}")
+                self.logger.info(
+                    f"Item {idx}/{total_items} processed successfully: {item}"
+                )
             except Exception as e:
                 self._handle_processing_exception(item, e)
 
@@ -76,8 +79,13 @@ class BatchProcessor(ABC):
             items (list): List of items to process.
         """
         total_items = len(items)
-        with ThreadPoolExecutor(max_workers=min(self.batch_size, total_items)) as executor:
-            futures = {executor.submit(self._threaded_process_item, item): item for item in items}
+        with ThreadPoolExecutor(
+            max_workers=min(self.batch_size, total_items)
+        ) as executor:
+            futures = {
+                executor.submit(self._threaded_process_item, item): item
+                for item in items
+            }
 
             completed = 0
             for future in as_completed(futures, timeout=self.timeout):
@@ -85,11 +93,15 @@ class BatchProcessor(ABC):
                 try:
                     future.result()  # Raises exception if the task failed
                     completed += 1
-                    self.logger.info(f"Item {completed}/{total_items} processed successfully: {item}")
+                    self.logger.info(
+                        f"Item {completed}/{total_items} processed successfully: {item}"
+                    )
                 except Exception as e:
                     self._handle_processing_exception(item, e)
 
-            self.logger.info(f"Batch processing completed: {completed}/{total_items} items processed.")
+            self.logger.info(
+                f"Batch processing completed: {completed}/{total_items} items processed."
+            )
 
     def _threaded_process_item(self, item):
         """

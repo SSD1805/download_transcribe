@@ -2,11 +2,16 @@ from typing import Any, Callable, Union
 from dependency_injector.wiring import inject, Provide
 from src.infrastructure import AppContainer
 
+
 class ConfigurationRegistry:
     _instance = None  # Singleton instance
 
     @inject
-    def __new__(cls, base_registry=Provide[AppContainer.generic_registry], concurrency=Provide[AppContainer.concurrency_utilities]):
+    def __new__(
+        cls,
+        base_registry=Provide[AppContainer.generic_registry],
+        concurrency=Provide[AppContainer.concurrency_utilities],
+    ):
         if not cls._instance:
             with concurrency.get_lock():  # Using concurrency utility lock for singleton instantiation
                 if not cls._instance:
@@ -15,7 +20,13 @@ class ConfigurationRegistry:
         return cls._instance
 
     @inject
-    def _init_singleton(self, base_registry, concurrency, logger=Provide[AppContainer.struct_logger], tracker=Provide[AppContainer.performance_tracker]):
+    def _init_singleton(
+        self,
+        base_registry,
+        concurrency,
+        logger=Provide[AppContainer.struct_logger],
+        tracker=Provide[AppContainer.performance_tracker],
+    ):
         """
         Initialize the singleton instance.
         """
@@ -26,7 +37,9 @@ class ConfigurationRegistry:
         self._lazy_loaded_configs: Dict[str, Union[Any, Callable[[], Any]]] = {}
         self.logger.info("Initialized ConfigurationRegistry singleton.")
 
-    def register(self, name: str, config: Union[Any, Callable[[], Any]], lazy_load: bool = False):
+    def register(
+        self, name: str, config: Union[Any, Callable[[], Any]], lazy_load: bool = False
+    ):
         """
         Register a configuration value.
 
@@ -60,12 +73,17 @@ class ConfigurationRegistry:
                     # Double-check to avoid race conditions
                     config = self._lazy_loaded_configs.pop(name)
                     if callable(config):
-                        config = config()  # Call the lazy-loaded function to get the actual config
+                        config = (
+                            config()
+                        )  # Call the lazy-loaded function to get the actual config
                     self.base_registry.register(name, config)
-                    self.logger.info(f"Lazy configuration '{name}' loaded and registered.")
+                    self.logger.info(
+                        f"Lazy configuration '{name}' loaded and registered."
+                    )
                     return config
 
                 return self.base_registry.get(name)
+
 
 # Example Usage
 if __name__ == "__main__":

@@ -2,13 +2,14 @@ from dask.distributed import Client, WorkerPlugin
 from dependency_injector.wiring import inject, Provide
 from src.infrastructure.app.app_container import AppContainer
 
+
 class PerformanceMonitoringPlugin(WorkerPlugin):
     @inject
     def __init__(
         self,
         logger=Provide[AppContainer.logger],
         performance_tracker=Provide[AppContainer.performance_tracker],
-        interval=5
+        interval=5,
     ):
         """
         Initialize the performance monitoring plugin.
@@ -37,6 +38,7 @@ class PerformanceMonitoringPlugin(WorkerPlugin):
         """
         self.logger.info("Stopping performance monitoring on worker...")
         self.performance_tracker.stop_memory_monitoring()
+
 
 # Register the plugin with the Dask client
 client = Client()

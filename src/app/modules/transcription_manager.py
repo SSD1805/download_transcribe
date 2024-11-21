@@ -1,13 +1,16 @@
 from dependency_injector.wiring import inject, Provide
 from src.infrastructure import AppContainer
 
+
 class ModelLoader:
     @inject
-    def __init__(self,
-                 logger=Provide[AppContainer.logger],
-                 perf_tracker=Provide[AppContainer.performance_tracker],
-                 model_registry=Provide[AppContainer.model_registry],
-                 config_registry=Provide[AppContainer.configuration_registry]):
+    def __init__(
+        self,
+        logger=Provide[AppContainer.logger],
+        perf_tracker=Provide[AppContainer.performance_tracker],
+        model_registry=Provide[AppContainer.model_registry],
+        config_registry=Provide[AppContainer.configuration_registry],
+    ):
         """
         Initialize the ModelLoader.
 
@@ -51,7 +54,9 @@ class ModelLoader:
             self.model_registry.register_model("whisper", whisper_model)
             self.logger.info("Standard Whisper model loaded successfully.")
         except Exception as fallback_e:
-            self.logger.error(f"Failed to load both WhisperX and Whisper models: {fallback_e}")
+            self.logger.error(
+                f"Failed to load both WhisperX and Whisper models: {fallback_e}"
+            )
             raise ValueError("Could not load any transcription model") from fallback_e
 
     def transcribe_with_whisperx(self, audio_file, **kwargs):
@@ -103,7 +108,6 @@ class ModelLoader:
 
 # Example usage
 if __name__ == "__main__":
-
     container = AppContainer()
     container.wire(modules=[__name__])
 

@@ -33,8 +33,11 @@ class AudioTranscriber:
             with self.performance_tracker.track_execution(f"Load {model_name} Model"):
                 if model_name == "Whisper" or model_name == "WhisperX":
                     import whisper  # Importing here to minimize unnecessary imports
+
                     model = whisper.load_model("base", self.device)
-                    self.logger.info(f"{model_name} model loaded successfully on {self.device}.")
+                    self.logger.info(
+                        f"{model_name} model loaded successfully on {self.device}."
+                    )
                     return model
         except Exception as e:
             self.logger.error(f"Failed to load {model_name} model: {e}")
@@ -52,10 +55,14 @@ class AudioTranscriber:
             list: A list of transcription segments or an empty list if transcription fails.
         """
         if use_whisperx and self.whisperx_model:
-            return self._perform_transcription(self.whisperx_model, audio_file, "WhisperX")
+            return self._perform_transcription(
+                self.whisperx_model, audio_file, "WhisperX"
+            )
 
         if self.whisper_model:
-            return self._perform_transcription(self.whisper_model, audio_file, "Whisper")
+            return self._perform_transcription(
+                self.whisper_model, audio_file, "Whisper"
+            )
 
         self.logger.error("No transcription models available.")
         return []
@@ -73,12 +80,18 @@ class AudioTranscriber:
             list: Transcription segments or an empty list if transcription fails.
         """
         try:
-            with self.performance_tracker.track_execution(f"Transcription with {model_name}"):
+            with self.performance_tracker.track_execution(
+                f"Transcription with {model_name}"
+            ):
                 result = model.transcribe(audio_file)
-                self.logger.info(f"Transcription ({model_name}) completed for '{audio_file}'.")
+                self.logger.info(
+                    f"Transcription ({model_name}) completed for '{audio_file}'."
+                )
                 if model_name == "WhisperX":
                     return result.get("segments", [])
                 return [{"text": result.get("text", "")}]
         except Exception as e:
-            self.logger.error(f"Error transcribing with {model_name} for '{audio_file}': {e}")
+            self.logger.error(
+                f"Error transcribing with {model_name} for '{audio_file}': {e}"
+            )
             return []

@@ -4,7 +4,7 @@ from .observers import TaskCoordinatorObserver
 from dependency_injector.wiring import inject, Provide
 from src.infrastructure import AppContainer
 
-app = Celery('tasks', broker='pyamqp://guest@localhost//')
+app = Celery("tasks", broker="pyamqp://guest@localhost//")
 
 
 class ObservableCeleryTask(ObservableTask):
@@ -14,7 +14,13 @@ class ObservableCeleryTask(ObservableTask):
 
 @app.task(bind=True)
 @inject
-def download_file(self, file_url: str, logger_observer=Provide[AppContainer.logger_observer], *args, **kwargs):
+def download_file(
+    self,
+    file_url: str,
+    logger_observer=Provide[AppContainer.logger_observer],
+    *args,
+    **kwargs,
+):
     observable_task = ObservableCeleryTask()
 
     # Add observers
@@ -23,13 +29,19 @@ def download_file(self, file_url: str, logger_observer=Provide[AppContainer.logg
     observable_task.add_observer(coordinator_observer.update)
 
     try:
-        observable_task.notify_observers('task_started', {"task_id": self.request.id, "file_url": file_url})
+        observable_task.notify_observers(
+            "task_started", {"task_id": self.request.id, "file_url": file_url}
+        )
 
         # Task logic here - e.g., download the file
         result = f"Downloaded content from {file_url}"  # Placeholder for actual download logic
 
-        observable_task.notify_observers('task_completed', {"task_id": self.request.id, "result": result})
+        observable_task.notify_observers(
+            "task_completed", {"task_id": self.request.id, "result": result}
+        )
         return result
     except Exception as e:
-        observable_task.notify_observers('task_failed', {"task_id": self.request.id, "error": str(e)})
+        observable_task.notify_observers(
+            "task_failed", {"task_id": self.request.id, "error": str(e)}
+        )
         raise e

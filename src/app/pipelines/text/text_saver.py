@@ -19,10 +19,12 @@ class TextSaver:
             return
 
         try:
-            processed_data = pd.DataFrame({
-                'Sentence': sentences,
-                'Entities': [entities for _ in range(len(sentences))]
-            })
+            processed_data = pd.DataFrame(
+                {
+                    "Sentence": sentences,
+                    "Entities": [entities for _ in range(len(sentences))],
+                }
+            )
             processed_data.to_csv(filepath, index=False)
             logger.info(f"Processed text saved to CSV file at {filepath}.")
         except Exception as e:
@@ -41,7 +43,9 @@ class TextSaver:
                     f.write(f"Sentence: {sentence}, Entity: {entity}, Token: {token}\n")
             logger.info(f"Processed text saved to text file at {output_file}.")
         except Exception as e:
-            logger.error(f"Error saving processed text to text file at {output_file}: {e}")
+            logger.error(
+                f"Error saving processed text to text file at {output_file}: {e}"
+            )
             raise
 
     @perf_tracker.track
@@ -51,8 +55,10 @@ class TextSaver:
             return
 
         try:
-            data = [{"Sentence": sentence, "Entities": entity, "Tokens": token}
-                    for sentence, entity, token in zip(sentences, entities, tokens)]
+            data = [
+                {"Sentence": sentence, "Entities": entity, "Tokens": token}
+                for sentence, entity, token in zip(sentences, entities, tokens)
+            ]
             with open(filepath, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4)
             logger.info(f"Processed text saved to JSON file at {filepath}.")

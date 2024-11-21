@@ -5,6 +5,7 @@ from src.infrastructure import inject, Provide
 from src.infrastructure import AppContainer
 import traceback
 
+
 class MemoryMonitor:
     @inject
     def __init__(
@@ -13,7 +14,7 @@ class MemoryMonitor:
         high_usage_threshold: int = 90,
         action_on_high_usage: callable = None,
         logger=Provide[AppContainer.logger],
-        perf_tracker=Provide[AppContainer.performance_tracker]
+        perf_tracker=Provide[AppContainer.performance_tracker],
     ):
         """
         Initialize the MemoryMonitor.
@@ -27,7 +28,9 @@ class MemoryMonitor:
         """
         self.interval = interval
         self.high_usage_threshold = high_usage_threshold
-        self.action_on_high_usage = action_on_high_usage or self._default_high_usage_action
+        self.action_on_high_usage = (
+            action_on_high_usage or self._default_high_usage_action
+        )
         self.logger = logger
         self.perf_tracker = perf_tracker
         self._stop = threading.Event()
@@ -63,7 +66,9 @@ class MemoryMonitor:
 
                         # Trigger action if memory usage exceeds threshold
                         if memory_info.percent >= self.high_usage_threshold:
-                            self.logger.warning(f"High memory usage detected: {memory_info.percent}%")
+                            self.logger.warning(
+                                f"High memory usage detected: {memory_info.percent}%"
+                            )
                             self.action_on_high_usage(memory_info)
 
                     time.sleep(self.interval)

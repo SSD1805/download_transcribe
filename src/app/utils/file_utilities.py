@@ -15,9 +15,11 @@ class FileUtilityFacade:
     """
 
     @inject
-    def __init__(self,
-                 logger=Provide[AppContainer.logger],
-                 tracker=Provide[AppContainer.performance_tracker]):
+    def __init__(
+        self,
+        logger=Provide[AppContainer.logger],
+        tracker=Provide[AppContainer.performance_tracker],
+    ):
         self.logger = logger
         self.tracker = tracker
 
@@ -26,7 +28,7 @@ class FileUtilityFacade:
         """Save binary content to a specified file path."""
         with self.tracker.track_execution("Save File"):
             try:
-                with open(file_path, 'wb') as file:
+                with open(file_path, "wb") as file:
                     file.write(content)
                 self.logger.info(f"File saved successfully: {file_path}")
             except Exception as e:
@@ -37,7 +39,7 @@ class FileUtilityFacade:
         """Load and return binary content from a file."""
         with self.tracker.track_execution("Load File"):
             try:
-                with open(file_path, 'rb') as file:
+                with open(file_path, "rb") as file:
                     content = file.read()
                 self.logger.info(f"File loaded successfully: {file_path}")
                 return content
@@ -62,7 +64,9 @@ class FileUtilityFacade:
                 shutil.copy2(source, destination)
                 self.logger.info(f"File copied from {source} to {destination}")
             except Exception as e:
-                self.logger.error(f"Failed to copy file from {source} to {destination}: {e}")
+                self.logger.error(
+                    f"Failed to copy file from {source} to {destination}: {e}"
+                )
                 raise
 
     # Directory Operations
@@ -75,7 +79,9 @@ class FileUtilityFacade:
             self.logger.error(f"Failed to ensure directory {directory_path}: {e}")
             raise
 
-    def list_files(self, directory_path: str, extensions: Optional[tuple] = None) -> list:
+    def list_files(
+        self, directory_path: str, extensions: Optional[tuple] = None
+    ) -> list:
         """
         List files in a directory with optional filtering by extensions.
 
@@ -93,10 +99,14 @@ class FileUtilityFacade:
                 if os.path.isfile(os.path.join(directory_path, f))
                 and (not extensions or f.endswith(extensions))
             ]
-            self.logger.info(f"Listed {len(files)} files in directory: {directory_path}")
+            self.logger.info(
+                f"Listed {len(files)} files in directory: {directory_path}"
+            )
             return files
         except Exception as e:
-            self.logger.error(f"Failed to list files in directory {directory_path}: {e}")
+            self.logger.error(
+                f"Failed to list files in directory {directory_path}: {e}"
+            )
             raise
 
     # YAML Parsing Operations
@@ -104,7 +114,7 @@ class FileUtilityFacade:
         """Reads YAML data from a file."""
         self.logger.info(f"Reading YAML file at {filepath}.")
         try:
-            with open(filepath, 'r') as file:
+            with open(filepath, "r") as file:
                 data = yaml.safe_load(file)
             self.logger.info(f"YAML data read successfully from {filepath}.")
             return data
@@ -116,7 +126,7 @@ class FileUtilityFacade:
         """Writes YAML data to a file."""
         self.logger.info(f"Writing YAML data to file at {filepath}.")
         try:
-            with open(filepath, 'w') as file:
+            with open(filepath, "w") as file:
                 yaml.safe_dump(data, file)
             self.logger.info(f"YAML data written successfully to {filepath}.")
         except Exception as e:
@@ -128,7 +138,7 @@ class FileUtilityFacade:
         """Formats the given timestamp to 'YYYY-MM-DD HH:MM:SS'. Uses the current time if no timestamp is provided."""
         if timestamp is None:
             timestamp = arrow.now()
-        formatted = timestamp.format('YYYY-MM-DD HH:mm:ss')
+        formatted = timestamp.format("YYYY-MM-DD HH:mm:ss")
         self.logger.info(f"Formatted timestamp: {formatted}")
         return formatted
 
@@ -141,6 +151,8 @@ class FileUtilityFacade:
     # Filename Sanitization
     def sanitize_filename(self, filename: str) -> str:
         """Sanitize a filename to make it safe for file systems."""
-        sanitized = "".join(c if c.isalnum() or c in " ._-()" else "_" for c in filename)
+        sanitized = "".join(
+            c if c.isalnum() or c in " ._-()" else "_" for c in filename
+        )
         self.logger.info(f"Sanitized filename: {sanitized}")
         return sanitized

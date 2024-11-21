@@ -11,7 +11,10 @@ class AudioSplitter(AudioProcessorBase):
     def split(self, input_file, chunk_duration_ms, output_file_prefix):
         try:
             audio = self.load_audio(input_file)
-            chunks = [audio[i:i + chunk_duration_ms] for i in range(0, len(audio), chunk_duration_ms)]
+            chunks = [
+                audio[i : i + chunk_duration_ms]
+                for i in range(0, len(audio), chunk_duration_ms)
+            ]
             chunk_files = []
             for idx, chunk in enumerate(chunks):
                 chunk_file = f"{output_file_prefix}_chunk{idx}.{self.format}"

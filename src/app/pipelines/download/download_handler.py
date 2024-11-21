@@ -3,13 +3,16 @@ from src.infrastructure.app.app_container import AppContainer
 import os
 import yt_dlp
 
+
 class DownloadManager:
     @inject
-    def __init__(self,
-                 config_manager=Provide[AppContainer.configuration_registry],
-                 logger=Provide[AppContainer.logger],
-                 perf_tracker=Provide[AppContainer.performance_tracker],
-                 error_registry=Provide[AppContainer.error_registry]):
+    def __init__(
+        self,
+        config_manager=Provide[AppContainer.configuration_registry],
+        logger=Provide[AppContainer.logger],
+        perf_tracker=Provide[AppContainer.performance_tracker],
+        error_registry=Provide[AppContainer.error_registry],
+    ):
         """
         Initialize the DownloadManager.
 
@@ -25,19 +28,32 @@ class DownloadManager:
         self.error_registry = error_registry
 
         try:
-            self.download_directory = self.config_manager.get('download_directory', '/data/audio_files')
-            self.yt_dlp_options = self.config_manager.get('yt_dlp_options', {
-                'format': 'bestaudio/best',
-                'outtmpl': os.path.join(self.download_directory, '%(title)s.%(ext)s'),
-                'postprocessors': [{
-                    'key': 'FFmpegExtractAudio',
-                    'preferredcodec': 'mp3',
-                    'preferredquality': '192',
-                }]
-            })
+            self.download_directory = self.config_manager.get(
+                "download_directory", "/data/audio_files"
+            )
+            self.yt_dlp_options = self.config_manager.get(
+                "yt_dlp_options",
+                {
+                    "format": "bestaudio/best",
+                    "outtmpl": os.path.join(
+                        self.download_directory, "%(title)s.%(ext)s"
+                    ),
+                    "postprocessors": [
+                        {
+                            "key": "FFmpegExtractAudio",
+                            "preferredcodec": "mp3",
+                            "preferredquality": "192",
+                        }
+                    ],
+                },
+            )
             if not os.path.exists(self.download_directory):
-                raise self.error_registry.FileError(f"Download directory does not exist: {self.download_directory}")
-            self.logger.info(f"DownloadManager initialized with directory: {self.download_directory}")
+                raise self.error_registry.FileError(
+                    f"Download directory does not exist: {self.download_directory}"
+                )
+            self.logger.info(
+                f"DownloadManager initialized with directory: {self.download_directory}"
+            )
         except KeyError as e:
             message = f"Missing configuration key: {e}"
             self.logger.error(message)
@@ -47,7 +63,9 @@ class DownloadManager:
             raise
 
     def sanitize_filename(self, filename):
-        sanitized_name = "".join([c if c.isalnum() or c in " ._-()" else "_" for c in filename])
+        sanitized_name = "".join(
+            [c if c.isalnum() or c in " ._-()" else "_" for c in filename]
+        )
         self.logger.info(f"Sanitized filename: {sanitized_name}")
         return sanitized_name
 

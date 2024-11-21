@@ -3,25 +3,36 @@ from dependency_injector.wiring import inject, Provide
 from src.infrastructure import AppContainer
 
 # Set up Dask client
-client = Client('localhost:8786')
+client = Client("localhost:8786")
+
 
 @inject
-def transcription_task(audio_file: str, logger_observer=Provide[AppContainer.logger_observer], *args, **kwargs):
+def transcription_task(
+    audio_file: str,
+    logger_observer=Provide[AppContainer.logger_observer],
+    *args,
+    **kwargs,
+):
     observable_task = ObservableDaskTask()
 
     # Add observers
     observable_task.add_observer(logger_observer.update)
 
     try:
-        observable_task.notify_observers('task_started', {"audio_file": audio_file})
+        observable_task.notify_observers("task_started", {"audio_file": audio_file})
 
         # Task logic here - e.g., transcribe the audio file
         result = f"Transcribed content from {audio_file}"  # Placeholder for actual transcription logic
 
-        observable_task.notify_observers('task_completed', {"audio_file": audio_file, "result": result})
+        observable_task.notify_observers(
+            "task_completed", {"audio_file": audio_file, "result": result}
+        )
         return result
     except Exception as e:
-        observable_task.notify_observers('task_failed', {"audio_file": audio_file, "error": str(e)})
+        observable_task.notify_observers(
+            "task_failed", {"audio_file": audio_file, "error": str(e)}
+        )
         raise e
+
 
 # This worker can be submitted by the coordinator or another workflow step

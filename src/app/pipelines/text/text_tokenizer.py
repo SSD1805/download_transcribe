@@ -33,13 +33,19 @@ class TextTokenizer:
     @perf_tracker.track
     def tokenize_text(self, text):
         if not text:
-            logger.warning("No input text to tokenize. Please provide text before processing.")
+            logger.warning(
+                "No input text to tokenize. Please provide text before processing."
+            )
             return []
 
         try:
             stopwords_set = self.get_stopwords()
             words = word_tokenize(text)
-            tokens = [word for word in words if word.isalnum() and word.lower() not in stopwords_set]
+            tokens = [
+                word
+                for word in words
+                if word.isalnum() and word.lower() not in stopwords_set
+            ]
             logger.info(
                 f"Text tokenization complete: {len(tokens)} tokens generated from input of length {len(text)}."
             )

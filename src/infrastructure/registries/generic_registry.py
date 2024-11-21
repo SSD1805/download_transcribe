@@ -5,7 +5,8 @@ from dependency_injector.wiring import inject, Provide
 from src.infrastructure import AppContainer
 
 # Define a generic type for the registries.
-T = TypeVar('T')
+T = TypeVar("T")
+
 
 class GenericRegistry(ABC, Generic[T]):
     """
@@ -13,8 +14,13 @@ class GenericRegistry(ABC, Generic[T]):
     logging, and performance tracking.
     Handles common operations like adding, retrieving, and validating items.
     """
+
     @inject
-    def __init__(self, logger=Provide[AppContainer.struct_logger], tracker=Provide[AppContainer.performance_tracker]):
+    def __init__(
+        self,
+        logger=Provide[AppContainer.struct_logger],
+        tracker=Provide[AppContainer.performance_tracker],
+    ):
         self._registry: Dict[str, Union[T, Callable[..., T]]] = {}
         self._lock = Lock()
         self.logger = logger
@@ -50,8 +56,12 @@ class GenericRegistry(ABC, Generic[T]):
             with self.tracker.track_execution("Get Item"):
                 if name not in self._registry:
                     available = ", ".join(self._registry.keys())
-                    self.logger.error(f"Item '{name}' is not registered. Available: {available}")
-                    raise ValueError(f"Item '{name}' is not registered. Available: {available}")
+                    self.logger.error(
+                        f"Item '{name}' is not registered. Available: {available}"
+                    )
+                    raise ValueError(
+                        f"Item '{name}' is not registered. Available: {available}"
+                    )
                 self.logger.info(f"Retrieved item with name: '{name}'.")
                 return self._registry[name]
 
@@ -80,6 +90,7 @@ class GenericRegistry(ABC, Generic[T]):
         """
         pass
 
+
 # Example usage of the refactored GenericRegistry.
 class RefactoredProcessorRegistry(GenericRegistry[Callable[[int], int]]):
     def validate_item(self, item: Callable[[int], int]) -> bool:
@@ -89,6 +100,7 @@ class RefactoredProcessorRegistry(GenericRegistry[Callable[[int], int]]):
             return True
         self.logger.error("Invalid processor item. It must be callable.")
         return False
+
 
 # Reinitialize the processor registry.
 processor_registry = RefactoredProcessorRegistry()

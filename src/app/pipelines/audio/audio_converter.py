@@ -8,7 +8,7 @@ perf_tracker = PerformanceTracker.get_instance()
 
 
 class AudioConverter(AudioProcessorBase):
-    def convert(self, input_file, output_file, target_format='wav'):
+    def convert(self, input_file, output_file, target_format="wav"):
         self.format = target_format
         try:
             audio = self.load_audio(input_file)

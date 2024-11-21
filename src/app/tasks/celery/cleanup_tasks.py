@@ -6,8 +6,7 @@ from src.infrastructure import container  # This is used for wiring the dependen
 @shared_task
 @inject
 def cleanup_old_data(
-        logger=Provide[container.logger],
-        file_manager=Provide[container.file_manager]
+    logger=Provide[container.logger], file_manager=Provide[container.file_manager]
 ):
     """
     Celery task to clean up old data or files.
@@ -19,7 +18,9 @@ def cleanup_old_data(
         directory_path = "/data/audio_files"
         retention_days = 30
         file_manager.remove_old_files(directory_path, days=retention_days)
-        logger.info(f"Data cleanup completed for directory: {directory_path}, older than {retention_days} days.")
+        logger.info(
+            f"Data cleanup completed for directory: {directory_path}, older than {retention_days} days."
+        )
     except Exception as e:
         logger.error(f"Error during data cleanup: {e}")
 

@@ -3,6 +3,7 @@ import os
 from src.app.utils.structlog_logger import StructLogger
 from src.app.utils.tracking_utilities import PerformanceTracker
 
+
 class TranscriptionPipeline:
     def __init__(self, input_directory, output_directory):
         self.input_directory = input_directory
@@ -13,7 +14,9 @@ class TranscriptionPipeline:
     def process_files(self):
         self.logger.info(f"Starting transcription pipeline for {self.input_directory}")
         audio_files = [
-            f for f in os.listdir(self.input_directory) if f.endswith(('.mp3', '.wav', '.flac'))
+            f
+            for f in os.listdir(self.input_directory)
+            if f.endswith((".mp3", ".wav", ".flac"))
         ]
         for file_name in audio_files:
             input_path = os.path.join(self.input_directory, file_name)
@@ -30,7 +33,9 @@ class TranscriptionPipeline:
             # Transcribe
             segments = self.transcriber.transcribe(wav_file)
             if not segments:
-                self.logger.error(f"Skipping {input_file} due to transcription failure.")
+                self.logger.error(
+                    f"Skipping {input_file} due to transcription failure."
+                )
                 return
 
             # Save transcription

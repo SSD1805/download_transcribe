@@ -18,7 +18,9 @@ class HelperFunctions:
         Returns:
             str: The sanitized file name.
         """
-        sanitized_name = "".join(c if c.isalnum() or c in " ._-()" else "_" for c in file_name)
+        sanitized_name = "".join(
+            c if c.isalnum() or c in " ._-()" else "_" for c in file_name
+        )
         return sanitized_name
 
     @staticmethod

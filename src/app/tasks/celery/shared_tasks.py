@@ -2,13 +2,14 @@ from celery_app import shared_task
 from dependency_injector.wiring import inject, Provide
 from src.infrastructure import container
 
+
 @shared_task
 @inject
 def update_task_status(
     task_id: str,
     status: str,
     logger=Provide[container.logger],
-    performance_tracker=Provide[container.performance_tracker]
+    performance_tracker=Provide[container.performance_tracker],
 ):
     """
     Shared task to update task status.

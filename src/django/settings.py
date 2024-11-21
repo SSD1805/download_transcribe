@@ -61,6 +61,7 @@ structlog.configure(
     cache_logger_on_first_use=True,
 )
 
+
 @setup_logging.connect
 def configure_structlog_celery(**kwargs):
     """Configure Structlog for Celery."""
@@ -78,6 +79,7 @@ def configure_structlog_celery(**kwargs):
         wrapper_class=structlog.stdlib.BoundLogger,
         cache_logger_on_first_use=True,
     )
+
 
 # Logging Configuration
 LOGGING = {

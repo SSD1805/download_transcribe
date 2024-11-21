@@ -6,7 +6,9 @@ from src.app.utils.tracking_utilities import PerformanceTracker
 logger = StructLogger.get_logger()
 perf_tracker = PerformanceTracker.get_instance()
 
-download_manager = DownloadManager(config_manager=None)  # Pass actual config manager here
+download_manager = DownloadManager(
+    config_manager=None
+)  # Pass actual config manager here
 
 
 class YouTubeDownloader:
@@ -46,5 +48,7 @@ class YouTubeDownloader:
             self.download_video(url)
 
         logger.info("Starting batch download...")
-        self.performance_tracker.batch_process(download_single_url, urls, batch_size=batch_size)
+        self.performance_tracker.batch_process(
+            download_single_url, urls, batch_size=batch_size
+        )
         logger.info("Batch download completed.")

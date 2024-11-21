@@ -4,10 +4,12 @@ import sys
 import threading
 import logging
 
+
 class StructLogger:
     """
     Singleton Logger using structlog.
     """
+
     _instance = None
     _lock = threading.Lock()
     _is_configured = False
@@ -37,7 +39,7 @@ class StructLogger:
                 structlog.stdlib.add_log_level,
                 structlog.processors.StackInfoRenderer(),
                 structlog.processors.format_exc_info,
-                structlog.dev.ConsoleRenderer()  # Use a console renderer for simplicity
+                structlog.dev.ConsoleRenderer(),  # Use a console renderer for simplicity
             ],
             context_class=dict,
             logger_factory=structlog.stdlib.LoggerFactory(),
@@ -60,8 +62,11 @@ class StructLogger:
         Returns the singleton logger instance.
         """
         if StructLogger._logger is None:
-            raise RuntimeError("Logger is not configured. Call `StructLogger.configure()` first.")
+            raise RuntimeError(
+                "Logger is not configured. Call `StructLogger.configure()` first."
+            )
         return StructLogger._logger
+
 
 # Convenience functions for direct use throughout the application
 def log_info(message):
@@ -71,6 +76,7 @@ def log_info(message):
     logger = StructLogger.get_logger()
     logger.info(message)
 
+
 def log_error(message):
     """
     Logs an error message using the singleton logger instance.
@@ -78,12 +84,14 @@ def log_error(message):
     logger = StructLogger.get_logger()
     logger.error(message)
 
+
 def log_warning(message):
     """
     Logs a warning message using the singleton logger instance.
     """
     logger = StructLogger.get_logger()
     logger.warning(message)
+
 
 # Example usage
 if __name__ == "__main__":

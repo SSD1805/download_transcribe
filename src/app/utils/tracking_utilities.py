@@ -8,18 +8,22 @@ from dependency_injector.wiring import inject, Provide
 from src.infrastructure import AppContainer
 from tqdm import tqdm
 
+
 class TrackerStrategy(ABC):
     """
     Abstract base class for different tracking strategies.
     """
+
     @abstractmethod
     def track(self, *args, **kwargs):
         pass
+
 
 class PerformanceTracker(TrackerStrategy):
     """
     Strategy for tracking performance metrics like CPU and memory usage.
     """
+
     @inject
     def __init__(self, logger=Provide[AppContainer.logger]):
         self.logger = logger
@@ -38,7 +42,9 @@ class PerformanceTracker(TrackerStrategy):
             end_time = time.time()
             elapsed_time = end_time - start_time
             self.metrics[operation_name] = elapsed_time
-            self.logger.info(f"Completed tracking: {operation_name} - Duration: {elapsed_time:.2f} seconds")
+            self.logger.info(
+                f"Completed tracking: {operation_name} - Duration: {elapsed_time:.2f} seconds"
+            )
 
     def log_metric(self, operation_name: str, value: float) -> None:
         """
@@ -60,12 +66,18 @@ class PerformanceTracker(TrackerStrategy):
         with self.track_execution(operation_name):
             pass
 
+
 class ProgressBarTracker(TrackerStrategy):
     """
     Strategy for displaying a progress bar while iterating over an iterable.
     """
+
     @inject
-    def __init__(self, logger=Provide[AppContainer.logger], performance_tracker=Provide[AppContainer.performance_tracker]):
+    def __init__(
+        self,
+        logger=Provide[AppContainer.logger],
+        performance_tracker=Provide[AppContainer.performance_tracker],
+    ):
         self.logger = logger
         self.performance_tracker = performance_tracker
 
@@ -74,7 +86,9 @@ class ProgressBarTracker(TrackerStrategy):
         Wraps an iterable with a progress bar and tracks the performance.
         """
         if iterable is None:
-            self.logger.warning("Provided iterable is None. Returning an empty iterable.")
+            self.logger.warning(
+                "Provided iterable is None. Returning an empty iterable."
+            )
             return iter([])
 
         try:
@@ -96,11 +110,13 @@ class ProgressBarTracker(TrackerStrategy):
         """
         yield from self.wrap(iterable, description, **kwargs)
 
+
 # Context Class for Tracking
 class TrackerContext:
     """
     Context for using different tracking strategies.
     """
+
     def __init__(self, strategy: TrackerStrategy):
         self._strategy = strategy
 
@@ -112,6 +128,7 @@ class TrackerContext:
             yield from self._strategy.track(*args, **kwargs)
         else:
             self._strategy.track(*args, **kwargs)
+
 
 # Example Usage
 if __name__ == "__main__":

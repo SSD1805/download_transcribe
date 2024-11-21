@@ -20,7 +20,9 @@ class TextSegmenter:
     @perf_tracker.track
     def segment_sentences(self, text):
         if not text:
-            logger.warning("No input text to segment. Please provide text before processing.")
+            logger.warning(
+                "No input text to segment. Please provide text before processing."
+            )
             return []
 
         try:

@@ -6,12 +6,13 @@ import click
 # Initialize Dask client
 client = Client()
 
+
 @inject
 def load_text_task(
     text: str,
     loader=Provide[AppContainer.pipeline_component_registry.provide("text_loader")],
     logger=Provide[AppContainer.logger],
-    perf_tracker=Provide[AppContainer.performance_tracker]
+    perf_tracker=Provide[AppContainer.performance_tracker],
 ):
     """
     Load text for processing and track performance.
@@ -26,13 +27,15 @@ def load_text_task(
             logger.error(f"Error loading text: {e}")
             raise
 
+
 @click.command()
-@click.argument('sample_text')
+@click.argument("sample_text")
 @inject
 def main(sample_text: str):
     """Command-line entry for loading text."""
     future = client.submit(load_text_task, sample_text)
     click.echo(f"Text Loading Result: {future.result()}")
+
 
 if __name__ == "__main__":
     # Wire dependencies for this module
