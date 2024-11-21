@@ -1,0 +1,80 @@
+# Download Settings
+download:
+  delay: 10  # Delay between downloads (seconds)
+  retries: 3  # Number of retry attempts for failed downloads
+  timeout: 30  # Timeout in seconds for each download attempt
+  cookiefile_path: "/path/to/youtube_cookies.txt"  # Optional cookie file for authenticated downloads
+  user_agent: "Mozilla/5.0"  # Custom user-agent string for requests
+
+# Whisper AI Configuration
+whisper:
+  model: "base"  # Whisper model size: base, small, medium, large
+  timestamps: true  # Enable timestamps in transcription output
+  segmentation: true  # Segment transcriptions into readable chunks
+  noise_suppression: true  # Apply noise suppression
+  fallback_to_whisper_ai: true  # Fallback to Whisper if WhisperX fails
+
+# WhisperX Advanced Features
+whisperx:
+  model: "base"  # WhisperX model size
+  alignment: true  # Enable word alignment for precise timestamps
+  diarization: true  # Enable speaker diarization
+  device: "cuda"  # Processing device: 'cuda' or 'cpu'
+
+# Post-Processing Settings
+post_processing:
+  remove_noise: true  # Remove noise in final transcription outputs
+  spell_check: true  # Enable spell checking
+  grammar_check: false  # Optionally apply grammar checks
+
+# Processing Options
+processing:
+  sentence_segmentation: true  # Enable segmentation of sentences
+  ner: true  # Perform named entity recognition (NER)
+  save_format: "csv"  # Output format for processed transcriptions (csv or json)
+  output_dir: "/data/processed_transcriptions"  # Directory for processed files
+
+# Directories (Centralized)
+directories:
+  audio_files_dir: "/data/audio_files"  # Directory for input audio_processor files
+  transcriptions_dir: "/data/transcriptions"  # Directory for raw transcriptions
+  processed_dir: "/data/processed_transcriptions"  # Directory for processed outputs
+  logs_dir: "/data/logs"  # Directory for application logs
+
+# Logging Configuration
+logging:
+  level: "INFO"  # Logging level
+  output_file: "/data/logs/app.log"  # Path for log files
+  max_bytes: 10485760  # Log file size limit for rotation (10 MB)
+  backup_count: 5  # Number of backup log files to keep
+  console_logging: true  # Enable console-based logging
+  file_logging: true  # Enable file-based logging
+
+# Error Handling
+error_handling:
+  retry_on_failure: true  # Retry tasks on failure
+  max_retries: 5  # Maximum retry attempts
+  retry_delay: 5  # Delay between retries (seconds)
+
+# File Management
+file_management:
+  auto_cleanup: true  # Automatically clean up processed files after a set period
+  cleanup_threshold: 7  # Number of days after which files are cleaned up (0 to disable)
+
+# Resource Management
+resource_management:
+  max_memory_usage: "2GB"  # Maximum memory usage limit
+  enable_memory_profiling: true  # Enable memory usage monitoring
+  cpu_limit: 2  # Limit CPU cores (set to 0 for no limit)
+
+# Advanced Processing Settings
+batch_processing:
+  enabled: true
+  batch_size_audio: 5
+  batch_size_text: 3
+  batch_size_transcription: 2
+
+
+parallel_processing:
+  enabled: true  # Enable parallel processing of tasks
+  num_workers: 4  # Number of parallel workers
