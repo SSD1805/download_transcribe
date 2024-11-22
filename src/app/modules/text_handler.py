@@ -4,11 +4,11 @@ from dependency_injector.wiring import Provide, inject
 from src.infrastructure.app.app_container import AppContainer
 
 
-class TextProcessor:
+class TextHandler:
     @inject
     def __init__(self, logger=Provide[AppContainer.logger]):
         """
-        Initialize the TextProcessor.
+        Initialize the TextHandler.
 
         Args:
             logger: The logger instance from the AppContainer.

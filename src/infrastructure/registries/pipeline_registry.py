@@ -4,6 +4,7 @@ from typing import Callable, Dict, Type
 from dependency_injector.wiring import Provide, inject
 
 from src.infrastructure.app.app_container import AppContainer
+from src.pipelines.audio.audio_processor_base import AudioProcessorBase
 
 
 # Define an abstract PipelineComponent class for Composite Pattern
@@ -62,8 +63,8 @@ class CompositePipeline(PipelineComponent):
 
 class PipelineRegistry:
     """
-    A registry for managing different components used in the pipeline system,
-    such as processors, handlers, and batch processors.
+    Registry for managing and executing components across multiple pipelines.
+    Supports dynamic registration of processors, handlers, batch processors, and audio pipeline components.
     """
 
     _instance = None
@@ -135,6 +136,19 @@ class PipelineRegistry:
                 self.generic_registry.add_item(name, batch_processor)
                 self.logger.info(f"Batch Processor '{name}' registered successfully.")
 
+    def register_audio_component(
+        self, name: str, component_class: Type[AudioProcessorBase], *args, **kwargs
+    ):
+        """Register an audio processing component."""
+        component = component_class(*args, **kwargs)
+        if not isinstance(component, AudioProcessorBase):
+            raise ValueError(
+                f"Component '{name}' must inherit from AudioProcessorBase."
+            )
+        with self.concurrency.get_lock():
+            self.generic_registry.add_item(name, component)
+            self.logger.info(f"Audio component '{name}' registered successfully.")
+
     def add_to_composite(self, name: str):
         """Add a registered component to the composite pipeline."""
         component = self.generic_registry.get_item(name)
@@ -149,16 +163,3 @@ class PipelineRegistry:
             result = self._composite_pipeline.execute(*args, **kwargs)
             self.logger.info("Executed composite pipeline successfully.")
             return result
-
-
-# Example Usage
-if __name__ == "__main__":
-    from src.infrastructure import container
-
-    container.wire(modules=[__name__])
-
-    pipeline_registry = PipelineRegistry()
-    pipeline_registry.register_processor("example_processor", lambda x: x * 2)
-    pipeline_registry.add_to_composite("example_processor")
-    result = pipeline_registry.execute_pipeline(5)
-    print(f"Pipeline Execution Result: {result}")

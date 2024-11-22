@@ -28,7 +28,9 @@ class CeleryScheduler:
                 self.logger.info("Starting Celery Beat Schedule initialization...")
 
                 now = pendulum.now()
-                self.logger.info(f"Current time for reference: {now.to_iso8601_string()}")
+                self.logger.info(
+                    f"Current time for reference: {now.to_iso8601_string()}"
+                )
 
                 schedule = {
                     "cleanup_old_data": {

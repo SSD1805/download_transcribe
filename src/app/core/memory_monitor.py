@@ -71,7 +71,7 @@ class MemoryMonitor:
                             self.logger.warning(
                                 f"High memory usage detected: {memory_info.percent}%"
                             )
-                            self.action_on_high_usage(memory_info)
+                            self.action_on_high_usage()
 
                     time.sleep(self.interval)
 

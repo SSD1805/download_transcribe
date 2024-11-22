@@ -1,20 +1,12 @@
-# Description: Module to load text for processing.
-from src.app.utils.structlog_logger import StructLogger
-from src.app.utils.tracking_utilities import PerformanceTracker
-
-logger = StructLogger.get_logger()
-perf_tracker = PerformanceTracker.get_instance()
+from src.app.pipelines.text.text_processor_base import TextProcessorBase
 
 
-class TextLoader:
-    def __init__(self):
-        self.input_text = ""
-
-    @perf_tracker.track
-    def load_text(self, text):
-        if not text:
-            logger.warning("Empty text provided for loading.")
+class TextLoader(TextProcessorBase):
+    def process(self, text: str) -> bool:
+        """Load text for processing."""
+        if not self.validate_text(text):
             return False
-        self.input_text = text
-        logger.info("Text loaded for processing.")
+
+        self.logger.info("Text loaded for processing.")
+        self.text = text
         return True

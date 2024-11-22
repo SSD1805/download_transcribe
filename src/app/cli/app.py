@@ -1,176 +1,90 @@
-"""
-CLI application for YouTube audio downloading, transcription, and batch processing.
-"""
-
 import click
-from dependency_injector.wiring import inject
-
+from dependency_injector.wiring import Provide, inject
 from src.infrastructure.app.app_container import AppContainer
-
-# CLI Command Functions
-
-
-@inject
-def download_command(downloader, logger, url):
-    """
-    Command to handle downloading a single video from YouTube.
-    """
-    try:
-        logger.info(f"Starting download for URL: {url}")
-        downloader.download_video(url)
-        logger.info(f"Download completed for URL: {url}")
-    except Exception as e:
-        logger.error(f"Failed to download video from URL {url}: {e}")
-        raise
+from src.app.cli import cli_audio, cli_text, cli_download, cli_transcription
 
 
-@inject
-def transcribe_command(
-    transcriber,
-    pipeline,
-    logger,
-    performance_tracker,
-    audio_file,
-    title,
-    use_whisperx,
-    fallback_to_whisper,
-):
-    """
-    Command to handle transcribing an audio file.
-    """
-    try:
-        if use_whisperx:
-            logger.info(f"Using WhisperX to transcribe audio file: {audio_file}")
-            with performance_tracker.track_execution("transcription_pipeline"):
-                success = pipeline.transcribe_audio(audio_file, title)
-            if not success and fallback_to_whisper:
-                logger.warning(
-                    f"WhisperX failed. Falling back to Whisper AI for audio file: "
-                    f"{audio_file}"
-                )
-                transcriber.transcribe_audio(audio_file, title)
-        else:
-            logger.info(f"Using Whisper AI to transcribe audio file: {audio_file}")
-            with performance_tracker.track_execution("transcription_pipeline"):
-                transcriber.transcribe_audio(audio_file, title)
+class CommandManager:
+    """Manages the registration and execution of commands."""
 
-        logger.info(f"Transcription completed for file: {audio_file}")
-    except Exception as e:
-        logger.error(f"Transcription failed for {audio_file}: {e}")
-        raise
+    def __init__(self, logger):
+        self.commands = {}
+        self.logger = logger
 
+    def register(self, name: str, command: click.Command):
+        """Register a command."""
+        if name in self.commands:
+            raise ValueError(f"Command '{name}' is already registered.")
+        self.commands[name] = command
+        self.logger.info(f"Command '{name}' registered successfully.")
 
-@inject
-def batch_process_command(batch_processor, logger, input_directory, output_directory):
-    """
-    Command to handle batch processing tasks.
-    """
-    try:
-        logger.info(f"Starting batch processing for input directory: {input_directory}")
-        batch_processor.process(input_directory, output_directory)
-        logger.info(f"Batch processing completed. Output saved in: {output_directory}")
-    except Exception as e:
-        logger.error(
-            f"Batch processing failed for input directory {input_directory}: {e}"
-        )
-        raise
+    def execute(self, name: str, *args, **kwargs):
+        """Execute a registered command."""
+        if name not in self.commands:
+            self.logger.error(f"Command '{name}' not found.")
+            raise ValueError(f"Command '{name}' not found.")
+        self.logger.info(f"Executing command '{name}'")
+        return self.commands[name].main(*args, **kwargs)
 
+    def list_commands(self):
+        """List all registered commands."""
+        self.logger.info("Listing all registered commands.")
+        return list(self.commands.keys())
 
-# CLI Commands with Click
+    def register_to_cli(self, cli: click.Group):
+        """Register all commands with a Click group."""
+        for name, command in self.commands.items():
+            cli.add_command(command, name=name)
+        self.logger.info("All commands registered to the CLI.")
 
 
 @click.group()
-def cli():
-    """YouTube Audio Downloader and Transcriber CLI"""
+@inject
+def cli(logger=Provide[AppContainer.logger]):
+    """Unified CLI for managing various tasks."""
+    logger.info("CLI initialized.")
 
 
-@cli.command()
-@click.option(
-    "--url",
-    prompt="Enter YouTube URL",
-    help="YouTube video or channel URL to download.",
-)
-@click.pass_context
-def download(ctx, url):
-    """Download video from YouTube"""
-    command = ctx.obj.get("download_command")
-    command(url)
-
-
-@cli.command()
-@click.argument("audio_file")
-@click.option("--title", prompt="Enter video title", help="Title for the audio file.")
-@click.option(
-    "--use-whisperx",
-    is_flag=True,
-    default=False,
-    help="Use WhisperX for transcription.",
-)
-@click.option(
-    "--fallback-to-whisper",
-    is_flag=True,
-    default=False,
-    help="Use Whisper AI as a fallback if WhisperX fails.",
-)
-@click.pass_context
-def transcribe(ctx, audio_file, title, use_whisperx, fallback_to_whisper):
-    """Transcribe the provided audio file"""
-    command = ctx.obj.get("transcribe_command")
-    command(audio_file, title, use_whisperx, fallback_to_whisper)
-
-
-@cli.command()
-@click.argument("input_directory")
-@click.argument("output_directory")
-@click.pass_context
-def batch_process(ctx, input_directory, output_directory):
-    """Process batch tasks for input directory"""
-    command = ctx.obj.get("batch_command")
-    command(input_directory, output_directory)
-
-
-# Main Entry Point
-
-
-@click.pass_context
-def setup_context(ctx):
+@inject
+def discover_and_register_commands(command_manager: CommandManager):
     """
-    Set up the dependency context for CLI commands.
+    Discover and register all commands dynamically from CLI modules.
     """
-    container = AppContainer()
-    ctx.ensure_object(dict)
-
-    # Add commands to the context
-    ctx.obj["download_command"] = lambda url: download_command(
-        container.pipeline_component_registry.provide_pipeline_components()[
-            "youtube_downloader"
-        ],
-        container.struct_logger,
-        url,
-    )
-    ctx.obj["transcribe_command"] = (
-        lambda audio_file, title, use_whisperx, fallback_to_whisper: transcribe_command(
-            container.transcriber,
-            container.pipeline_component_registry.provide_pipeline_components()[
-                "transcription_pipeline"
-            ],
-            container.struct_logger,
-            container.tracking_utility,
-            audio_file,
-            title,
-            use_whisperx,
-            fallback_to_whisper,
-        )
-    )
-    ctx.obj["batch_command"] = (
-        lambda input_directory, output_directory: batch_process_command(
-            container.batch_processor,
-            container.struct_logger,
-            input_directory,
-            output_directory,
-        )
-    )
+    # Example: Discover commands from each module
+    command_manager.register("audio", cli_audio.cli)
+    command_manager.register("text", cli_text.cli)
+    command_manager.register("download", cli_download.cli)
+    command_manager.register("transcription", cli_transcription.cli)
 
 
 if __name__ == "__main__":
-    cli(obj={})
+    # Dependency injection setup
+    container = AppContainer()
+    container.wire(
+        modules=[
+            "src.cli.cli_audio",
+            "src.cli.cli_text",
+            "src.cli.cli_download",
+            "src.cli.cli_transcription",
+        ]
+    )
+
+    # Initialize logger and performance tracker
+    logger = container.logger()
+    performance_tracker = container.performance_tracker()
+
+    # Initialize Command Manager
+    command_manager = CommandManager(logger=logger)
+
+    # Discover and register commands
+    with performance_tracker.track_execution("Command Registration"):
+        discover_and_register_commands(command_manager)
+
+    # Register commands dynamically with the Click CLI
+    command_manager.register_to_cli(cli)
+
+    # Run the CLI
+    try:
+        cli()
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: {e}")

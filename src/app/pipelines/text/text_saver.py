@@ -1,69 +1,27 @@
-# This module is responsible for saving the processed text to a file.
 import json
 
 import pandas as pd
 
-from src.app.utils.structlog_logger import StructLogger
-from src.app.utils.tracking_utilities import PerformanceTracker
-
-logger = StructLogger.get_logger()
-perf_tracker = PerformanceTracker.get_instance()
+from src.app.pipelines.text.text_processor_base import TextProcessorBase
 
 
-class TextSaver:
-    def __init__(self):
-        pass
-
-    @perf_tracker.track
+class TextSaver(TextProcessorBase):
     def save_to_csv(self, sentences, entities, filepath):
-        if not sentences:
-            logger.warning("No sentences to save. Please process text before saving.")
-            return
-
+        """Save processed data to a CSV file."""
         try:
-            processed_data = pd.DataFrame(
-                {
-                    "Sentence": sentences,
-                    "Entities": [entities for _ in range(len(sentences))],
-                }
-            )
-            processed_data.to_csv(filepath, index=False)
-            logger.info(f"Processed text saved to CSV file at {filepath}.")
+            data = pd.DataFrame({"Sentences": sentences, "Entities": entities})
+            data.to_csv(filepath, index=False)
+            self.logger.info(f"Data saved to CSV at {filepath}.")
         except Exception as e:
-            logger.error(f"Error saving processed text to CSV at {filepath}: {e}")
+            self.logger.error(f"Error saving data to CSV: {e}")
             raise
 
-    @perf_tracker.track
-    def save_to_text(self, sentences, entities, tokens, output_file: str):
-        if not sentences:
-            logger.warning("No sentences to save. Please process text before saving.")
-            return
-
+    def save_to_json(self, data, filepath):
+        """Save processed data to a JSON file."""
         try:
-            with open(output_file, "a", encoding="utf-8") as f:
-                for sentence, entity, token in zip(sentences, entities, tokens):
-                    f.write(f"Sentence: {sentence}, Entity: {entity}, Token: {token}\n")
-            logger.info(f"Processed text saved to text file at {output_file}.")
-        except Exception as e:
-            logger.error(
-                f"Error saving processed text to text file at {output_file}: {e}"
-            )
-            raise
-
-    @perf_tracker.track
-    def save_to_json(self, sentences, entities, tokens, filepath: str):
-        if not sentences:
-            logger.warning("No sentences to save. Please process text before saving.")
-            return
-
-        try:
-            data = [
-                {"Sentence": sentence, "Entities": entity, "Tokens": token}
-                for sentence, entity, token in zip(sentences, entities, tokens)
-            ]
             with open(filepath, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4)
-            logger.info(f"Processed text saved to JSON file at {filepath}.")
+            self.logger.info(f"Data saved to JSON at {filepath}.")
         except Exception as e:
-            logger.error(f"Error saving processed text to JSON at {filepath}: {e}")
+            self.logger.error(f"Error saving data to JSON: {e}")
             raise

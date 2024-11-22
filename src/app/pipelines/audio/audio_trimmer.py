@@ -1,18 +1,21 @@
-# This module is responsible for trimming audio files based on silence threshold.
-from src.app.pipelines.audio.audio_processor_base import AudioProcessorBase
-from src.app.utils.structlog_logger import StructLogger
-from src.app.utils.tracking_utilities import PerformanceTracker
-
-logger = StructLogger.get_logger()
-perf_tracker = PerformanceTracker.get_instance()
+from src.app.pipelines.audio import AudioProcessorBase
 
 
 class AudioTrimmer(AudioProcessorBase):
-    def trim(self, input_file, output_file, silence_thresh=-40):
+    """
+    Trims silence from the beginning and end of audio files.
+    """
+
+    def process(
+        self, input_file: str, output_file: str, silence_thresh: int = -40
+    ) -> str:
         try:
+            self.logger.info(f"Trimming silence from {input_file}")
             audio = self.load_audio(input_file)
             trimmed_audio = audio.strip_silence(silence_thresh=silence_thresh)
-            return self.save_audio(trimmed_audio, output_file)
+            trimmed_file = self.save_audio(trimmed_audio, output_file)
+            self.logger.info(f"Successfully trimmed {input_file}")
+            return trimmed_file
         except Exception as e:
-            logger.error(f"Error trimming audio file {input_file}: {e}")
+            self.logger.error(f"Error trimming audio file {input_file}: {e}")
             raise

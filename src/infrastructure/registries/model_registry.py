@@ -66,7 +66,9 @@ class ModelRegistry(GenericRegistry[Any]):
             name (str): The name of the model.
             model (Any): The model instance to be registered.
         """
-        with self.concurrency.get_lock(), self.tracker.track_execution("Register Model"):
+        with self.concurrency.get_lock(), self.tracker.track_execution(
+            "Register Model"
+        ):
             if self.validate_item(model):
                 self._registered_models[name] = model
                 self.logger.info(f"Model '{name}' registered successfully.")
@@ -108,9 +110,7 @@ class ModelRegistry(GenericRegistry[Any]):
         ):
             if name in self._model_factories:
                 self.logger.error(f"Model factory for '{name}' is already registered.")
-                raise ValueError(
-                    f"Model factory for '{name}' is already registered."
-                )
+                raise ValueError(f"Model factory for '{name}' is already registered.")
 
             self._model_factories[name] = (model_class, args, kwargs)
             self.logger.info(f"Model factory for '{name}' registered successfully.")
@@ -129,12 +129,8 @@ class ModelRegistry(GenericRegistry[Any]):
         """
         with self.concurrency.get_lock(), self.tracker.track_execution("Create Model"):
             if name not in self._model_factories:
-                self.logger.error(
-                    f"Model factory for '{name}' not found in registry."
-                )
-                raise ValueError(
-                    f"Model factory for '{name}' not found in registry."
-                )
+                self.logger.error(f"Model factory for '{name}' not found in registry.")
+                raise ValueError(f"Model factory for '{name}' not found in registry.")
 
             model_class, default_args, default_kwargs = self._model_factories[name]
             combined_args = default_args + args

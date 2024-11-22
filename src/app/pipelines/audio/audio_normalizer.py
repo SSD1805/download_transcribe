@@ -1,19 +1,21 @@
 from pydub import effects
 
-from src.app.pipelines.audio.audio_processor_base import AudioProcessorBase
-from src.app.utils.structlog_logger import StructLogger
-from src.app.utils.tracking_utilities import PerformanceTracker
-
-logger = StructLogger.get_logger()
-perf_tracker = PerformanceTracker.get_instance()
+from src.app.pipelines.audio import AudioProcessorBase
 
 
 class AudioNormalizer(AudioProcessorBase):
-    def normalize(self, input_file, output_file):
+    """
+    Normalizes audio files to a standard volume level.
+    """
+
+    def process(self, input_file: str, output_file: str) -> str:
         try:
+            self.logger.info(f"Normalizing audio file: {input_file}")
             audio = self.load_audio(input_file)
             normalized_audio = effects.normalize(audio)
-            return self.save_audio(normalized_audio, output_file)
+            normalized_file = self.save_audio(normalized_audio, output_file)
+            self.logger.info(f"Successfully normalized {input_file}")
+            return normalized_file
         except Exception as e:
-            logger.error(f"Error normalizing audio file {input_file}: {e}")
+            self.logger.error(f"Error normalizing audio file {input_file}: {e}")
             raise
