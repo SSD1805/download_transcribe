@@ -1,8 +1,9 @@
 # src/utils/structlog_logger.py
-import structlog
+import logging
 import sys
 import threading
-import logging
+
+import structlog
 
 
 class StructLogger:

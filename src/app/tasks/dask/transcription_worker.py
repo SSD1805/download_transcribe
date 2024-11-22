@@ -1,6 +1,7 @@
 from dask.distributed import Client
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure import AppContainer
+from dependency_injector.wiring import Provide, inject
+
+from src.infrastructure.app.app_container import AppContainer
 
 # Set up Dask client
 client = Client("localhost:8786")

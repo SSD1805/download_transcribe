@@ -1,5 +1,7 @@
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure import AppContainer
+from dependency_injector.wiring import Provide, inject
+
+from src.infrastructure.app.app_container import AppContainer
+
 from .transcription_tasks import transcribe_audio
 
 

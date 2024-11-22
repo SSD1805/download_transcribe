@@ -1,11 +1,13 @@
 # src/utils/file_utilities.py
 import os
 import shutil
-import yaml
-import arrow  # Arrow is a library for handling dates and times in Python.
 from typing import Optional
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure import AppContainer
+
+import arrow  # Arrow is a library for handling dates and times in Python.
+import yaml
+from dependency_injector.wiring import Provide, inject
+
+from src.infrastructure.app.app_container import AppContainer
 
 
 class FileUtilityFacade:
@@ -114,7 +116,7 @@ class FileUtilityFacade:
         """Reads YAML data from a file."""
         self.logger.info(f"Reading YAML file at {filepath}.")
         try:
-            with open(filepath, "r") as file:
+            with open(filepath) as file:
                 data = yaml.safe_load(file)
             self.logger.info(f"YAML data read successfully from {filepath}.")
             return data

@@ -1,5 +1,6 @@
 # Description: Django settings for the project.
 import os
+
 import environ
 import structlog
 from celery.signals import setup_logging

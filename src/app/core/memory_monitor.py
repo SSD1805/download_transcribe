@@ -1,9 +1,11 @@
-import psutil
-import time
 import threading
-from src.infrastructure import inject, Provide
-from src.infrastructure import AppContainer
+import time
 import traceback
+
+import psutil
+
+from src.infrastructure import Provide, inject
+from src.infrastructure.app.app_container import AppContainer
 
 
 class MemoryMonitor:

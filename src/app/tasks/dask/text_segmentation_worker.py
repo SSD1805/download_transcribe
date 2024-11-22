@@ -1,8 +1,7 @@
 from dask.distributed import Client
-from .observable_task import ObservableTask
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure import AppContainer
-from tasks.observers import LoggerObserver
+from dependency_injector.wiring import Provide, inject
+
+from src.infrastructure.app.app_container import AppContainer
 
 # Set up Dask client
 client = Client("localhost:8786")
@@ -34,8 +33,6 @@ def text_segmentation_task(
 
 # Submit the task to Dask
 future = client.submit(text_segmentation_task, "Sample text for segmentation.")
-
-from tasks.observers import LoggerObserver, DaskCoordinatorObserver
 
 
 @inject
@@ -68,10 +65,9 @@ def text_segmentation_task(
 
 
 from dask.distributed import Client
-from .observable_task import ObservableTask
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure import AppContainer
-from tasks.observers import LoggerObserver
+from dependency_injector.wiring import Provide, inject
+
+from src.infrastructure.app.app_container import AppContainer
 
 # Set up Dask client
 client = Client("localhost:8786")
@@ -103,8 +99,6 @@ def text_segmentation_task(
 
 # Submit the task to Dask
 future = client.submit(text_segmentation_task, "Sample text for segmentation.")
-
-from tasks.observers import LoggerObserver, DaskCoordinatorObserver
 
 
 @inject

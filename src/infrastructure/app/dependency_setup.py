@@ -1,8 +1,10 @@
 # src/infrastructure/dependency_setup.py
 
-from src.infrastructure import AppContainer
-from dependency_injector.wiring import Provide, inject
 import logging
+
+from dependency_injector.wiring import Provide, inject
+
+from src.infrastructure.app.app_container import AppContainer
 
 # Initialize the dependency injection container
 container = AppContainer()

@@ -73,10 +73,24 @@ pre-commit = ">=3.3,<5.0"  # Pre-commit hooks
 rope = ">=1.2,<2.0"  # Python refactoring library
 
 [tool.ruff]
-line-length = 88  # Matches Black's default
-select = ["E", "F", "I", "C"]  # Includes linting and import sorting
-ignore = ["E203", "W503"]  # Black-compatible rules
-target-version = "py310"  # Target Python version
+line-length = 88  # Match Black's default
+select = [
+    "E",    # pycodestyle
+    "F",    # Pyflakes
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "I",    # isort
+]
+
+ignore = ["E203"]  # Ignore Black-compatible line-break-before-binary-operator rule
+
+exclude = [
+    "__pycache__/",
+    ".venv/",
+    "migrations/",  # Optional: Skip Django migrations
+    "*.test.py",    # Optional: Skip test files
+]
 
 [tool.poetry.scripts]
 app = "app:cli"

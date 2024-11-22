@@ -1,7 +1,7 @@
-from typing import Any, Type, Callable, Dict
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure import AppContainer
-from src.infrastructure import GenericRegistry
+from typing import Any, Callable, Dict, Type
+
+from dependency_injector.wiring import Provide, inject
+from src.infrastructure.app.app_container import AppContainer, GenericRegistry
 
 
 class ModelRegistry(GenericRegistry[Any]):
@@ -51,7 +51,7 @@ class ModelRegistry(GenericRegistry[Any]):
         Returns:
             bool: Whether the model instance is valid.
         """
-        if hasattr(item, "predict") and callable(getattr(item, "predict")):
+        if hasattr(item, "predict") and callable(item.predict):
             self.logger.info("Validated model item successfully.")
             return True
         else:

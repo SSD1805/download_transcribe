@@ -1,30 +1,37 @@
+import logging
+
+import structlog
 from dependency_injector import containers, providers
-from src.app.utils import StructLogger
-from src.app.utils import ConcurrencyManager
-from src.app.utils import FileManager, DirectoryManager, FilenameSanitizer
-from src.app.pipelines.transcription.audio_transcriber import AudioTranscriber
-from src.app.pipelines.transcription.transcription_pipeline import TranscriptionPipeline
-from src.app.pipelines import TranscriptionSaver
+
+from src.app.core import SingletonLogger, SingletonPerformanceTracker
+from src.app.core.batch_processor import BatchProcessor
+from src.app.core.memory_monitor import MemoryMonitor
+from src.app.modules import (
+    AudioHandler,
+    DownloadCoordinator,
+    HelperFunctions,
+    ModelLoader,
+    PipelineManager,
+    TextProcessor,
+)
+from src.app.pipelines import NERProcessor, TranscriptionSaver
 from src.app.pipelines.download.download_handler import DownloadManager
 from src.app.pipelines.download.youtube_downloader import YouTubeDownloader
-from src.app.pipelines import NERProcessor
 from src.app.pipelines.text.text_loader import TextLoader
 from src.app.pipelines.text.text_saver import TextSaver
 from src.app.pipelines.text.text_segmenter import TextSegmenter
 from src.app.pipelines.text.text_tokenizer import TextTokenizer
+from src.app.pipelines.transcription.audio_transcriber import AudioTranscriber
+from src.app.pipelines.transcription.transcription_pipeline import TranscriptionPipeline
+from src.app.utils import (
+    ConcurrencyManager,
+    DirectoryManager,
+    FileManager,
+    FilenameSanitizer,
+    StructLogger,
+)
 from src.infrastructure import ConfigurationRegistry
 from src.infrastructure.registries.model_registry import ModelRegistry
-from src.app.core.batch_processor import BatchProcessor
-from src.app.core.memory_monitor import MemoryMonitor
-from src.app.core import SingletonLogger, SingletonPerformanceTracker
-from src.app.modules import AudioHandler
-from src.app.modules import DownloadCoordinator
-from src.app.modules import PipelineManager
-from src.app.modules import TextProcessor
-from src.app.modules import ModelLoader
-from src.app.modules import HelperFunctions
-import structlog
-import logging
 
 
 class AppContainer(containers.DeclarativeContainer):

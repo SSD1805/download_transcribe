@@ -1,6 +1,6 @@
 from threading import Lock
-from src.infrastructure import inject, Provide
-from src.infrastructure import AppContainer
+
+from src.infrastructure.app.app_container import AppContainer, Provide, inject
 
 
 class SingletonLogger:

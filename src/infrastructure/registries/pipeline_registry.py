@@ -1,7 +1,8 @@
-from typing import Callable, Type, Dict
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure import AppContainer
 from abc import ABC, abstractmethod
+from typing import Callable, Dict, Type
+
+from dependency_injector.wiring import Provide, inject
+from src.infrastructure.app.app_container import AppContainer
 
 
 # Define an abstract PipelineComponent class for Composite Pattern

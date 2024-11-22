@@ -1,7 +1,8 @@
 # Description: Module to tokenize text data using NLTK library.
 import nltk
-from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
 from src.app.utils.structlog_logger import StructLogger
 from src.app.utils.tracking_utilities import PerformanceTracker
 

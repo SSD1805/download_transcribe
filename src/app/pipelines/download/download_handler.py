@@ -1,7 +1,9 @@
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure.app.app_container import AppContainer
 import os
+
 import yt_dlp
+from dependency_injector.wiring import Provide, inject
+
+from src.infrastructure.app.app_container import AppContainer
 
 
 class DownloadManager:

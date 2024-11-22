@@ -1,8 +1,9 @@
 from celery import Celery
+from dependency_injector.wiring import Provide, inject
+
+from src.infrastructure.app.app_container import AppContainer
+
 from .observable_task import ObservableTask
-from .observers import LoggerObserver
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure import AppContainer
 
 app = Celery("tasks", broker="pyamqp://guest@localhost//")
 

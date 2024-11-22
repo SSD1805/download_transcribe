@@ -1,12 +1,13 @@
 # src/utils/tracking_utilities.py
 import time
-import psutil
 from abc import ABC, abstractmethod
-from typing import Optional, Iterable
 from contextlib import contextmanager
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure import AppContainer
+from typing import Iterable, Optional
+
+from dependency_injector.wiring import Provide, inject
 from tqdm import tqdm
+
+from src.infrastructure.app.app_container import AppContainer
 
 
 class TrackerStrategy(ABC):

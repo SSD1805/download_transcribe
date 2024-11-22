@@ -1,8 +1,10 @@
-from typing import Callable, Dict, Union, TypeVar, Generic
-from threading import Lock
 from abc import ABC, abstractmethod
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure import AppContainer
+from threading import Lock
+from typing import Callable, Dict, Generic, TypeVar, Union
+
+from dependency_injector.wiring import Provide, inject
+
+from src.infrastructure.app.app_container import AppContainer
 
 # Define a generic type for the registries.
 T = TypeVar("T")

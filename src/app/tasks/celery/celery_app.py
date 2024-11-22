@@ -1,5 +1,6 @@
 ### celery_app.py ###
 from celery_app import Celery
+
 from src.infrastructure import container
 
 # Create Celery app instance using ConfigurationRegistry

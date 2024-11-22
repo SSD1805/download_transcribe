@@ -1,6 +1,7 @@
 # This module is responsible for saving the transcriptions to a file.
-import os
 import json
+import os
+
 from src.app.utils.structlog_logger import StructLogger
 from src.app.utils.tracking_utilities import PerformanceTracker
 

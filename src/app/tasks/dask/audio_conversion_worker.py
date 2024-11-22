@@ -1,8 +1,9 @@
 from dask.distributed import Client
+from dependency_injector.wiring import Provide, inject
+
+from src.infrastructure.app.app_container import AppContainer
+
 from .observable_task import ObservableTask
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure import AppContainer
-from tasks.observers import LoggerObserver
 
 # Set up Dask client
 client = Client("localhost:8786")

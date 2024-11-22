@@ -1,5 +1,6 @@
 from dask.distributed import Client, WorkerPlugin
-from dependency_injector.wiring import inject, Provide
+from dependency_injector.wiring import Provide, inject
+
 from src.infrastructure.app.app_container import AppContainer
 
 

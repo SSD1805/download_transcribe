@@ -3,9 +3,9 @@ CLI application for YouTube audio downloading, transcription, and batch processi
 """
 
 import click
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure.app.app_container import AppContainer
+from dependency_injector.wiring import inject
 
+from src.infrastructure.app.app_container import AppContainer
 
 # CLI Command Functions
 
@@ -25,7 +25,16 @@ def download_command(downloader, logger, url):
 
 
 @inject
-def transcribe_command(transcriber, pipeline, logger, performance_tracker, audio_file, title, use_whisperx, fallback_to_whisper):
+def transcribe_command(
+    transcriber,
+    pipeline,
+    logger,
+    performance_tracker,
+    audio_file,
+    title,
+    use_whisperx,
+    fallback_to_whisper,
+):
     """
     Command to handle transcribing an audio file.
     """
@@ -35,7 +44,10 @@ def transcribe_command(transcriber, pipeline, logger, performance_tracker, audio
             with performance_tracker.track_execution("transcription_pipeline"):
                 success = pipeline.transcribe_audio(audio_file, title)
             if not success and fallback_to_whisper:
-                logger.warning(f"WhisperX failed. Falling back to Whisper AI for audio file: {audio_file}")
+                logger.warning(
+                    f"WhisperX failed. Falling back to Whisper AI for audio file: "
+                    f"{audio_file}"
+                )
                 transcriber.transcribe_audio(audio_file, title)
         else:
             logger.info(f"Using Whisper AI to transcribe audio file: {audio_file}")
@@ -58,7 +70,9 @@ def batch_process_command(batch_processor, logger, input_directory, output_direc
         batch_processor.process(input_directory, output_directory)
         logger.info(f"Batch processing completed. Output saved in: {output_directory}")
     except Exception as e:
-        logger.error(f"Batch processing failed for input directory {input_directory}: {e}")
+        logger.error(
+            f"Batch processing failed for input directory {input_directory}: {e}"
+        )
         raise
 
 
@@ -71,7 +85,11 @@ def cli():
 
 
 @cli.command()
-@click.option("--url", prompt="Enter YouTube URL", help="YouTube video or channel URL to download.")
+@click.option(
+    "--url",
+    prompt="Enter YouTube URL",
+    help="YouTube video or channel URL to download.",
+)
 @click.pass_context
 def download(ctx, url):
     """Download video from YouTube"""
@@ -82,8 +100,18 @@ def download(ctx, url):
 @cli.command()
 @click.argument("audio_file")
 @click.option("--title", prompt="Enter video title", help="Title for the audio file.")
-@click.option("--use-whisperx", is_flag=True, default=False, help="Use WhisperX for transcription.")
-@click.option("--fallback-to-whisper", is_flag=True, default=False, help="Use Whisper AI as a fallback if WhisperX fails.")
+@click.option(
+    "--use-whisperx",
+    is_flag=True,
+    default=False,
+    help="Use WhisperX for transcription.",
+)
+@click.option(
+    "--fallback-to-whisper",
+    is_flag=True,
+    default=False,
+    help="Use Whisper AI as a fallback if WhisperX fails.",
+)
 @click.pass_context
 def transcribe(ctx, audio_file, title, use_whisperx, fallback_to_whisper):
     """Transcribe the provided audio file"""
@@ -114,25 +142,33 @@ def setup_context(ctx):
 
     # Add commands to the context
     ctx.obj["download_command"] = lambda url: download_command(
-        container.pipeline_component_registry.provide_pipeline_components()["youtube_downloader"],
+        container.pipeline_component_registry.provide_pipeline_components()[
+            "youtube_downloader"
+        ],
         container.struct_logger,
         url,
     )
-    ctx.obj["transcribe_command"] = lambda audio_file, title, use_whisperx, fallback_to_whisper: transcribe_command(
-        container.transcriber,
-        container.pipeline_component_registry.provide_pipeline_components()["transcription_pipeline"],
-        container.struct_logger,
-        container.tracking_utility,
-        audio_file,
-        title,
-        use_whisperx,
-        fallback_to_whisper,
+    ctx.obj["transcribe_command"] = (
+        lambda audio_file, title, use_whisperx, fallback_to_whisper: transcribe_command(
+            container.transcriber,
+            container.pipeline_component_registry.provide_pipeline_components()[
+                "transcription_pipeline"
+            ],
+            container.struct_logger,
+            container.tracking_utility,
+            audio_file,
+            title,
+            use_whisperx,
+            fallback_to_whisper,
+        )
     )
-    ctx.obj["batch_command"] = lambda input_directory, output_directory: batch_process_command(
-        container.batch_processor,
-        container.struct_logger,
-        input_directory,
-        output_directory,
+    ctx.obj["batch_command"] = (
+        lambda input_directory, output_directory: batch_process_command(
+            container.batch_processor,
+            container.struct_logger,
+            input_directory,
+            output_directory,
+        )
     )
 
 

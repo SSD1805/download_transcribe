@@ -1,7 +1,9 @@
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure import AppContainer
-import threading
 import os
+import threading
+
+from dependency_injector.wiring import Provide, inject
+
+from src.infrastructure.app.app_container import AppContainer
 
 
 class ConfigManager:
@@ -45,7 +47,7 @@ class ConfigManager:
                 )
 
             try:
-                with open(self.config_path, "r") as config_file:
+                with open(self.config_path) as config_file:
                     config_data = self.yaml_parser.safe_load(config_file)
                     self.logger.info(f"Configuration loaded from {self.config_path}")
                     return config_data

@@ -1,6 +1,7 @@
-from dependency_injector.wiring import inject, Provide
-from src.infrastructure import AppContainer
 import click
+from dependency_injector.wiring import Provide, inject
+
+from src.infrastructure.app.app_container import AppContainer
 
 
 class TextProcessor:
@@ -55,7 +56,7 @@ def process(
             click.echo(f"Processed text saved to: {output_filepath}")
     except Exception as e:
         logger.error(f"Failed to process text: {e}")
-        click.echo(f"Error: Failed to process text. Check logs for more details.")
+        click.echo("Error: Failed to process text. Check logs for more details.")
 
 
 if __name__ == "__main__":
