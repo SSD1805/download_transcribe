@@ -5,8 +5,6 @@ from src.infrastructure.app.app_container import AppContainer
 
 from .commands.base_command import BaseCommand
 
-# Command Classes for Different Audio Tasks
-
 
 class NormalizeAudioCommand(BaseCommand):
     """
@@ -14,19 +12,16 @@ class NormalizeAudioCommand(BaseCommand):
     """
 
     @inject
-    def __init__(
-        self,
-        handler=Provide[
-            AppContainer.pipeline_component_registry.provide_pipeline_components().get(
-                "audio_handler"
-            )
-        ],
-        logger=Provide[AppContainer.struct_logger],
-    ):
-        self.handler = handler
+    def __init__(self, logger=Provide[AppContainer.struct_logger]):
+        self.handler = None
         self.logger = logger
 
+    @inject
+    def setup_handler(self, pipeline_registry=Provide[AppContainer.pipeline_component_registry]):
+        self.handler = pipeline_registry.provide_pipeline_components().get("audio_handler")
+
     def execute(self, input_file, output_file):
+        self.setup_handler()
         try:
             self.logger.info(f"Normalizing audio file: {input_file}")
             result = self.handler.normalize_audio(input_file, output_file)
@@ -42,19 +37,16 @@ class SplitAudioCommand(BaseCommand):
     """
 
     @inject
-    def __init__(
-        self,
-        handler=Provide[
-            AppContainer.pipeline_component_registry.provide_pipeline_components().get(
-                "audio_handler"
-            )
-        ],
-        logger=Provide[AppContainer.struct_logger],
-    ):
-        self.handler = handler
+    def __init__(self, logger=Provide[AppContainer.struct_logger]):
+        self.handler = None
         self.logger = logger
 
+    @inject
+    def setup_handler(self, pipeline_registry=Provide[AppContainer.pipeline_component_registry]):
+        self.handler = pipeline_registry.provide_pipeline_components().get("audio_handler")
+
     def execute(self, input_file, chunk_duration, output_file_prefix):
+        self.setup_handler()
         try:
             self.logger.info(
                 f"Splitting audio file: {input_file} into chunks of {chunk_duration} seconds."
@@ -74,19 +66,16 @@ class TrimAudioCommand(BaseCommand):
     """
 
     @inject
-    def __init__(
-        self,
-        handler=Provide[
-            AppContainer.pipeline_component_registry.provide_pipeline_components().get(
-                "audio_handler"
-            )
-        ],
-        logger=Provide[AppContainer.struct_logger],
-    ):
-        self.handler = handler
+    def __init__(self, logger=Provide[AppContainer.struct_logger]):
+        self.handler = None
         self.logger = logger
 
+    @inject
+    def setup_handler(self, pipeline_registry=Provide[AppContainer.pipeline_component_registry]):
+        self.handler = pipeline_registry.provide_pipeline_components().get("audio_handler")
+
     def execute(self, input_file, output_file, silence_thresh):
+        self.setup_handler()
         try:
             self.logger.info(f"Trimming silence from audio file: {input_file}")
             result = self.handler.trim_audio(input_file, output_file, silence_thresh)
@@ -102,19 +91,16 @@ class ConvertAudioCommand(BaseCommand):
     """
 
     @inject
-    def __init__(
-        self,
-        handler=Provide[
-            AppContainer.pipeline_component_registry.provide_pipeline_components().get(
-                "audio_handler"
-            )
-        ],
-        logger=Provide[AppContainer.struct_logger],
-    ):
-        self.handler = handler
+    def __init__(self, logger=Provide[AppContainer.struct_logger]):
+        self.handler = None
         self.logger = logger
 
+    @inject
+    def setup_handler(self, pipeline_registry=Provide[AppContainer.pipeline_component_registry]):
+        self.handler = pipeline_registry.provide_pipeline_components().get("audio_handler")
+
     def execute(self, input_file, output_file, target_format):
+        self.setup_handler()
         try:
             self.logger.info(
                 f"Converting audio file: {input_file} to format: {target_format}"
@@ -129,7 +115,6 @@ class ConvertAudioCommand(BaseCommand):
 # Other command classes like running the transcription pipeline can follow a similar pattern.
 
 # CLI Commands with Click
-
 
 @click.group()
 def cli():
@@ -188,7 +173,6 @@ def setup_context(ctx):
     """
     Set up the dependency context for CLI commands.
     """
-    container = AppContainer()
     ctx.ensure_object(dict)
 
     # Instantiate command classes and add them to the context
@@ -198,8 +182,6 @@ def setup_context(ctx):
     ctx.obj["convert_command"] = ConvertAudioCommand()
 
 
-# Inject the setup_context to initialize commands
 if __name__ == "__main__":
-    cli(
-        obj={}
-    )  # Initialize with an empty context dictionary and let Click pass it to commands
+    cli(obj={})
+

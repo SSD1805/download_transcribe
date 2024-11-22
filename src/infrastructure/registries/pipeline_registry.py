@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Callable, Dict, Type
 
 from dependency_injector.wiring import Provide, inject
+
 from src.infrastructure.app.app_container import AppContainer
 
 
@@ -74,9 +75,9 @@ class PipelineRegistry:
         concurrency=Provide[AppContainer.concurrency_utilities],
     ):
         if not cls._instance:
-            with concurrency.get_lock():  # Use concurrency utility for thread safety
+            with concurrency.get_lock():
                 if not cls._instance:
-                    cls._instance = super(PipelineRegistry, cls).__new__(cls)
+                    cls._instance = super().__new__(cls)
                     cls._instance._init_singleton(generic_registry, concurrency)
         return cls._instance
 
@@ -98,26 +99,18 @@ class PipelineRegistry:
     def validate_item(self, item: PipelineComponent) -> bool:
         """
         Validate if the item being registered is a valid PipelineComponent.
-
-        Args:
-            item (PipelineComponent): The pipeline component to validate.
-
-        Returns:
-            bool: Whether the pipeline component is valid.
         """
         if isinstance(item, PipelineComponent):
             self.logger.info("Validated pipeline component successfully.")
             return True
-        else:
-            self.logger.error(
-                "Invalid pipeline component. It must be an instance of PipelineComponent."
-            )
-            return False
+        self.logger.error(
+            "Invalid pipeline component. "
+            "It must be an instance of PipelineComponent."
+        )
+        return False
 
     def register_processor(self, name: str, processor_function: Callable):
-        """
-        Register a processor for the pipeline.
-        """
+        """Register a processor for the pipeline."""
         processor = Processor(processor_function)
         with self.concurrency.get_lock():
             if self.validate_item(processor):
@@ -125,9 +118,7 @@ class PipelineRegistry:
                 self.logger.info(f"Processor '{name}' registered successfully.")
 
     def register_handler(self, name: str, handler_function: Callable):
-        """
-        Register a handler for the pipeline.
-        """
+        """Register a handler for the pipeline."""
         handler = Handler(handler_function)
         with self.concurrency.get_lock():
             if self.validate_item(handler):
@@ -137,9 +128,7 @@ class PipelineRegistry:
     def register_batch_processor(
         self, name: str, batch_processor_class: Type, *args, **kwargs
     ):
-        """
-        Register a batch processor class for the pipeline.
-        """
+        """Register a batch processor class for the pipeline."""
         batch_processor = BatchProcessor(batch_processor_class, *args, **kwargs)
         with self.concurrency.get_lock():
             if self.validate_item(batch_processor):
@@ -147,45 +136,29 @@ class PipelineRegistry:
                 self.logger.info(f"Batch Processor '{name}' registered successfully.")
 
     def add_to_composite(self, name: str):
-        """
-        Add a registered component to the composite pipeline.
-        """
+        """Add a registered component to the composite pipeline."""
         component = self.generic_registry.get_item(name)
         self._composite_pipeline.add(name, component)
         self.logger.info(f"Component '{name}' added to composite pipeline.")
 
     def execute_pipeline(self, *args, **kwargs):
-        """
-        Execute all components in the composite pipeline.
-        """
-        with self.concurrency.get_lock():
-            with self.tracker.track_execution("Execute Composite Pipeline"):
-                result = self._composite_pipeline.execute(*args, **kwargs)
-                self.logger.info("Executed composite pipeline successfully.")
-                return result
+        """Execute all components in the composite pipeline."""
+        with self.concurrency.get_lock(), self.tracker.track_execution(
+            "Execute Composite Pipeline"
+        ):
+            result = self._composite_pipeline.execute(*args, **kwargs)
+            self.logger.info("Executed composite pipeline successfully.")
+            return result
 
 
 # Example Usage
 if __name__ == "__main__":
     from src.infrastructure import container
 
-    # Wire the AppContainer dependencies to this module
     container.wire(modules=[__name__])
 
-    # Get the singleton instance of PipelineRegistry
     pipeline_registry = PipelineRegistry()
-
-    # Register processors, handlers, and batch processors
     pipeline_registry.register_processor("example_processor", lambda x: x * 2)
-    pipeline_registry.register_handler("example_handler", lambda x: f"Handled {x}")
-    pipeline_registry.register_batch_processor(
-        "example_batch_processor", BatchProcessor, lambda x: [item * 2 for item in x]
-    )
-
-    # Add components to the composite pipeline
     pipeline_registry.add_to_composite("example_processor")
-    pipeline_registry.add_to_composite("example_handler")
-
-    # Execute the entire composite pipeline
-    pipeline_result = pipeline_registry.execute_pipeline(5)
-    print(f"Pipeline Execution Result: {pipeline_result}")
+    result = pipeline_registry.execute_pipeline(5)
+    print(f"Pipeline Execution Result: {result}")

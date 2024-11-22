@@ -3,7 +3,7 @@ import os
 import shutil
 from typing import Optional
 
-import arrow  # Arrow is a library for handling dates and times in Python.
+import pendulum  # Replacing Arrow with Pendulum
 import yaml
 from dependency_injector.wiring import Provide, inject
 
@@ -135,18 +135,18 @@ class FileUtilityFacade:
             self.logger.error(f"Failed to write YAML file {filepath}: {e}")
             raise
 
-    # Timestamp Utilities using Arrow
+    # Timestamp Utilities using Pendulum
     def format_timestamp(self, timestamp=None):
         """Formats the given timestamp to 'YYYY-MM-DD HH:MM:SS'. Uses the current time if no timestamp is provided."""
         if timestamp is None:
-            timestamp = arrow.now()
+            timestamp = pendulum.now()
         formatted = timestamp.format("YYYY-MM-DD HH:mm:ss")
         self.logger.info(f"Formatted timestamp: {formatted}")
         return formatted
 
     def get_current_timestamp(self):
-        """Returns the current timestamp using Arrow."""
-        current_timestamp = arrow.now()
+        """Returns the current timestamp using Pendulum."""
+        current_timestamp = pendulum.now()
         self.logger.info(f"Current timestamp: {current_timestamp}")
         return current_timestamp
 
