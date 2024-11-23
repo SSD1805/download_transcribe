@@ -1,4 +1,4 @@
-from src.app.pipelines.base_pipeline import BasePipeline
+from src.app.pipelines.transcription.basepipeline import BasePipeline
 import os
 
 

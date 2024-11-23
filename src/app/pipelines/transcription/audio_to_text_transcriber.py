@@ -1,4 +1,4 @@
-from src.pipelines.base_pipeline import BasePipeline
+from src.app.pipelines.basepipeline import BasePipeline
 
 
 class AudioTranscriber(BasePipeline):

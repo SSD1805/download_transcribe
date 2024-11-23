@@ -2,7 +2,7 @@ from dependency_injector.wiring import Provide, inject
 
 from src.infrastructure.app.app_container import AppContainer
 
-from .transcription_tasks import transcribe_audio
+from .transcription_tasks_celery import transcribe_audio
 
 
 class DownloadCoordinatorObserver:
