@@ -64,7 +64,7 @@ class CompositePipeline(PipelineComponent):
 class PipelineRegistry:
     """
     Registry for managing and executing components across multiple pipelines.
-    Supports dynamic registration of processors, handlers, batch processors, and audio pipeline components.
+    Supports dynamic registration of processors, handlers, batch processors, and audio_processing pipeline components.
     """
 
     _instance = None
@@ -139,7 +139,7 @@ class PipelineRegistry:
     def register_audio_component(
         self, name: str, component_class: Type[AudioProcessorBase], *args, **kwargs
     ):
-        """Register an audio processing component."""
+        """Register an audio_processing processing component."""
         component = component_class(*args, **kwargs)
         if not isinstance(component, AudioProcessorBase):
             raise ValueError(

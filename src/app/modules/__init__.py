@@ -1,10 +1,9 @@
-from .audio_handler import AudioHandler
-from .config_manager import ConfigManager
+from .audio_command_handler import AudioHandler
+from .configuration_manager import ConfigManager
 from .download_command import DownloadCommand
-from .helper_functions import HelperFunctions
-from .model_loader import ModelLoader
 from .pipeline_manager import PipelineManager
 from .text_handler import TextHandler
+from .transcription_model_loader import ModelLoader
 
 __all__ = [
     "ConfigManager",

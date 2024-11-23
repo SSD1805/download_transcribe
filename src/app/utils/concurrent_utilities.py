@@ -1,4 +1,4 @@
-# src/utils/concurrency_utilities.py
+# src/utils/concurrent_utilities.py
 import concurrent.futures
 import threading
 from abc import ABC, abstractmethod

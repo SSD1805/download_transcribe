@@ -29,7 +29,7 @@ def audio_conversion_task(
     try:
         observable_task.notify_observers("task_started", {"audio_file": audio_file})
 
-        # Task logic here - e.g., convert the audio file
+        # Task logic here - e.g., convert the audio_processing file
         result = f"Converted {audio_file}"  # Placeholder for actual conversion logic
 
         observable_task.notify_observers(
@@ -64,7 +64,7 @@ def audio_conversion_task(
     try:
         observable_task.notify_observers("task_started", {"audio_file": audio_file})
 
-        # Task logic here - e.g., convert the audio file
+        # Task logic here - e.g., convert the audio_processing file
         result = f"Converted {audio_file}"  # Placeholder for actual conversion logic
 
         observable_task.notify_observers(
@@ -95,7 +95,7 @@ def audio_conversion_task(
     try:
         observable_task.notify_observers("task_started", {"audio_file": audio_file})
 
-        # Task logic here - e.g., convert the audio file
+        # Task logic here - e.g., convert the audio_processing file
         result = f"Converted {audio_file}"  # Placeholder for actual conversion logic
 
         observable_task.notify_observers(

@@ -18,7 +18,7 @@ def save_text_task(
     perf_tracker=Provide[AppContainer.performance_tracker],
 ):
     """
-    Save processed text and track performance.
+    Save processed text_processing and track performance.
 
     Args:
         processed_sentences (list): The processed sentences to save.
@@ -26,14 +26,14 @@ def save_text_task(
         output_filepath (str): The output file path.
     """
     with perf_tracker.track_execution("Text Saving"):
-        logger.info("Starting text saving task.")
+        logger.info("Starting text_processing saving task.")
         try:
             saver.save_processed_text(
                 processed_sentences, identified_entities, output_filepath
             )
             logger.info(f"Text saved successfully to {output_filepath}.")
         except Exception as e:
-            logger.error(f"Error saving text to {output_filepath}: {e}")
+            logger.error(f"Error saving text_processing to {output_filepath}: {e}")
             raise
 
 
@@ -43,7 +43,7 @@ def save_text_task(
 @click.argument("output_filepath")
 @inject
 def main(sentences, entities, output_filepath):
-    """Command-line entry for saving text."""
+    """Command-line entry for saving text_processing."""
     future = client.submit(save_text_task, sentences, entities, output_filepath)
     click.echo(f"Save completed for file: {output_filepath}")
 

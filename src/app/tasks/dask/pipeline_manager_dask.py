@@ -61,7 +61,7 @@ class PipelineManager:
         for text in text_batch:
             try:
                 with self.performance_tracker.track_execution("Pipeline Task"):
-                    # Schedule tasks for each text item in the batch
+                    # Schedule tasks for each text_processing item in the batch
                     future_load = self.client.submit(text_loader.load_text, text)
                     loaded_text = future_load.result()
 
@@ -87,10 +87,10 @@ class PipelineManager:
                     )
                     results.append(future_save.result())
 
-                    self.logger.info(f"Processed text and saved to {output_file}")
+                    self.logger.info(f"Processed text_processing and saved to {output_file}")
 
             except Exception as e:
-                self.logger.error(f"Error processing text batch item: {e}")
+                self.logger.error(f"Error processing text_processing batch item: {e}")
 
         return results
 
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     container.wire(modules=[__name__])
 
     # Sample data and output filepath
-    sample_texts = ["This is a sample text.", "Another text for processing."]
+    sample_texts = ["This is a sample text_processing.", "Another text_processing for processing."]
     sample_output_filepath = "/data/data/processed_output.csv"
 
     # Initialize the pipeline manager

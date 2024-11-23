@@ -16,16 +16,16 @@ def load_text_task(
     perf_tracker=Provide[AppContainer.performance_tracker],
 ):
     """
-    Load text for processing and track performance.
+    Load text_processing for processing and track performance.
     """
     with perf_tracker.track_execution("Text Loading"):
-        logger.info("Starting text loading task.")
+        logger.info("Starting text_processing loading task.")
         try:
             result = loader.load_text(text)
             logger.info("Text loading completed successfully.")
             return result
         except Exception as e:
-            logger.error(f"Error loading text: {e}")
+            logger.error(f"Error loading text_processing: {e}")
             raise
 
 
@@ -33,7 +33,7 @@ def load_text_task(
 @click.argument("sample_text")
 @inject
 def main(sample_text: str):
-    """Command-line entry for loading text."""
+    """Command-line entry for loading text_processing."""
     future = client.submit(load_text_task, sample_text)
     click.echo(f"Text Loading Result: {future.result()}")
 

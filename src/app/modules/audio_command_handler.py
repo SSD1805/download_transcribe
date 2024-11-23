@@ -7,7 +7,7 @@ from src.infrastructure import container, di_inject, di_Provide
 class AudioCommand(ABC):
     @abstractmethod
     def execute(self, **kwargs):
-        """Method to execute the audio command."""
+        """Method to execute the audio_processing command."""
         pass
 
 
@@ -75,7 +75,7 @@ class AudioHandler:
                     f"Registered command for operation '{operation_name}' is not a valid AudioCommand."
                 )
 
-            self.logger.info(f"Executing audio operation '{operation_name}'")
+            self.logger.info(f"Executing audio_processing operation '{operation_name}'")
 
             # Add logger to kwargs so commands can use it
             kwargs["logger"] = self.logger

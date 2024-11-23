@@ -7,7 +7,7 @@ from src.infrastructure import container  # This is used for wiring the dependen
 @shared_task
 @inject
 def cleanup_old_data(
-    logger=Provide[container.logger], file_manager=Provide[container.file_manager]
+    logger=Provide[container.logger], file_manager=Provide[container.file_utilities]
 ):
     """
     Celery task to clean up old data or files.

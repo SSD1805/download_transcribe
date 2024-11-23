@@ -18,13 +18,18 @@ from src.app.cli import (
 )
 from src.app.core import SingletonLogger, SingletonPerformanceTracker
 from src.app.modules import HelperFunctions, PipelineManager
-from src.app.pipelines.audio import (
+from src.app.pipelines.audio_processing import (
     AudioConverter,
     AudioNormalizer,
     AudioSplitter,
     AudioTrimmer,
 )
-from src.app.pipelines.text import TextLoader, TextSaver, TextSegmenter, TextTokenizer
+from src.app.pipelines.text_processing import (
+    TextLoader,
+    TextSaver,
+    TextSegmenter,
+    TextTokenizer,
+)
 from src.app.pipelines.transcription import AudioTranscriber, TranscriptionPipeline
 from src.app.utils import ConcurrentTask, FileUtilityFacade, StructLogger
 from src.infrastructure.registries import (
@@ -43,9 +48,9 @@ class AppContainer(containers.DeclarativeContainer):
     # Shared Utilities
     logger = providers.Singleton(SingletonLogger.get_instance)
     performance_tracker = providers.Singleton(SingletonPerformanceTracker.get_instance)
-    helper_functions = providers.Singleton(HelperFunctions)
     concurrent_task = providers.Singleton(ConcurrentTask)
-    file_manager = providers.Singleton(FileUtilityFacade)
+    file_utilities = providers.Singleton(FileUtilityFacade)
+    timestamp = providers.Singleton(HelperFunctions.get_timestamp)
 
     # Structlog Configuration
     @providers.Singleton

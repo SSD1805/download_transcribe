@@ -17,5 +17,5 @@ FROM python:3.11-slim
 WORKDIR /app
 COPY --from=builder /app /app
 
-# Run the text processing service
+# Run the text_processing processing service
 CMD ["poetry", "run", "python", "src/cli/cli_text_processor.py"]

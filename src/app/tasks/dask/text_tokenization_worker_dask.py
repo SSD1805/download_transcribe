@@ -18,16 +18,16 @@ def tokenize_text_task(
     perf_tracker=Provide[AppContainer.performance_tracker],
 ):
     """
-    Tokenize text into words and track performance.
+    Tokenize text_processing into words and track performance.
     """
     with perf_tracker.track_execution("Text Tokenization"):
-        logger.info("Starting text tokenization task.")
+        logger.info("Starting text_processing tokenization task.")
         try:
             result = tokenizer.tokenize_text(text)
             logger.info("Text tokenization completed successfully.")
             return result
         except Exception as e:
-            logger.error(f"Error during text tokenization: {e}")
+            logger.error(f"Error during text_processing tokenization: {e}")
             raise
 
 
@@ -35,7 +35,7 @@ def tokenize_text_task(
 @click.argument("sample_text")
 @inject
 def main(sample_text: str):
-    """Command-line entry for the text tokenization."""
+    """Command-line entry for the text_processing tokenization."""
     future = client.submit(tokenize_text_task, sample_text)
     click.echo(f"Tokenization Result: {future.result()}")
 

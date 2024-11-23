@@ -1,7 +1,8 @@
 import click
 from dependency_injector.wiring import Provide, inject
+
+from src.app.cli import cli_audio, cli_download, cli_text, cli_transcription
 from src.infrastructure.app.app_container import AppContainer
-from src.app.cli import cli_audio, cli_text, cli_download, cli_transcription
 
 
 class CommandManager:
@@ -51,8 +52,8 @@ def discover_and_register_commands(command_manager: CommandManager):
     Discover and register all commands dynamically from CLI modules.
     """
     # Example: Discover commands from each module
-    command_manager.register("audio", cli_audio.cli)
-    command_manager.register("text", cli_text.cli)
+    command_manager.register("audio_processing", cli_audio.cli)
+    command_manager.register("text_processing", cli_text.cli)
     command_manager.register("download", cli_download.cli)
     command_manager.register("transcription", cli_transcription.cli)
 

@@ -32,7 +32,7 @@ def transcribe_audio(
             "task_started", {"task_id": self.request.id, "audio_file": audio_file}
         )
 
-        # Task logic here - e.g., transcribe the audio file
+        # Task logic here - e.g., transcribe the audio_processing file
         result = f"Transcribed content from {audio_file}"  # Placeholder for actual transcription logic
 
         observable_task.notify_observers(

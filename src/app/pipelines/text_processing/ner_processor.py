@@ -1,6 +1,6 @@
 import spacy
 
-from src.app.pipelines.text.text_processor_base import TextProcessorBase
+from src.app.pipelines.text_processing.text_processor_base import TextProcessorBase
 
 
 class NERProcessor(TextProcessorBase):
@@ -19,6 +19,6 @@ class NERProcessor(TextProcessorBase):
             return []
 
         doc = self.spacy_model(text)
-        entities = [{"text": ent.text, "label": ent.label_} for ent in doc.ents]
+        entities = [{"text_processing": ent.text, "label": ent.label_} for ent in doc.ents]
         self.logger.info(f"Found {len(entities)} named entities.")
         return entities

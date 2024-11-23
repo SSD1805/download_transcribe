@@ -1,9 +1,9 @@
 from dask.distributed import Client
 
-from src.app.pipelines.audio.audio_converter import AudioConverter
+from src.app.pipelines.audio_processing.audio_converter import AudioConverter
 from src.app.pipelines.transcription.audio_to_text_transcriber import AudioTranscriber
-from src.app.utils.structlog_logger import LoggerService
-from src.app.utils.tracking_utilities import PerformanceTrackerService
+from src.app.utils.performance_and_progress_tracking import PerformanceTrackerService
+from src.app.utils.application_logger import LoggerService
 
 # Get logger and performance tracker from CoreServices
 logger = LoggerService.get_logger()

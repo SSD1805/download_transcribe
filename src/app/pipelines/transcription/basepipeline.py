@@ -1,6 +1,8 @@
-from dependency_injector.wiring import Provide, inject
-from src.infrastructure.app.app_container import AppContainer
 import os
+
+from dependency_injector.wiring import Provide, inject
+
+from src.infrastructure.app.app_container import AppContainer
 
 
 class BasePipeline:

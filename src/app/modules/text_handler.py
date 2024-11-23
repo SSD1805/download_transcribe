@@ -1,66 +1,51 @@
-import click
 from dependency_injector.wiring import Provide, inject
-
 from src.infrastructure.app.app_container import AppContainer
 
 
 class TextHandler:
+    """
+    Handles text processing tasks such as tokenization, segmentation, and NER.
+    """
+
     @inject
     def __init__(self, logger=Provide[AppContainer.logger]):
-        """
-        Initialize the TextHandler.
-
-        Args:
-            logger: The logger instance from the AppContainer.
-        """
         self.logger = logger
+        self.processed_data = []
 
-    def process_text(self, text, output_filepath):
+    def load(self, file_path: str):
         """
-        Processes the input text and saves it to the specified file.
+        Load a single text file for processing.
+        """
+        self.logger.info(f"Loading file: {file_path}")
+        with open(file_path, "r") as file:
+            content = file.read()
+        self.logger.info(f"Loaded content from {file_path}.")
+        self.processed_data.append(content)
+
+    def process_tasks(self, tasks: str):
+        """
+        Process tasks such as tokenization, segmentation, and NER.
 
         Args:
-            text (str): The input text to process.
-            output_filepath (str): Path to save the processed text.
+            tasks (str): Comma-separated list of tasks to execute, or "all".
         """
-        with open(output_filepath, "w") as f:
-            processed_text = text.upper()  # Example processing
-            f.write(processed_text)
-        self.logger.info(f"Processed text saved to: {output_filepath}")
+        self.logger.info(f"Processing tasks: {tasks}")
+        # Example task logic
+        if tasks == "all":
+            tasks = ["tokenization", "segmentation", "ner"]
 
+        for task in tasks.split(","):
+            self.logger.info(f"Executing task: {task.strip()}")
+            # Mock task execution
+            for i, data in enumerate(self.processed_data):
+                self.processed_data[i] = f"{data} [{task.strip()}]"
 
-@click.group()
-def cli():
-    """Command-line interface for text processing tasks."""
-    pass
+    def get_processed_data(self):
+        """
+        Retrieve the processed data.
 
-
-@cli.command()
-@click.argument("text")
-@click.argument("output_filepath")
-@inject
-def process(
-    text,
-    output_filepath,
-    perf_tracker=Provide[AppContainer.performance_tracker],
-    logger=Provide[AppContainer.logger],
-    text_processor=Provide[
-        AppContainer.pipeline_component_registry.provide("text_processor")
-    ],
-):
-    """Process input text and save the output to a specified file."""
-    try:
-        with perf_tracker.track_execution("Text Processing Command"):
-            logger.info(f"Starting text processing for output file: {output_filepath}")
-            text_processor.process_text(text, output_filepath)
-            click.echo(f"Processed text saved to: {output_filepath}")
-    except Exception as e:
-        logger.error(f"Failed to process text: {e}")
-        click.echo("Error: Failed to process text. Check logs for more details.")
-
-
-if __name__ == "__main__":
-    # Initialize the dependency container
-    container = AppContainer()
-    container.wire(modules=[__name__])
-    cli()
+        Returns:
+            list: The processed data.
+        """
+        self.logger.info("Retrieving processed data.")
+        return self.processed_data

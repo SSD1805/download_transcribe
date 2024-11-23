@@ -1,4 +1,4 @@
-# src/utils/structlog_logger.py
+# src/utils/application_logger.py
 import logging
 import sys
 import threading

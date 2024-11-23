@@ -65,7 +65,7 @@ class ModelLoader:
         Transcribe using WhisperX if it is loaded.
 
         Args:
-            audio_file (str): Path to the audio file.
+            audio_file (str): Path to the audio_processing file.
             **kwargs: Additional WhisperX parameters.
 
         Returns:
@@ -88,7 +88,7 @@ class ModelLoader:
         Transcribe using Whisper if it is loaded.
 
         Args:
-            audio_file (str): Path to the audio file.
+            audio_file (str): Path to the audio_processing file.
             **kwargs: Additional Whisper parameters.
 
         Returns:
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     model_loader = ModelLoader()
     model_loader.load_models()
 
-    # Example audio file path
+    # Example audio_processing file path
     audio_file = "example_audio.wav"
 
     # Attempt transcription with WhisperX

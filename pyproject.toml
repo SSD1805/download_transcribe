@@ -41,7 +41,7 @@ spacy-transformers = ">=1.2,<2.0"  # Transformer integration for NLP
 
 # Audio Processing Utilities
 pydub = ">=0.25,<0.30"  # Audio handling
-soundfile = ">=0.12,<1.0"  # Read/write audio files
+soundfile = ">=0.12,<1.0"  # Read/write audio_processing files
 
 # HTTP and CLI Utilities
 requests = ">=2.31,<3.0"  # HTTP client

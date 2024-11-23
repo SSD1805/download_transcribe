@@ -1,9 +1,9 @@
-from src.app.pipelines.audio import AudioProcessorBase
+from src.app.pipelines.audio_processing import AudioProcessorBase
 
 
 class AudioConverter(AudioProcessorBase):
     """
-    Converts audio files to a specified format.
+    Converts audio_processing files to a specified format.
     """
 
     def process(

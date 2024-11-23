@@ -32,7 +32,7 @@ class DaskCoordinatorObserver:
                 f"Audio Conversion completed: {data}. Initiating transcription."
             )
             audio_file = data.get("audio_file")
-            # Trigger the transcription task with the converted audio file.
+            # Trigger the transcription task with the converted audio_processing file.
             client = Client("localhost:8786")
             client.submit(transcription_task, audio_file)
         elif event == "task_failed":
@@ -61,8 +61,8 @@ class DaskCoordinatorObserver:
 
             # Handle coordination based on the task type
             if "Text segmented" in data.get("result"):
-                self.logger.info("Initiating NER task after text segmentation.")
-                text = data.get("text")
+                self.logger.info("Initiating NER task after text_processing segmentation.")
+                text = data.get("text_processing")
                 client = Client("localhost:8786")
                 client.submit(ner_task, text)
 

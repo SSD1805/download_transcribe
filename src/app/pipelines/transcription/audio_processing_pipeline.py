@@ -1,5 +1,6 @@
-from src.app.pipelines.transcription.basepipeline import BasePipeline
 import os
+
+from src.app.pipelines.transcription.basepipeline import BasePipeline
 
 
 class AudioProcessingPipeline(BasePipeline):
@@ -17,6 +18,9 @@ class AudioProcessingPipeline(BasePipeline):
         self.saver = saver
 
     def process_files(self):
+        """
+        Orchestrates the processing of multiple audio files.
+        """
         self.ensure_directory_exists(self.output_directory)
         audio_files = self.get_files_with_extensions(self.input_directory, (".mp3", ".wav", ".m4a", ".flac"))
         for file_name in audio_files:
@@ -24,18 +28,19 @@ class AudioProcessingPipeline(BasePipeline):
 
     def _process_single_file(self, file_name: str):
         """
-        Process a single audio file.
+        Processes a single audio file.
         """
         input_path = os.path.join(self.input_directory, file_name)
 
-        if not file_name.endswith(".wav"):
-            wav_file = self.converter.convert_to_wav(input_path)
-            if not wav_file:
-                self.logger.warning(f"Skipping '{file_name}' due to conversion error.")
-                return
-        else:
-            wav_file = input_path
+        with self.track(f"Processing {file_name}"):
+            if not file_name.endswith(".wav"):
+                wav_file = self.converter.convert_to_wav(input_path)
+                if not wav_file:
+                    self.logger.warning(f"Skipping '{file_name}' due to conversion error.")
+                    return
+            else:
+                wav_file = input_path
 
-        segments = self.transcriber.transcribe(wav_file)
-        self.saver.save_transcription(segments, wav_file)
-        self.logger.info(f"Successfully processed '{file_name}'.")
+            segments = self.transcriber.transcribe(wav_file)
+            self.saver.save_transcription(segments, file_name)
+            self.logger.info(f"Successfully processed '{file_name}'.")

@@ -5,15 +5,27 @@ from src.infrastructure.app.app_container import AppContainer
 
 class BaseCommand(click.Command):
     """
-    A base class for CLI commands that injects logging and performance tracking
-    from the AppContainer.
+    A base class for CLI commands that injects logging, performance tracking,
+    and shared services from the AppContainer.
     """
 
     @inject
-    def __init__(self, *args, logger=Provide[AppContainer.logger], tracker=Provide[AppContainer.performance_tracker], **kwargs):
+    def __init__(
+        self,
+        *args,
+        logger=Provide[AppContainer.logger],
+        tracker=Provide[AppContainer.performance_tracker],
+        audio_processor=Provide[AppContainer.audio_processor],
+        downloader=Provide[AppContainer.downloader],
+        transcription_pipeline=Provide[AppContainer.transcription_pipeline],
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.logger = logger
         self.performance_tracker = tracker
+        self.audio_processor = audio_processor
+        self.downloader = downloader
+        self.transcription_pipeline = transcription_pipeline
 
     def invoke(self, ctx):
         """Override Click's invoke to include performance tracking."""

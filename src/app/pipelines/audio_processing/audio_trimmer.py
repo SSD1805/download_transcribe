@@ -1,9 +1,9 @@
-from src.app.pipelines.audio import AudioProcessorBase
+from src.app.pipelines.audio_processing import AudioProcessorBase
 
 
 class AudioTrimmer(AudioProcessorBase):
     """
-    Trims silence from the beginning and end of audio files.
+    Trims silence from the beginning and end of audio_processing files.
     """
 
     def process(
@@ -17,5 +17,5 @@ class AudioTrimmer(AudioProcessorBase):
             self.logger.info(f"Successfully trimmed {input_file}")
             return trimmed_file
         except Exception as e:
-            self.logger.error(f"Error trimming audio file {input_file}: {e}")
+            self.logger.error(f"Error trimming audio_processing file {input_file}: {e}")
             raise

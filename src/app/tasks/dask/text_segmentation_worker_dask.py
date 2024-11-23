@@ -17,22 +17,22 @@ def text_segmentation_task(
     observable_task.add_observer(logger_observer.update)
 
     try:
-        observable_task.notify_observers("task_started", {"text": text})
+        observable_task.notify_observers("task_started", {"text_processing": text})
 
-        # Task logic here - e.g., segment the text
+        # Task logic here - e.g., segment the text_processing
         result = f"Text segmented: {text}"  # Placeholder for actual segmentation logic
 
         observable_task.notify_observers(
-            "task_completed", {"text": text, "result": result}
+            "task_completed", {"text_processing": text, "result": result}
         )
         return result
     except Exception as e:
-        observable_task.notify_observers("task_failed", {"text": text, "error": str(e)})
+        observable_task.notify_observers("task_failed", {"text_processing": text, "error": str(e)})
         raise e
 
 
 # Submit the task to Dask
-future = client.submit(text_segmentation_task, "Sample text for segmentation.")
+future = client.submit(text_segmentation_task, "Sample text_processing for segmentation.")
 
 
 @inject
@@ -50,17 +50,17 @@ def text_segmentation_task(
     observable_task.add_observer(coordinator_observer.update)
 
     try:
-        observable_task.notify_observers("task_started", {"text": text})
+        observable_task.notify_observers("task_started", {"text_processing": text})
 
-        # Task logic here - e.g., segment the text
+        # Task logic here - e.g., segment the text_processing
         result = f"Text segmented: {text}"  # Placeholder for actual segmentation logic
 
         observable_task.notify_observers(
-            "task_completed", {"text": text, "result": result}
+            "task_completed", {"text_processing": text, "result": result}
         )
         return result
     except Exception as e:
-        observable_task.notify_observers("task_failed", {"text": text, "error": str(e)})
+        observable_task.notify_observers("task_failed", {"text_processing": text, "error": str(e)})
         raise e
 
 
@@ -83,22 +83,22 @@ def text_segmentation_task(
     observable_task.add_observer(logger_observer.update)
 
     try:
-        observable_task.notify_observers("task_started", {"text": text})
+        observable_task.notify_observers("task_started", {"text_processing": text})
 
-        # Task logic here - e.g., segment the text
+        # Task logic here - e.g., segment the text_processing
         result = f"Text segmented: {text}"  # Placeholder for actual segmentation logic
 
         observable_task.notify_observers(
-            "task_completed", {"text": text, "result": result}
+            "task_completed", {"text_processing": text, "result": result}
         )
         return result
     except Exception as e:
-        observable_task.notify_observers("task_failed", {"text": text, "error": str(e)})
+        observable_task.notify_observers("task_failed", {"text_processing": text, "error": str(e)})
         raise e
 
 
 # Submit the task to Dask
-future = client.submit(text_segmentation_task, "Sample text for segmentation.")
+future = client.submit(text_segmentation_task, "Sample text_processing for segmentation.")
 
 
 @inject
@@ -116,15 +116,15 @@ def text_segmentation_task(
     observable_task.add_observer(coordinator_observer.update)
 
     try:
-        observable_task.notify_observers("task_started", {"text": text})
+        observable_task.notify_observers("task_started", {"text_processing": text})
 
-        # Task logic here - e.g., segment the text
+        # Task logic here - e.g., segment the text_processing
         result = f"Text segmented: {text}"  # Placeholder for actual segmentation logic
 
         observable_task.notify_observers(
-            "task_completed", {"text": text, "result": result}
+            "task_completed", {"text_processing": text, "result": result}
         )
         return result
     except Exception as e:
-        observable_task.notify_observers("task_failed", {"text": text, "error": str(e)})
+        observable_task.notify_observers("task_failed", {"text_processing": text, "error": str(e)})
         raise e
