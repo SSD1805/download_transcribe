@@ -1,42 +1,25 @@
 import structlog
 from dependency_injector import containers, providers
 
-from src.app.cli import (
-    BatchDownloadCommand,
-    ConvertAudioCommand,
-    DownloadChannelCommand,
-    DownloadPlaylistCommand,
-    DownloadVideoCommand,
-    LoadTextCommand,
-    NormalizeAudioCommand,
-    ProcessTextCommand,
-    SaveTextCommand,
-    SaveTranscriptionCommand,
-    SplitAudioCommand,
-    TranscribeCommand,
-    TrimAudioCommand,
-)
+from src.app.cli import (BatchDownloadCommand, ConvertAudioCommand,
+                         DownloadChannelCommand, DownloadPlaylistCommand,
+                         DownloadVideoCommand, LoadTextCommand,
+                         NormalizeAudioCommand, ProcessTextCommand,
+                         SaveTextCommand, SaveTranscriptionCommand,
+                         SplitAudioCommand, TranscribeCommand,
+                         TrimAudioCommand)
 from src.app.core import SingletonLogger, SingletonPerformanceTracker
 from src.app.modules import HelperFunctions, PipelineManager
-from src.app.pipelines.audio_processing import (
-    AudioConverter,
-    AudioNormalizer,
-    AudioSplitter,
-    AudioTrimmer,
-)
-from src.app.pipelines.text_processing import (
-    TextLoader,
-    TextSaver,
-    TextSegmenter,
-    TextTokenizer,
-)
-from src.app.pipelines.transcription import AudioTranscriber, TranscriptionPipeline
-from src.app.utils import ConcurrentTask, FileUtilityFacade, StructLogger
-from src.infrastructure.registries import (
-    ConfigurationRegistry,
-    ModelRegistry,
-    PipelineRegistry,
-)
+from src.app.pipelines.audio_processing import (AudioConverter,
+                                                AudioNormalizer, AudioSplitter,
+                                                AudioTrimmer)
+from src.app.pipelines.text_processing import (TextLoader, TextSaver,
+                                               TextSegmenter, TextTokenizer)
+from src.app.pipelines.transcription import (AudioTranscriber,
+                                             TranscriptionPipeline)
+from src.app.utils import ConcurrentTask, FileUtilityFacade, ApplicationLogger
+from src.infrastructure.registries import (ConfigurationRegistry,
+                                           ModelRegistry, PipelineRegistry)
 
 
 class AppContainer(containers.DeclarativeContainer):
@@ -51,6 +34,25 @@ class AppContainer(containers.DeclarativeContainer):
     concurrent_task = providers.Singleton(ConcurrentTask)
     file_utilities = providers.Singleton(FileUtilityFacade)
     timestamp = providers.Singleton(HelperFunctions.get_timestamp)
+
+    # Shared Utilities
+    logger = providers.Singleton(ApplicationLogger.get_logger)
+    performance_tracker = providers.Singleton(PerformanceTracker)
+
+    # Observers
+    logger_observer = providers.Factory(LoggerObserver, logger=logger)
+    coordinator_observer = providers.Factory(CoordinatorObserver, logger=logger)
+
+    # Pipelines
+    download_pipeline = providers.Singleton(DownloadPipeline, logger=logger)
+
+    # Tasks
+    download_task = providers.Factory(
+        DownloadTask,
+        download_pipeline=download_pipeline,
+        logger_observer=logger_observer,
+        coordinator_observer=coordinator_observer,
+    )
 
     # Structlog Configuration
     @providers.Singleton
@@ -70,7 +72,7 @@ class AppContainer(containers.DeclarativeContainer):
                 structlog.stdlib.add_log_level,
                 structlog.processors.StackInfoRenderer(),
                 structlog.processors.format_exc_info,
-                StructLogger.add_custom_context,
+                ApplicationLogger.add_custom_context,
                 renderer,
             ],
             context_class=dict,

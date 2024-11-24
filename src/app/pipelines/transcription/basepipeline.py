@@ -51,8 +51,8 @@ class BasePipeline:
             self.logger.error(f"Directory '{directory}' does not exist.")
             return []
 
-        files = [
-            f for f in os.listdir(directory) if f.lower().endswith(extensions)
-        ]
-        self.logger.info(f"Found {len(files)} files in '{directory}' with extensions {extensions}.")
+        files = [f for f in os.listdir(directory) if f.lower().endswith(extensions)]
+        self.logger.info(
+            f"Found {len(files)} files in '{directory}' with extensions {extensions}."
+        )
         return files

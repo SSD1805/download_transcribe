@@ -23,5 +23,7 @@ class AudioSplitter(AudioProcessorBase):
             self.logger.info(f"Split audio_processing into {len(chunk_files)} chunks.")
             return chunk_files
         except Exception as e:
-            self.logger.error(f"Error splitting audio_processing file {input_file}: {e}")
+            self.logger.error(
+                f"Error splitting audio_processing file {input_file}: {e}"
+            )
             raise

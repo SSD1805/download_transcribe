@@ -1,4 +1,5 @@
 import click
+
 from src.app.cli.commands.base_command import BaseCommand
 
 
@@ -37,7 +38,9 @@ def trim(ctx, input_file, output_file, silence_thresh):
 @cli.command(cls=BaseCommand)
 @click.argument("input_file")
 @click.argument("output_file")
-@click.option("--target-format", default="wav", help="Target format for audio conversion.")
+@click.option(
+    "--target-format", default="wav", help="Target format for audio conversion."
+)
 def convert(ctx, input_file, output_file, target_format):
     """Convert an audio file to a specified format."""
     ctx.command.audio_processor.convert(input_file, output_file, target_format)

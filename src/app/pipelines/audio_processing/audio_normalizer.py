@@ -17,5 +17,7 @@ class AudioNormalizer(AudioProcessorBase):
             self.logger.info(f"Successfully normalized {input_file}")
             return normalized_file
         except Exception as e:
-            self.logger.error(f"Error normalizing audio_processing file {input_file}: {e}")
+            self.logger.error(
+                f"Error normalizing audio_processing file {input_file}: {e}"
+            )
             raise

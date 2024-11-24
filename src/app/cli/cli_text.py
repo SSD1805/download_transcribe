@@ -1,4 +1,5 @@
 import click
+
 from src.app.cli.commands.base_command import BaseCommand
 
 
@@ -25,7 +26,9 @@ def load(ctx, input_dir):
 
 
 @cli.command(cls=BaseCommand)
-@click.option("--tasks", default="all", help="Tasks to run: tokenization, segmentation, ner.")
+@click.option(
+    "--tasks", default="all", help="Tasks to run: tokenization, segmentation, ner."
+)
 def process(ctx, tasks):
     """
     Process text with the specified tasks.

@@ -9,5 +9,5 @@ __all__ = [
     "cli_audio",
     "cli_download",
     "cli_text",
-    "cli_transcription"
+    "cli_transcription",
 ]

@@ -1,4 +1,5 @@
 from dependency_injector.wiring import Provide, inject
+
 from src.infrastructure.app.app_container import AppContainer
 
 
@@ -21,6 +22,8 @@ class FilenameSanitizer:
         Returns:
             str: The sanitized filename.
         """
-        sanitized = "".join(c if c.isalnum() or c in " ._-()" else "_" for c in filename)
+        sanitized = "".join(
+            c if c.isalnum() or c in " ._-()" else "_" for c in filename
+        )
         self.logger.info(f"Sanitized filename: {sanitized}")
         return sanitized

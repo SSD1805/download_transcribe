@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.infrastructure import container, di_inject, di_Provide
+from src.infrastructure.app import app_container, di_inject, di_Provide
 
 
 # Base Command Class

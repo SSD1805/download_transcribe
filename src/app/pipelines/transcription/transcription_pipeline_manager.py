@@ -20,7 +20,9 @@ class TranscriptionManager(BasePipeline):
         Processes multiple audio files for transcription.
         """
         self.ensure_directory_exists(self.output_directory)
-        audio_files = self.get_files_with_extensions(self.input_directory, (".wav", ".mp3"))
+        audio_files = self.get_files_with_extensions(
+            self.input_directory, (".wav", ".mp3")
+        )
         for file_name in audio_files:
             self._process_file(file_name)
 

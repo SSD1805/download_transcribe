@@ -9,7 +9,9 @@ class AudioProcessingPipeline(BasePipeline):
     and saving results.
     """
 
-    def __init__(self, input_directory: str, output_directory: str, converter, transcriber, saver):
+    def __init__(
+        self, input_directory: str, output_directory: str, converter, transcriber, saver
+    ):
         super().__init__()
         self.input_directory = input_directory
         self.output_directory = output_directory
@@ -22,7 +24,9 @@ class AudioProcessingPipeline(BasePipeline):
         Orchestrates the processing of multiple audio files.
         """
         self.ensure_directory_exists(self.output_directory)
-        audio_files = self.get_files_with_extensions(self.input_directory, (".mp3", ".wav", ".m4a", ".flac"))
+        audio_files = self.get_files_with_extensions(
+            self.input_directory, (".mp3", ".wav", ".m4a", ".flac")
+        )
         for file_name in audio_files:
             self._process_single_file(file_name)
 
@@ -36,7 +40,9 @@ class AudioProcessingPipeline(BasePipeline):
             if not file_name.endswith(".wav"):
                 wav_file = self.converter.convert_to_wav(input_path)
                 if not wav_file:
-                    self.logger.warning(f"Skipping '{file_name}' due to conversion error.")
+                    self.logger.warning(
+                        f"Skipping '{file_name}' due to conversion error."
+                    )
                     return
             else:
                 wav_file = input_path

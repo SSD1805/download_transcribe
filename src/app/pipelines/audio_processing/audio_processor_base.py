@@ -45,7 +45,9 @@ class AudioProcessorBase(ABC):
             self.tracker.track_execution("save_audio", {"file": output_path})
             return output_path
         except Exception as e:
-            self.logger.error(f"Failed to save audio_processing file {output_file}: {e}")
+            self.logger.error(
+                f"Failed to save audio_processing file {output_file}: {e}"
+            )
             raise RuntimeError(f"Error saving audio_processing file {output_file}: {e}")
 
     @abstractmethod

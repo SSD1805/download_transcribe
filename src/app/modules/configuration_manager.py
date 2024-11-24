@@ -1,5 +1,7 @@
 import threading
+
 from dependency_injector.wiring import Provide, inject
+
 from src.infrastructure.app.app_container import AppContainer
 
 
@@ -14,7 +16,9 @@ class ConfigManager:
     @inject
     def __new__(
         cls,
-        config_data: dict = Provide[AppContainer.config_data],  # Injected config dictionary
+        config_data: dict = Provide[
+            AppContainer.config_data
+        ],  # Injected config dictionary
         logger=Provide[AppContainer.logger],
     ):
         """Ensure ConfigManager is a singleton."""
@@ -66,4 +70,6 @@ class ConfigManager:
         """
         Notify observers of configuration reload.
         """
-        self.logger.info("Configuration has been reloaded and may affect dependent services.")
+        self.logger.info(
+            "Configuration has been reloaded and may affect dependent services."
+        )

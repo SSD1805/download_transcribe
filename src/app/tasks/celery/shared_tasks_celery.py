@@ -1,28 +1,9 @@
-from celery_app import shared_task
-from dependency_injector.wiring import Provide, inject
+# src/app/tasks/dask/transcription_task.py
+from dask.distributed import Client
+from app.pipelines.transcription.transcription_pipeline import TranscriptionPipeline
 
+client = Client("localhost:8786")
 
-@shared_task
-@inject
-def update_task_status(
-    task_id: str,
-    status: str,
-    logger=Provide[container.logger],
-    performance_tracker=Provide[container.performance_tracker],
-):
-    """
-    Shared task to update task status.
-
-    Args:
-        task_id (str): The ID of the task.
-        status (str): The new status to set.
-        logger: Logger instance for logging (injected).
-        performance_tracker: Performance tracker instance for tracking execution (injected).
-    """
-    try:
-        with performance_tracker.track_execution(f"Update Task Status {task_id}"):
-            logger.info(f"Updating status of task {task_id} to {status}.")
-            # Placeholder for database update logic
-            # db.update_task_status(task_id, status)
-    except Exception as e:
-        logger.error(f"Failed to update status for task {task_id}: {e}")
+def transcription_pipeline_task(input_file: str, output_dir: str):
+    pipeline = TranscriptionPipeline(output_dir=output_dir)
+    return pipeline.run(input_file)

@@ -1,4 +1,5 @@
 import click
+
 from src.app.cli.commands.base_command import BaseCommand
 
 
@@ -31,7 +32,9 @@ def playlist(ctx, url):
 
 @cli.command(cls=BaseCommand)
 @click.argument("urls", nargs=-1)
-@click.option("--batch-size", default=3, help="Number of downloads to process simultaneously.")
+@click.option(
+    "--batch-size", default=3, help="Number of downloads to process simultaneously."
+)
 def batch(ctx, urls, batch_size):
     """Download multiple videos in batches."""
     ctx.command.downloader.download_batch(urls, batch_size=batch_size)

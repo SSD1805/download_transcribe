@@ -10,7 +10,6 @@ __all__ = [
     "AudioHandler",
     "TextHandler",
     "DownloadCommand",
-    "HelperFunctions",
     "PipelineManager",
     "ModelLoader",
 ]

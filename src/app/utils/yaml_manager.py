@@ -1,5 +1,6 @@
-import yaml
+import pyyaml
 from dependency_injector.wiring import Provide, inject
+
 from src.infrastructure.app.app_container import AppContainer
 
 

@@ -1,4 +1,4 @@
-# src/infrastructure/dependency_setup.py
+# src/app/infrastructure/dependency_setup.py
 
 import logging
 

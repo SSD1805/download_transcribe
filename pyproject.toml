@@ -14,6 +14,7 @@ python = ">=3.10,<3.13"  # Python version
 django = ">=4.0,<6.0"  # Django framework
 dependency-injector = ">=4.40,<4.50"  # Dependency injection framework
 django-environ = ">=0.4,<0.12"  # Environment variable handling
+cookiecutter = ">=2.4.0,<3.0"  # Project templating
 
 # API and Real-time
 djangorestframework = ">=3.13,<4.0"  # Django REST Framework

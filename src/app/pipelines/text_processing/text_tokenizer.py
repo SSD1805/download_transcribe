@@ -1,6 +1,7 @@
 from nltk.tokenize import word_tokenize
 
-from src.app.pipelines.text_processing.text_processor_base import TextProcessorBase
+from src.app.pipelines.text_processing.text_processor_base import \
+    TextProcessorBase
 
 
 class TextTokenizer(TextProcessorBase):
