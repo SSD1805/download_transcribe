@@ -30,7 +30,7 @@ class ModelLoader:
     @perf_tracker.track
     def load_models(self):
         """
-        Attempts to load WhisperX model first, with a fallback to standard Whisper model.
+        Attempts to load WhisperX model first, with fallback to standard Whisper model.
 
         Raises:
             ValueError: If both models fail to load.

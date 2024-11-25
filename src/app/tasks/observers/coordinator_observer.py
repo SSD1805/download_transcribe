@@ -1,5 +1,6 @@
 from celery import Celery
 from dask.distributed import Client
+
 from src.app.utils.application_logger import ApplicationLogger
 
 

@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Type
+from typing import Any, Callable, dict, type
 
 from dependency_injector.wiring import Provide, inject
 
@@ -7,9 +7,11 @@ from src.infrastructure.app.app_container import AppContainer, GenericRegistry
 
 class ModelRegistry(GenericRegistry[Any]):
     """
-    A registry for managing different models used in the system, such as transcribers and NLP models.
+    A registry for managing different models used in the system,
+    such as transcribers and NLP models.
 
-    This includes both registering existing model instances and creating new model instances as needed.
+    This includes both registering existing model instances and
+    creating new model instances as needed.
     """
 
     _instance = None
@@ -38,8 +40,8 @@ class ModelRegistry(GenericRegistry[Any]):
         super().__init__(logger, tracker)
         self.base_registry = base_registry
         self.concurrency = concurrency
-        self._registered_models: Dict[str, Any] = {}
-        self._model_factories: Dict[str, Callable] = {}
+        self._registered_models: dict[str, Any] = {}
+        self._model_factories: dict[str, Callable] = {}
         self.logger.info("Initialized ModelRegistry singleton.")
 
     def validate_item(self, item: Any) -> bool:
@@ -95,13 +97,13 @@ class ModelRegistry(GenericRegistry[Any]):
             self.logger.info(f"Model '{name}' retrieved from registry.")
             return self._registered_models[name]
 
-    def register_model_factory(self, name: str, model_class: Type, *args, **kwargs):
+    def register_model_factory(self, name: str, model_class: type, *args, **kwargs):
         """
         Register a model factory that can be used to create new model instances.
 
         Args:
             name (str): The name of the model factory.
-            model_class (Type): The class of the model to be instantiated.
+            model_class (type): The class of the model to be instantiated.
             *args: Default positional arguments for the model class.
             **kwargs: Default keyword arguments for the model class.
         """

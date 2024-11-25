@@ -22,7 +22,7 @@ class DownloadPipeline:
         """
         Run the download pipeline based on the specified type.
         :param url: The URL to download.
-        :param download_type: Type of download ('video', 'channel', 'playlist', 'batch').
+        :param download_type: type of download ('video', 'channel', 'playlist', 'batch').
         """
         self.logger.info(f"Starting {download_type} download for URL: {url}")
 

@@ -67,7 +67,7 @@ pytest = ">=7.0,<9.0"  # Testing framework
 pytest-cov = ">=4.0,<7.0"  # Code coverage
 black = ">=23.0,<25.0"  # Code formatter
 ruff = ">=0.7.4,<1.0"  # Linter and import sorter (replaces flake8)
-mypy = ">=1.0,<2.0"  # Type checker
+mypy = ">=1.0,<2.0"  # type checker
 pylint = ">=3.0,<4.0"  # Comprehensive linter
 bandit = ">=1.7,<2.0"  # Security analyzer
 pre-commit = ">=3.3,<5.0"  # Pre-commit hooks

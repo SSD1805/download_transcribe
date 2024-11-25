@@ -18,6 +18,7 @@ from src.app.pipelines.transcription import AudioTranscriber, TranscriptionPipel
 from src.app.tasks.celery import AudioProcessingTask, DownloadTask
 from src.app.tasks.observers import CoordinatorObserver, LoggerObserver
 from src.app.utils import ApplicationLogger, PerformanceTracker
+from src.infrastructure.registries import ConfigurationRegistry
 
 
 class AppContainer(containers.DeclarativeContainer):

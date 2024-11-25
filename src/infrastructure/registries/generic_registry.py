@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 from threading import Lock
-from typing import Callable, Dict, Generic, TypeVar, Union
+from typing import Callable, Generic, Union, typeVar
 
 from dependency_injector.wiring import Provide, inject
 
 from src.infrastructure.app.app_container import AppContainer
 
 # Define a generic type for the registries.
-T = TypeVar("T")
+T = typeVar("T")
 
 
 class GenericRegistry(ABC, Generic[T]):

@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+
 from dependency_injector.wiring import Provide, inject
+
 from src.app.tasks.observers.logger_observer import LoggerObserver
 from src.infrastructure.app.app_container import AppContainer
 
@@ -42,7 +44,7 @@ class BaseTask(ABC):
             self.logger.info(f"Task completed: {func.__name__}")
             self.tracker.track_execution_end(func.__name__, result=result)
             return result
-        except (IOError, TimeoutError) as e:
+        except (OSError, TimeoutError) as e:
             self.handle_recoverable_error(func.__name__, e)
         except Exception as e:
             self.handle_critical_error(func.__name__, e)

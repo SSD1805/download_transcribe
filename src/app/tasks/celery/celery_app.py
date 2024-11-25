@@ -1,5 +1,6 @@
 from celery import Celery
-from dependency_injector.wiring import inject, Provide
+from dependency_injector.wiring import Provide, inject
+
 from src.infrastructure.app.app_container import AppContainer
 from src.infrastructure.app.configuration_registry import ConfigurationRegistry
 
@@ -13,7 +14,7 @@ def create_celery_app(
     Create and configure a Celery app instance using ConfigurationRegistry.
 
     Args:
-        config_registry (ConfigurationRegistry): The configuration registry for app settings.
+        config_registry (ConfigurationRegistry): The config registry for app settings.
         logger: Logger instance for observability.
 
     Returns:

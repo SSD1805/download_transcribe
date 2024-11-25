@@ -61,7 +61,8 @@ class ConfigurationRegistry:
 
     def get(self, name: str) -> Any:
         """
-        Retrieve a configuration value by name. If the configuration is lazy-loaded, it will be initialized.
+        Retrieve a configuration value by name. If the configuration is lazy-loaded,
+        it will be initialized.
 
         Args:
             name (str): The name of the configuration.

@@ -1,5 +1,6 @@
-from src.app.tasks.base_task import BaseTask
 from dependency_injector.wiring import Provide, inject
+
+from src.app.tasks.base_task import BaseTask
 from src.infrastructure.app.app_container import AppContainer
 
 

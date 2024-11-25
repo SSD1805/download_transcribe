@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Dict, Type
+from typing import Callable, dict, type
 
 from dependency_injector.wiring import Provide, inject
 
-from src.infrastructure.app.app_container import AppContainer
 from src.app.pipelines.audio_processing.audio_processor_base import AudioProcessorBase
+from src.infrastructure.app.app_container import AppContainer
 
 
 # Define an abstract PipelineComponent class for Composite Pattern
@@ -32,7 +32,7 @@ class Handler(PipelineComponent):
 
 
 class BatchProcessor(PipelineComponent):
-    def __init__(self, batch_processor_class: Type, *args, **kwargs):
+    def __init__(self, batch_processor_class: type, *args, **kwargs):
         self.batch_processor_instance = batch_processor_class(*args, **kwargs)
 
     def execute(self, *args, **kwargs):
@@ -41,7 +41,7 @@ class BatchProcessor(PipelineComponent):
 
 class CompositePipeline(PipelineComponent):
     def __init__(self):
-        self._children: Dict[str, PipelineComponent] = {}
+        self._children: dict[str, PipelineComponent] = {}
 
     def add(self, name: str, component: PipelineComponent):
         if name in self._children:
@@ -64,7 +64,8 @@ class CompositePipeline(PipelineComponent):
 class PipelineRegistry:
     """
     Registry for managing and executing components across multiple pipelines.
-    Supports dynamic registration of processors, handlers, batch processors, and audio_processing pipeline components.
+    Supports dynamic registration of processors, handlers, batch processors,
+    and audio_processing pipeline components.
     """
 
     _instance = None
@@ -127,7 +128,7 @@ class PipelineRegistry:
                 self.logger.info(f"Handler '{name}' registered successfully.")
 
     def register_batch_processor(
-        self, name: str, batch_processor_class: Type, *args, **kwargs
+        self, name: str, batch_processor_class: type, *args, **kwargs
     ):
         """Register a batch processor class for the pipeline."""
         batch_processor = BatchProcessor(batch_processor_class, *args, **kwargs)
@@ -137,7 +138,7 @@ class PipelineRegistry:
                 self.logger.info(f"Batch Processor '{name}' registered successfully.")
 
     def register_audio_component(
-        self, name: str, component_class: Type[AudioProcessorBase], *args, **kwargs
+        self, name: str, component_class: type[AudioProcessorBase], *args, **kwargs
     ):
         """Register an audio_processing processing component."""
         component = component_class(*args, **kwargs)
