@@ -1,5 +1,5 @@
 ### celery_app.py ###
-from celery_app import Celery
+from celery import Celery
 
 # Create Celery app instance using ConfigurationRegistry
 celery_app = Celery(

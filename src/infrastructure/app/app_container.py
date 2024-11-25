@@ -1,39 +1,32 @@
-import structlog
+# src/infrastructure/app/app_container.py
 from dependency_injector import containers, providers
 
-from src.app.cli import (BatchDownloadCommand, ConvertAudioCommand,
-                         DownloadChannelCommand, DownloadPlaylistCommand,
-                         DownloadVideoCommand, LoadTextCommand,
-                         NormalizeAudioCommand, ProcessTextCommand,
-                         SaveTextCommand, SaveTranscriptionCommand,
-                         SplitAudioCommand, TranscribeCommand,
-                         TrimAudioCommand)
-from src.app.core import SingletonLogger, SingletonPerformanceTracker
-from src.app.modules import HelperFunctions, PipelineManager
-from src.app.pipelines.audio_processing import (AudioConverter,
-                                                AudioNormalizer, AudioSplitter,
-                                                AudioTrimmer)
-from src.app.pipelines.text_processing import (TextLoader, TextSaver,
-                                               TextSegmenter, TextTokenizer)
-from src.app.pipelines.transcription import (AudioTranscriber,
-                                             TranscriptionPipeline)
-from src.app.utils import ConcurrentTask, FileUtilityFacade, ApplicationLogger
-from src.infrastructure.registries import (ConfigurationRegistry,
-                                           ModelRegistry, PipelineRegistry)
+from src.app.pipelines.audio_processing import (
+    AudioConverter,
+    AudioNormalizer,
+    AudioProcessingPipeline,
+    AudioSplitter,
+    AudioTrimmer,
+)
+from src.app.pipelines.text_processing import (
+    TextLoader,
+    TextSaver,
+    TextSegmenter,
+    TextTokenizer,
+)
+from src.app.pipelines.transcription import AudioTranscriber, TranscriptionPipeline
+from src.app.tasks.celery import AudioProcessingTask, DownloadTask
+from src.app.tasks.observers import CoordinatorObserver, LoggerObserver
+from src.app.utils import ApplicationLogger, PerformanceTracker
 
 
 class AppContainer(containers.DeclarativeContainer):
-    """Unified Dependency Injection Container for the Application"""
+    """
+    Dependency injection container for the application.
+    """
 
-    # Configuration Registry
+    # Configuration Registry (shared across all pipelines and tasks)
     configuration_registry = providers.Singleton(ConfigurationRegistry)
-
-    # Shared Utilities
-    logger = providers.Singleton(SingletonLogger.get_instance)
-    performance_tracker = providers.Singleton(SingletonPerformanceTracker.get_instance)
-    concurrent_task = providers.Singleton(ConcurrentTask)
-    file_utilities = providers.Singleton(FileUtilityFacade)
-    timestamp = providers.Singleton(HelperFunctions.get_timestamp)
 
     # Shared Utilities
     logger = providers.Singleton(ApplicationLogger.get_logger)
@@ -43,43 +36,24 @@ class AppContainer(containers.DeclarativeContainer):
     logger_observer = providers.Factory(LoggerObserver, logger=logger)
     coordinator_observer = providers.Factory(CoordinatorObserver, logger=logger)
 
-    # Pipelines
-    download_pipeline = providers.Singleton(DownloadPipeline, logger=logger)
+    # Audio Pipeline Components
+    audio_converter = providers.Singleton(AudioConverter)
+    audio_normalizer = providers.Singleton(AudioNormalizer)
+    audio_splitter = providers.Singleton(AudioSplitter)
+    audio_trimmer = providers.Singleton(AudioTrimmer)
 
-    # Tasks
-    download_task = providers.Factory(
-        DownloadTask,
-        download_pipeline=download_pipeline,
-        logger_observer=logger_observer,
-        coordinator_observer=coordinator_observer,
+    # Audio Processing Pipeline
+    audio_processing_pipeline = providers.Singleton(
+        AudioProcessingPipeline,
+        converter=audio_converter,
+        normalizer=audio_normalizer,
+        splitter=audio_splitter,
+        trimmer=audio_trimmer,
     )
 
-    # Structlog Configuration
-    @providers.Singleton
-    def configure_structlog() -> None:
-        """Configure Structlog based on environment settings"""
-        environment = configuration_registry().get("environment", "development")
-        renderer = (
-            structlog.processors.JSONRenderer()
-            if environment != "development"
-            else structlog.dev.ConsoleRenderer()
-        )
-
-        structlog.configure(
-            processors=[
-                structlog.processors.TimeStamper(fmt="ISO"),
-                structlog.stdlib.add_logger_name,
-                structlog.stdlib.add_log_level,
-                structlog.processors.StackInfoRenderer(),
-                structlog.processors.format_exc_info,
-                ApplicationLogger.add_custom_context,
-                renderer,
-            ],
-            context_class=dict,
-            logger_factory=structlog.stdlib.LoggerFactory(),
-            wrapper_class=structlog.stdlib.BoundLogger,
-            cache_logger_on_first_use=True,
-        )
+    # Transcription Pipeline Components
+    transcription_pipeline = providers.Singleton(TranscriptionPipeline)
+    transcriber = providers.Singleton(AudioTranscriber)
 
     # Text Processing Components
     text_loader = providers.Singleton(TextLoader)
@@ -87,17 +61,20 @@ class AppContainer(containers.DeclarativeContainer):
     text_tokenizer = providers.Singleton(TextTokenizer)
     text_saver = providers.Singleton(TextSaver)
 
-    # Audio Pipeline Components
-    audio_converter = providers.Singleton(AudioConverter)
-    audio_splitter = providers.Singleton(AudioSplitter)
-    audio_normalizer = providers.Singleton(AudioNormalizer)
-    audio_trimmer = providers.Singleton(AudioTrimmer)
+    # Tasks
+    audio_processing_task = providers.Factory(
+        AudioProcessingTask,
+        pipeline=audio_processing_pipeline,
+        logger_observer=logger_observer,
+        coordinator_observer=coordinator_observer,
+    )
+    download_task = providers.Factory(
+        DownloadTask,
+        logger_observer=logger_observer,
+        coordinator_observer=coordinator_observer,
+    )
 
-    # Transcription Pipeline Components
-    transcriber = providers.Singleton(AudioTranscriber)
-    transcription_pipeline = providers.Singleton(TranscriptionPipeline)
-
-    # CLI Commands
+    # CLI Commands (if needed)
     audio_commands = providers.Factory(
         NormalizeAudioCommand,
         split_command=SplitAudioCommand,
@@ -110,53 +87,6 @@ class AppContainer(containers.DeclarativeContainer):
         playlist_command=DownloadPlaylistCommand,
         batch_command=BatchDownloadCommand,
     )
-    text_commands = providers.Factory(
-        load_command=LoadTextCommand,
-        process_command=ProcessTextCommand,
-        save_command=SaveTextCommand,
-    )
-    transcription_commands = providers.Factory(
-        TranscribeCommand, save_command=SaveTranscriptionCommand
-    )
 
-    # Registries
-    model_registry = providers.Singleton(ModelRegistry)
-    pipeline_registry = providers.Singleton(PipelineRegistry)
-
-    # Pipeline Manager
-    pipeline_manager = providers.Singleton(
-        PipelineManager,
-        batch_processor=providers.Singleton(
-            BatchProcessor, logger=logger, performance_tracker=performance_tracker
-        ),
-        memory_monitor=providers.Singleton(
-            MemoryMonitor,
-            threshold=configuration_registry().get("memory", {}).get("threshold", 80),
-        ),
-        logger=logger,
-        concurrency_manager=concurrent_task,
-    )
-
-    # Dynamic Pipeline Registration
-    @pipeline_registry.provider
-    def provide_pipeline_components() -> PipelineRegistry:
-        """Dynamically register pipeline components"""
-        registry = PipelineRegistry()
-
-        # Transcription Components
-        registry.register("transcription_pipeline", TranscriptionPipeline)
-        registry.register("audio_transcriber", AudioTranscriber)
-
-        # Audio Components
-        registry.register("audio_converter", AudioConverter)
-        registry.register("audio_splitter", AudioSplitter)
-        registry.register("audio_normalizer", AudioNormalizer)
-        registry.register("audio_trimmer", AudioTrimmer)
-
-        # Text Components
-        registry.register("text_loader", TextLoader)
-        registry.register("text_segmenter", TextSegmenter)
-        registry.register("text_tokenizer", TextTokenizer)
-        registry.register("text_saver", TextSaver)
-
-        return registry
+    # Structlog Configuration (delegated to a utility function)
+    structlog_configuration = providers.Resource(ApplicationLogger.configure_structlog)

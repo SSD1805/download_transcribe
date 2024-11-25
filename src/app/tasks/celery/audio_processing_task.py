@@ -1,8 +1,11 @@
 # src/app/tasks/celery/audio_processing_task.py
 from celery import Celery
-from app.tasks.base_task import BaseTask
-from app.tasks.observers.logger_observer import LoggerObserver
-from app.pipelines.audio.audio_pipeline import AudioProcessingPipeline
+
+from src.app.pipelines.transcription.audio_processing_pipeline import (
+    AudioProcessingPipeline,
+)
+from src.app.tasks.base_task import BaseTask
+from src.app.tasks.observers.logger_observer import LoggerObserver
 
 app = Celery("tasks", broker="redis://localhost:6379/0")
 

@@ -1,6 +1,7 @@
 # src/app/tasks/observers/coordinator_observer.py
-from dask.distributed import Client
 from celery import Celery
+from dask.distributed import Client
+
 from src.app.utils.application_logger import ApplicationLogger
 
 
@@ -63,10 +64,6 @@ class CoordinatorObserver:
         self.logger.error(f"Task {failed_task} failed with error: {error}")
         # Optionally trigger a retry or notify a monitoring system
 
-class CoordinatorObserver:
-    def __init__(self, logger=None, celery_app=None):
-        self.logger = logger or ApplicationLogger.get_logger()
-        self.celery_app = celery_app or Celery("tasks")
 
     def update(self, event: str, data: dict):
         if event == "task_completed" and data.get("function") == "download_pipeline_task":

@@ -1,8 +1,10 @@
 # src/app/tasks/base_task.py
 from abc import ABC, abstractmethod
+
 from dependency_injector.wiring import Provide, inject
-from src.infrastructure.app.app_container import AppContainer
+
 from src.app.tasks.observers.logger_observer import LoggerObserver
+from src.infrastructure.app.app_container import AppContainer
 
 
 class BaseTask(ABC):

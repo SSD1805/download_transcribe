@@ -2,8 +2,7 @@ import json
 
 import pandas as pd
 
-from src.app.pipelines.text_processing.text_processor_base import \
-    TextProcessorBase
+from src.app.pipelines.text_processing.text_processor_base import TextProcessorBase
 
 
 class TextSaver(TextProcessorBase):

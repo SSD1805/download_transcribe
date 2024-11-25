@@ -1,5 +1,6 @@
 # src/app/tasks/dask/transcription_task.py
 from dask.distributed import Client
+
 from app.pipelines.transcription.transcription_pipeline import TranscriptionPipeline
 
 client = Client("localhost:8786")

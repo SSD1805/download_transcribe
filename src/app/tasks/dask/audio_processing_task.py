@@ -1,5 +1,6 @@
 # src/app/tasks/dask/audio_processing_task.py
 from dask.distributed import Client
+
 from app.pipelines.audio.audio_pipeline import AudioProcessingPipeline
 
 client = Client("localhost:8786")

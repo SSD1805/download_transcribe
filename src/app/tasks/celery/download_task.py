@@ -1,8 +1,9 @@
 # src/app/tasks/celery/download_task.py
 from celery import Celery
 from dependency_injector.wiring import Provide, inject
-from src.infrastructure.app.app_container import AppContainer
+
 from src.app.tasks.base_task import BaseTask
+from src.infrastructure.app.app_container import AppContainer
 
 app = Celery("tasks", broker="redis://localhost:6379/0")
 

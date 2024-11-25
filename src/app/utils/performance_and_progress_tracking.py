@@ -1,8 +1,9 @@
 # src/utils/performance_and_progress_tracking.py
 import time
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 from contextlib import contextmanager
-from typing import Iterable, Optional
+from typing import Optional
 
 from dependency_injector.wiring import Provide, inject
 from tqdm import tqdm

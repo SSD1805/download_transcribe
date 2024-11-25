@@ -18,7 +18,7 @@ class TextHandler:
         Load a single text file for processing.
         """
         self.logger.info(f"Loading file: {file_path}")
-        with open(file_path, "r") as file:
+        with open(file_path) as file:
             content = file.read()
         self.logger.info(f"Loaded content from {file_path}.")
         self.processed_data.append(content)

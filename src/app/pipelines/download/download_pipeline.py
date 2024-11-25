@@ -1,5 +1,6 @@
 # src/app/pipelines/download/download_pipeline.py
 from dependency_injector.wiring import Provide, inject
+
 from src.infrastructure.app.app_container import AppContainer
 
 

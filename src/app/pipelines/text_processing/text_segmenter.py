@@ -1,7 +1,6 @@
 from nltk.tokenize import sent_tokenize
 
-from src.app.pipelines.text_processing.text_processor_base import \
-    TextProcessorBase
+from src.app.pipelines.text_processing.text_processor_base import TextProcessorBase
 
 
 class TextSegmenter(TextProcessorBase):
