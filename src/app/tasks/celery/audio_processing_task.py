@@ -1,21 +1,25 @@
-# src/app/tasks/celery/audio_processing_task.py
-from celery import Celery
-
-from src.app.pipelines.transcription.audio_processing_pipeline import (
-    AudioProcessingPipeline,
-)
 from src.app.tasks.base_task import BaseTask
-from src.app.tasks.observers.logger_observer import LoggerObserver
+from dependency_injector.wiring import Provide, inject
+from src.infrastructure.app.app_container import AppContainer
 
-app = Celery("tasks", broker="redis://localhost:6379/0")
 
 class AudioProcessingTask(BaseTask):
-    def process(self, input_file, output_dir):
-        pipeline = AudioProcessingPipeline(output_dir=output_dir)
-        return pipeline.run(input_file)
+    @inject
+    def __init__(
+        self,
+        pipeline=Provide[AppContainer.audio_processing_pipeline],
+        logger_observer=Provide[AppContainer.logger_observer],
+    ):
+        super().__init__()
+        self.pipeline = pipeline
+        self.add_observer(logger_observer)
+
+    def process(self, input_file: str, output_dir: str):
+        self.logger.info(f"Starting audio processing for {input_file}")
+        return self.pipeline.run(input_file, output_dir)
+
 
 @app.task
 def audio_processing_pipeline_task(input_file: str, output_dir: str):
-    task = AudioProcessingTask()
-    task.add_observer(LoggerObserver(task.logger))
+    task = Provide[AppContainer.audio_processing_task]
     return task.execute(task.process, input_file, output_dir)

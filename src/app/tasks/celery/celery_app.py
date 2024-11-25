@@ -1,36 +1,58 @@
-### celery_app.py ###
 from celery import Celery
+from dependency_injector.wiring import inject, Provide
+from src.infrastructure.app.app_container import AppContainer
+from src.infrastructure.app.configuration_registry import ConfigurationRegistry
 
-# Create Celery app instance using ConfigurationRegistry
-celery_app = Celery(
-    "youtube_audio_downloader",
-    broker=container.configuration_registry()
-    .get("celery", {})
-    .get("broker_url", "redis://localhost:6379/0"),
-    backend=container.configuration_registry()
-    .get("celery", {})
-    .get("result_backend", "django-db"),
-)
 
-# Load configuration from ConfigurationRegistry
-celery_config = container.configuration_registry().get("celery", {})
+@inject
+def create_celery_app(
+        config_registry: ConfigurationRegistry = Provide[AppContainer.configuration_registry],
+        logger=Provide[AppContainer.logger],
+) -> Celery:
+    """
+    Create and configure a Celery app instance using ConfigurationRegistry.
 
-celery_app.conf.update(
-    task_serializer=celery_config.get("task_serializer", "json"),
-    accept_content=celery_config.get("accept_content", ["json"]),
-    result_serializer=celery_config.get("result_serializer", "json"),
-    timezone=celery_config.get("timezone", "UTC"),
-    enable_utc=celery_config.get("enable_utc", True),
-    task_track_started=celery_config.get("task_track_started", True),
-    task_time_limit=celery_config.get("task_time_limit", 300),
-)
+    Args:
+        config_registry (ConfigurationRegistry): The configuration registry for app settings.
+        logger: Logger instance for observability.
 
-# Discover tasks from specific modules
-celery_app.autodiscover_tasks(
-    [
-        "src.celery.cleanup_tasks",
-        "src.celery.download_tasks",
-        "src.celery.transcription_tasks",
-        "src.celery.shared_tasks",
-    ]
-)
+    Returns:
+        Celery: Configured Celery app instance.
+    """
+    logger.info("Initializing Celery app...")
+
+    # Retrieve Celery-specific configurations from the registry
+    broker_url = config_registry.get("celery_broker_url")
+    result_backend = config_registry.get("celery_result_backend")
+    task_serializer = config_registry.get("celery_task_serializer")
+    accept_content = config_registry.get("celery_accept_content")
+    result_serializer = config_registry.get("celery_result_serializer")
+    timezone = config_registry.get("celery_timezone")
+    enable_utc = config_registry.get("celery_enable_utc")
+    task_track_started = config_registry.get("celery_task_track_started")
+    task_time_limit = config_registry.get("celery_task_time_limit")
+
+    # Initialize the Celery app
+    celery_app = Celery(
+        "transcription_pipeline",
+        broker=broker_url,
+        backend=result_backend,
+    )
+
+    # Update Celery configurations
+    celery_app.conf.update(
+        task_serializer=task_serializer,
+        accept_content=accept_content,
+        result_serializer=result_serializer,
+        timezone=timezone,
+        enable_utc=enable_utc,
+        task_track_started=task_track_started,
+        task_time_limit=task_time_limit,
+    )
+
+    logger.info("Celery app initialized and configured.")
+    return celery_app
+
+
+# Create and expose the Celery app instance
+celery_app = create_celery_app()

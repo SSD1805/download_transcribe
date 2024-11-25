@@ -1,46 +1,25 @@
-from celery import Celery
+from src.app.tasks.base_task import BaseTask
 from dependency_injector.wiring import Provide, inject
-
 from src.infrastructure.app.app_container import AppContainer
 
-from .observable_task import ObservableTask
 
-app = Celery("tasks", broker="pyamqp://guest@localhost//")
-
-
-class ObservableCeleryTask(ObservableTask):
-    def __init__(self):
+class TextProcessingTask(BaseTask):
+    @inject
+    def __init__(
+        self,
+        pipeline=Provide[AppContainer.text_processing_pipeline],
+        logger_observer=Provide[AppContainer.logger_observer],
+    ):
         super().__init__()
+        self.pipeline = pipeline
+        self.add_observer(logger_observer)
+
+    def process(self, text_file: str, output_dir: str):
+        self.logger.info(f"Processing text file: {text_file}")
+        return self.pipeline.run(text_file, output_dir)
 
 
-@app.task(bind=True)
-@inject
-def transcribe_audio(
-    self,
-    audio_file: str,
-    logger_observer=Provide[AppContainer.logger_observer],
-    *args,
-    **kwargs,
-):
-    observable_task = ObservableCeleryTask()
-
-    # Add observers
-    observable_task.add_observer(logger_observer.update)
-
-    try:
-        observable_task.notify_observers(
-            "task_started", {"task_id": self.request.id, "audio_file": audio_file}
-        )
-
-        # Task logic here - e.g., transcribe the audio_processing file
-        result = f"Transcribed content from {audio_file}"  # Placeholder for actual transcription logic
-
-        observable_task.notify_observers(
-            "task_completed", {"task_id": self.request.id, "result": result}
-        )
-        return result
-    except Exception as e:
-        observable_task.notify_observers(
-            "task_failed", {"task_id": self.request.id, "error": str(e)}
-        )
-        raise e
+@app.task
+def text_processing_pipeline_task(text_file: str, output_dir: str):
+    task = Provide[AppContainer.text_processing_task]
+    return task.execute(task.process, text_file, output_dir)

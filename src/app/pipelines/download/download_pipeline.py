@@ -36,7 +36,9 @@ class DownloadPipeline:
             else:
                 raise ValueError(f"Unknown download type: {download_type}")
 
-            self.logger.info(f"{download_type.capitalize()} download completed for URL: {url}")
+            self.logger.info(
+                f"{download_type.capitalize()} download completed for URL: {url}"
+            )
         except Exception as e:
             self.logger.error(f"Failed {download_type} download for URL: {url}: {e}")
             raise

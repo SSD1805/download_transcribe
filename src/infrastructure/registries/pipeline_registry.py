@@ -4,7 +4,7 @@ from typing import Callable, Dict, Type
 from dependency_injector.wiring import Provide, inject
 
 from src.infrastructure.app.app_container import AppContainer
-from src.pipelines.audio.audio_processor_base import AudioProcessorBase
+from src.app.pipelines.audio_processing.audio_processor_base import AudioProcessorBase
 
 
 # Define an abstract PipelineComponent class for Composite Pattern
