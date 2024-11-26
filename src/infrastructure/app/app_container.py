@@ -91,3 +91,19 @@ class AppContainer(containers.DeclarativeContainer):
 
     # Structlog Configuration (delegated to a utility function)
     structlog_configuration = providers.Resource(ApplicationLogger.configure_structlog)
+
+
+from dependency_injector import containers
+from src.infrastructure.app.audio_pipeline_container import AudioPipelineContainer
+from src.app.utils import ApplicationLogger, PerformanceTracker
+
+
+class AppContainer(containers.DeclarativeContainer):
+    logger = providers.Singleton(ApplicationLogger.get_logger)
+    tracker = providers.Singleton(PerformanceTracker)
+
+    audio_pipeline = providers.Container(
+        AudioPipelineContainer,
+        logger=logger,
+        tracker=tracker,
+    )

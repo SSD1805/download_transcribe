@@ -1,5 +1,7 @@
 from src.app.pipelines.audio_processing import AudioProcessorBase
 
+from typing import List
+
 
 class AudioSplitter(AudioProcessorBase):
     """
