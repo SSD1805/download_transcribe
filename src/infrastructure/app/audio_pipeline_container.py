@@ -1,10 +1,11 @@
 from dependency_injector import containers, providers
+
 from src.app.pipelines.audio_processing import (
     AudioConverter,
     AudioNormalizer,
+    AudioProcessingPipeline,
     AudioSplitter,
     AudioTrimmer,
-    AudioProcessingPipeline,
 )
 
 

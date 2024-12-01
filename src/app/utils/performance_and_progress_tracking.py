@@ -1,4 +1,5 @@
-# src/utils/performance_and_progress_tracking.py
+# src/app/utils/performance_and_progress_tracking.py
+
 import time
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
@@ -97,8 +98,7 @@ class ProgressBarTracker(TrackerStrategy):
             self.logger.info(f"Starting progress bar: {description}")
             # Track overall execution time
             with self.performance_tracker.track_execution(description):
-                for item in tqdm(iterable, desc=description, **kwargs):
-                    yield item
+                yield from tqdm(iterable, desc=description, **kwargs)
 
             self.logger.info(f"Progress bar '{description}' completed.")
 

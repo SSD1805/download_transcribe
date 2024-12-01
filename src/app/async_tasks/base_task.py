@@ -2,13 +2,13 @@ from abc import ABC, abstractmethod
 
 from dependency_injector.wiring import Provide, inject
 
-from src.app.tasks.observers.logger_observer import LoggerObserver
+from src.app.async_tasks.observers.logger_observer import LoggerObserver
 from src.infrastructure.app.app_container import AppContainer
 
 
 class BaseTask(ABC):
     """
-    Base class for tasks with centralized logging, performance tracking,
+    Base class for async_tasks with centralized logging, performance tracking,
     and observer integration.
     """
 

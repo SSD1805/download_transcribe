@@ -64,12 +64,9 @@ class BatchProcessor(ABC):
         total_items = len(items)
         for idx, item in enumerate(items, start=1):
             try:
-                with self._lock:  # Acquire lock
-                    with self.perf_tracker.track_execution(f"Processing Item: {item}"):
-                        self.process_item(item)
-                self.logger.info(
-                    f"Item {idx}/{total_items} processed successfully: {item}"
-                )
+                with self._lock, self.perf_tracker.track_execution(f"Processing Item: {item}"):
+                    self.process_item(item)
+                self.logger.info(f"Item {idx}/{total_items} processed successfully: {item}")
             except Exception as e:
                 self._handle_processing_exception(item, e)
 
@@ -81,9 +78,7 @@ class BatchProcessor(ABC):
             items (list): List of items to process.
         """
         total_items = len(items)
-        with ThreadPoolExecutor(
-            max_workers=min(self.batch_size, total_items)
-        ) as executor:
+        with ThreadPoolExecutor(max_workers=min(self.batch_size, total_items)) as executor:
             futures = {
                 executor.submit(self._threaded_process_item, item): item
                 for item in items
@@ -95,14 +90,13 @@ class BatchProcessor(ABC):
                 try:
                     future.result()  # Raises exception if the task failed
                     completed += 1
-                    self.logger.info(
-                        f"Item {completed}/{total_items} processed successfully: {item}"
-                    )
+                    self.logger.info(f"Item {completed}/{total_items} processed successfully: {item}")
                 except Exception as e:
                     self._handle_processing_exception(item, e)
 
             self.logger.info(
-                f"Batch processing completed: {completed}/{total_items} items processed."
+                f"Batch processing completed: "
+                f"{completed}/{total_items} items processed."
             )
 
     def _threaded_process_item(self, item):
@@ -112,9 +106,8 @@ class BatchProcessor(ABC):
         Args:
             item: Item to process.
         """
-        with self._lock:  # Ensure thread-safe processing
-            with self.perf_tracker.track_execution(f"Threaded Processing Item: {item}"):
-                self.process_item(item)
+        with self._lock, self.perf_tracker.track_execution(f"Threaded Processing Item: {item}"):
+            self.process_item(item)
 
     def _handle_processing_exception(self, item, exception):
         """

@@ -82,6 +82,9 @@ select = [
     "B",    # flake8-bugbear
     "SIM",  # flake8-simplify
     "I",    # isort
+    "F401", # unused-import
+    "F403", # undefined-local-with-import-star
+    "I001"  # unsorted-imports
 ]
 
 ignore = ["E203"]  # Ignore Black-compatible line-break-before-binary-operator rule

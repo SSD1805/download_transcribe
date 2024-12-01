@@ -1,4 +1,3 @@
-# src/app/tasks/observers/logger_observer.py
 from src.app.utils.application_logger import ApplicationLogger
 
 
@@ -10,6 +9,7 @@ class LoggerObserver:
     def __init__(self, logger=None):
         """
         Initializes the LoggerObserver with a logger instance.
+
         :param logger: The logger instance (defaults to ApplicationLogger).
         """
         self.logger = logger or ApplicationLogger.get_logger()
@@ -17,8 +17,11 @@ class LoggerObserver:
     def update(self, event: str, data: dict):
         """
         Logs task lifecycle events.
-        :param event: The type of event (e.g., 'task_started', 'task_completed', 'task_failed').
-        :param data: Associated event data (e.g., function name, result, or error details).
+
+        :param event: The type of event (e.g., 'task_started',
+                      'task_completed', 'task_failed').
+        :param data: Associated event data (e.g., function name, result,
+                     or error details).
         """
         if event == "task_started":
             self.logger.info("Task started", **data)

@@ -27,16 +27,16 @@ def load(ctx, input_dir):
 
 @cli.command(cls=BaseCommand)
 @click.option(
-    "--tasks", default="all", help="Tasks to run: tokenization, segmentation, ner."
+    "--async_tasks", default="all", help="Tasks to run: tokenization, segmentation, ner."
 )
 def process(ctx, tasks):
     """
-    Process text with the specified tasks.
+    Process text with the specified async_tasks.
     """
     text_handler = ctx.command.text_handler
     text_handler.process_tasks(tasks)
 
-    click.echo(f"Processed tasks: {tasks}.")
+    click.echo(f"Processed async_tasks: {tasks}.")
 
 
 @cli.command(cls=BaseCommand)

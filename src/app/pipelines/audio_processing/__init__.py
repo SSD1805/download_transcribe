@@ -7,13 +7,13 @@ __all__ = [
     "AudioProcessorBase",
 ]
 
-# Mapping of class names to their respective modules
+# Mapping of class names to their respective modules for lazy loading
 _module_map = {
     "AudioSplitter": "audio_splitter",
     "AudioConverter": "audio_converter",
     "AudioNormalizer": "audio_normalizer",
     "AudioTrimmer": "audio_trimmer",
-    "AudioProcessorBase": "audio_processor_base",
+    "AudioProcessorBase": "audioprocessorbase",
 }
 
 
@@ -23,6 +23,7 @@ def __getattr__(name):
         module_name = _module_map.get(name)
         if module_name:
             try:
+                # Dynamically import the module and return the attribute
                 module = __import__(f"{__name__}.{module_name}", fromlist=[name])
                 return getattr(module, name)
             except ImportError as e:

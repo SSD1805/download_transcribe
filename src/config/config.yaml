@@ -52,7 +52,7 @@ logging:
 
 # Error Handling
 error_handling:
-  retry_on_failure: true  # Retry tasks on failure
+  retry_on_failure: true  # Retry async_tasks on failure
   max_retries: 5  # Maximum retry attempts
   retry_delay: 5  # Delay between retries (seconds)
 
@@ -76,5 +76,5 @@ batch_processing:
 
 
 parallel_processing:
-  enabled: true  # Enable parallel processing of tasks
+  enabled: true  # Enable parallel processing of async_tasks
   num_workers: 4  # Number of parallel workers

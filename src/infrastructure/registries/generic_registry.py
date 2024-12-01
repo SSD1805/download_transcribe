@@ -1,20 +1,22 @@
 from abc import ABC, abstractmethod
 from threading import Lock
-from typing import Callable, Generic, Union, typeVar
+from typing import Callable, Generic, TypeVar, Union
 
 from dependency_injector.wiring import Provide, inject
 
 from src.infrastructure.app.app_container import AppContainer
 
 # Define a generic type for the registries.
-T = typeVar("T")
+T = TypeVar("T")
 
 
 class GenericRegistry(ABC, Generic[T]):
     """
-    A reusable base class for registries with type safety, basic validation, thread safety,
-    logging, and performance tracking.
-    Handles common operations like adding, retrieving, and validating items.
+    A reusable base class for registries with:
+    - Type safety
+    - Basic validation
+    - Thread safety
+    - Logging and performance tracking
     """
 
     @inject
@@ -23,7 +25,7 @@ class GenericRegistry(ABC, Generic[T]):
         logger=Provide[AppContainer.struct_logger],
         tracker=Provide[AppContainer.performance_tracker],
     ):
-        self._registry: Dict[str, Union[T, Callable[..., T]]] = {}
+        self._registry: dict[str, Union[T, Callable[..., T]]] = {}
         self._lock = Lock()
         self.logger = logger
         self.tracker = tracker
@@ -36,13 +38,12 @@ class GenericRegistry(ABC, Generic[T]):
             name (str): Unique name for the item.
             item (T or Callable[..., T]): The item or a callable to produce the item.
         """
-        with self._lock:
-            with self.tracker.track_execution("Register Item"):
-                if name in self._registry:
-                    self.logger.error(f"Item with name '{name}' is already registered.")
-                    raise ValueError(f"Item with name '{name}' is already registered.")
-                self._registry[name] = item
-                self.logger.info(f"Registered item with name: '{name}'.")
+        with self._lock, self.tracker.track_execution("Register Item"):
+            if name in self._registry:
+                self.logger.error(f"Item with name '{name}' is already registered.")
+                raise ValueError(f"Item with name '{name}' is already registered.")
+            self._registry[name] = item
+            self.logger.info(f"Registered item with name: '{name}'.")
 
     def get(self, name: str) -> Union[T, Callable[..., T]]:
         """
@@ -54,30 +55,28 @@ class GenericRegistry(ABC, Generic[T]):
         Returns:
             T or Callable[..., T]: The requested item or callable.
         """
-        with self._lock:
-            with self.tracker.track_execution("Get Item"):
-                if name not in self._registry:
-                    available = ", ".join(self._registry.keys())
-                    self.logger.error(
-                        f"Item '{name}' is not registered. Available: {available}"
-                    )
-                    raise ValueError(
-                        f"Item '{name}' is not registered. Available: {available}"
-                    )
-                self.logger.info(f"Retrieved item with name: '{name}'.")
-                return self._registry[name]
+        with self._lock, self.tracker.track_execution("Get Item"):
+            if name not in self._registry:
+                available = ", ".join(self._registry.keys())
+                self.logger.error(
+                    f"Item '{name}' is not registered. Available: {available}"
+                )
+                raise ValueError(
+                    f"Item '{name}' is not registered. Available: {available}"
+                )
+            self.logger.info(f"Retrieved item with name: '{name}'.")
+            return self._registry[name]
 
-    def list_items(self) -> Dict[str, Union[T, Callable[..., T]]]:
+    def list_items(self) -> dict[str, Union[T, Callable[..., T]]]:
         """
         List all registered items.
 
         Returns:
-            Dict[str, T or Callable[..., T]]: A dictionary of all registered items.
+            dict[str, T or Callable[..., T]]: A dictionary of all registered items.
         """
-        with self._lock:
-            with self.tracker.track_execution("List Items"):
-                self.logger.info("Listing all registered items.")
-                return self._registry
+        with self._lock, self.tracker.track_execution("List Items"):
+            self.logger.info("Listing all registered items.")
+            return self._registry
 
     @abstractmethod
     def validate_item(self, item: T) -> bool:

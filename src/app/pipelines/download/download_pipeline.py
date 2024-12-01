@@ -1,4 +1,3 @@
-# src/app/pipelines/download/download_pipeline.py
 from dependency_injector.wiring import Provide, inject
 
 from src.infrastructure.app.app_container import AppContainer
@@ -33,6 +32,8 @@ class DownloadPipeline:
                 self.download_manager.download_channel(url)
             elif download_type == "playlist":
                 self.download_manager.download_playlist(url)
+            elif download_type == "batch":
+                self.download_manager.download_batch(url)
             else:
                 raise ValueError(f"Unknown download type: {download_type}")
 

@@ -5,7 +5,7 @@ from src.infrastructure.app.app_container import AppContainer
 
 class TextHandler:
     """
-    Handles text processing tasks such as tokenization, segmentation, and NER.
+    Handles text processing async_tasks such as tokenization, segmentation, and NER.
     """
 
     @inject
@@ -25,12 +25,12 @@ class TextHandler:
 
     def process_tasks(self, tasks: str):
         """
-        Process tasks such as tokenization, segmentation, and NER.
+        Process async_tasks such as tokenization, segmentation, and NER.
 
         Args:
-            tasks (str): Comma-separated list of tasks to execute, or "all".
+            tasks (str): Comma-separated list of async_tasks to execute, or "all".
         """
-        self.logger.info(f"Processing tasks: {tasks}")
+        self.logger.info(f"Processing async_tasks: {tasks}")
         # Example task logic
         if tasks == "all":
             tasks = ["tokenization", "segmentation", "ner"]

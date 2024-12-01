@@ -12,7 +12,7 @@ class CoordinatorObserver:
     def __init__(self, logger=None, dask_client=None, celery_app=None):
         self.logger = logger or ApplicationLogger.get_logger()
         self.dask_client = dask_client or Client()
-        self.celery_app = celery_app or Celery("tasks")
+        self.celery_app = celery_app or Celery("async_tasks")
 
     def update(self, event: str, data: dict):
         if event == "task_completed":

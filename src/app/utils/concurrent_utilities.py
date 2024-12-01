@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 
 class ConcurrentTask(ABC):
     """
-    Abstract base class defining a template for concurrent tasks.
+    Abstract base class defining a template for concurrent async_tasks.
     """
 
     @abstractmethod

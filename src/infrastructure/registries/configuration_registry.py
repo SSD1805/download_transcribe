@@ -15,9 +15,9 @@ class ConfigurationRegistry:
         concurrency=Provide[AppContainer.concurrency_utilities],
     ):
         if not cls._instance:
-            with concurrency.get_lock():  # Using concurrency utility lock for singleton instantiation
+            with concurrency.get_lock():  # Using concurrency utility lock
                 if not cls._instance:
-                    cls._instance = super(ConfigurationRegistry, cls).__new__(cls)
+                    cls._instance = super().__new__(cls)
                     cls._instance._init_singleton(base_registry, concurrency)
         return cls._instance
 
@@ -26,7 +26,7 @@ class ConfigurationRegistry:
         self,
         base_registry,
         concurrency,
-        logger=Provide[AppContainer.struct_logger],
+        logger=Provide[AppContainer.application_logger],
         tracker=Provide[AppContainer.performance_tracker],
     ):
         """
@@ -36,7 +36,7 @@ class ConfigurationRegistry:
         self.logger = logger
         self.tracker = tracker
         self.concurrency = concurrency
-        self._lazy_loaded_configs: Dict[str, Union[Any, Callable[[], Any]]] = {}
+        self._lazy_loaded_configs: dict[str, Union[Any, Callable[[], Any]]] = {}
         self.logger.info("Initialized ConfigurationRegistry singleton.")
 
     def register(
@@ -47,17 +47,17 @@ class ConfigurationRegistry:
 
         Args:
             name (str): The name of the configuration.
-            config (Any or Callable[[], Any]): The configuration value or a callable that returns it.
+            config (Any or Callable[[], Any]):
+                The configuration value or a callable that returns it.
             lazy_load (bool): Whether to lazy-load the configuration.
         """
-        with self.concurrency.get_lock():  # Using concurrency utility lock for thread safety
-            with self.tracker.track_execution("Register Configuration Item"):
-                if lazy_load:
-                    self._lazy_loaded_configs[name] = config
-                    self.logger.info(f"Lazy configuration '{name}' registered.")
-                else:
-                    self.base_registry.register(name, config)
-                    self.logger.info(f"Configuration '{name}' registered immediately.")
+        with self.concurrency.get_lock(), self.tracker.track_execution("Register Configuration Item"):
+            if lazy_load:
+                self._lazy_loaded_configs[name] = config
+                self.logger.info(f"Lazy configuration '{name}' registered.")
+            else:
+                self.base_registry.register(name, config)
+                self.logger.info(f"Configuration '{name}' registered immediately.")
 
     def get(self, name: str) -> Any:
         """
@@ -70,22 +70,17 @@ class ConfigurationRegistry:
         Returns:
             Any: The configuration value.
         """
-        with self.concurrency.get_lock():  # Using concurrency utility lock for thread safety
-            with self.tracker.track_execution("Get Configuration Item"):
-                if name in self._lazy_loaded_configs:
-                    # Double-check to avoid race conditions
-                    config = self._lazy_loaded_configs.pop(name)
-                    if callable(config):
-                        config = (
-                            config()
-                        )  # Call the lazy-loaded function to get the actual config
-                    self.base_registry.register(name, config)
-                    self.logger.info(
-                        f"Lazy configuration '{name}' loaded and registered."
-                    )
-                    return config
+        with self.concurrency.get_lock(), self.tracker.track_execution("Get Configuration Item"):
+            if name in self._lazy_loaded_configs:
+                # Double-check to avoid race conditions
+                config = self._lazy_loaded_configs.pop(name)
+                if callable(config):
+                    config = config()  # Call the lazy-loaded function
+                self.base_registry.register(name, config)
+                self.logger.info(f"Lazy configuration '{name}' loaded and registered.")
+                return config
 
-                return self.base_registry.get(name)
+            return self.base_registry.get(name)
 
 
 # Example Usage

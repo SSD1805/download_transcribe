@@ -42,7 +42,7 @@ class CommandManager:
 @click.group()
 @inject
 def cli(logger=Provide[AppContainer.logger]):
-    """Unified CLI for managing various tasks."""
+    """Unified CLI for managing various async_tasks."""
     logger.info("CLI initialized.")
 
 

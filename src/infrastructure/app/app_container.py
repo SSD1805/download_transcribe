@@ -1,6 +1,22 @@
-# src/infrastructure/app/app_container.py
+# Standard Library Imports
+import logging
+
+# Third-Party Imports
 from dependency_injector import containers, providers
 
+# Application Imports
+from src.app.async_tasks.celery import AudioProcessingTask, DownloadTask
+from src.app.async_tasks.observers import CoordinatorObserver, LoggerObserver
+from src.app.cli import (
+    BatchDownloadCommand,
+    ConvertAudioCommand,
+    DownloadChannelCommand,
+    DownloadPlaylistCommand,
+    DownloadVideoCommand,
+    NormalizeAudioCommand,
+    SplitAudioCommand,
+    TrimAudioCommand,
+)
 from src.app.pipelines.audio_processing import (
     AudioConverter,
     AudioNormalizer,
@@ -15,8 +31,6 @@ from src.app.pipelines.text_processing import (
     TextTokenizer,
 )
 from src.app.pipelines.transcription import AudioTranscriber, TranscriptionPipeline
-from src.app.tasks.celery import AudioProcessingTask, DownloadTask
-from src.app.tasks.observers import CoordinatorObserver, LoggerObserver
 from src.app.utils import ApplicationLogger, PerformanceTracker
 from src.infrastructure.registries import ConfigurationRegistry
 
@@ -26,7 +40,7 @@ class AppContainer(containers.DeclarativeContainer):
     Dependency injection container for the application.
     """
 
-    # Configuration Registry (shared across all pipelines and tasks)
+    # Configuration Registry (shared across all pipelines and async_tasks)
     configuration_registry = providers.Singleton(ConfigurationRegistry)
 
     # Shared Utilities
@@ -75,35 +89,24 @@ class AppContainer(containers.DeclarativeContainer):
         coordinator_observer=coordinator_observer,
     )
 
-    # CLI Commands (if needed)
+    # CLI Commands
     audio_commands = providers.Factory(
-        NormalizeAudioCommand,
+        normalize_command=NormalizeAudioCommand,
         split_command=SplitAudioCommand,
         trim_command=TrimAudioCommand,
         convert_command=ConvertAudioCommand,
     )
     download_commands = providers.Factory(
-        DownloadVideoCommand,
+        download_command=DownloadVideoCommand,
         channel_command=DownloadChannelCommand,
         playlist_command=DownloadPlaylistCommand,
         batch_command=BatchDownloadCommand,
     )
 
-    # Structlog Configuration (delegated to a utility function)
+    # Structlog Configuration
     structlog_configuration = providers.Resource(ApplicationLogger.configure_structlog)
 
 
-from dependency_injector import containers
-from src.infrastructure.app.audio_pipeline_container import AudioPipelineContainer
-from src.app.utils import ApplicationLogger, PerformanceTracker
-
-
-class AppContainer(containers.DeclarativeContainer):
-    logger = providers.Singleton(ApplicationLogger.get_logger)
-    tracker = providers.Singleton(PerformanceTracker)
-
-    audio_pipeline = providers.Container(
-        AudioPipelineContainer,
-        logger=logger,
-        tracker=tracker,
-    )
+# Initialize Logging
+logger = logging.getLogger(__name__)
+logger.info("AppContainer initialized successfully.")
